@@ -281,6 +281,166 @@ Find the area of the events of interest by finding areas of corresponding circle
 However for practical purposes we would never be interested in probabilities like $\IP(X = 0.000000000\ldots)$ or  $\IP(X = 12.000000000\ldots)$ with infinite precision.
 1.  However we define "close to"---within 1 inch or within 0.1 inch or within 0.01 inch, etc---the dart is more likely to land close to the edge than close to the center.
 
+## Solution to @exr-distribution-intro-collector3
+
+1.  Construct a two-way table representing the *joint distribution* of $X$ and $Y$.
+1.  Sketch a plot representing the joint distribution of $X$ and $Y$.
+1.  Identify the *marginal* distribution of $X$, and sketch a plot of it.
+1.  Identify the *marginal* distribution of $Y$, and sketch a plot of it.
+1.  Compute and interpret $\text{E}(X)$.
+1.  Compute and interpret $\text{E}(Y)$.
+
+
+1.  One dimension will have possible values of $x$, the other possible values of $y$.
+The interior cells should contain the probability of each $(x, y)$ pair.
+
+    |       |      |       |      |      |       |
+    |:------|-----:|------:|-----:|-----:|------:|
+    |       |  $y$ |       |      |      |       |
+    | $x$   |    0 |     1 |    2 |    3 | Total |
+    | 1     | 2/27 |     0 |    0 | 1/27 |  3/27 |
+    | 2     | 6/27 |  6/27 | 6/27 |    0 | 18/27 |
+    | 3     |    0 |  6/27 |    0 |    0 |  6/27 |
+    | Total | 8/27 | 12/27 | 6/27 | 1/27 |     1 |
+
+1.  Make a tile plot with color or shading representing probability; see @fig-distribution-intro-collector3
+
+
+1.  The possible values of $X$ are in the leftmost column (1, 2, 3) and the probabilities are in the Total column.
+See @fig-distribution-intro-collector3-X.
+
+1.  The possible values of $Y$ are in the top row (0, 1, 2, 3) and the probabilities are in the Total row.
+See @fig-distribution-intro-collector3-Y.
+
+1.  $\E(X) = 1\times (3/27) + 2 \times (18/27) + 3 \times (6/ 27) = 2.11$.
+Over many sets of 3 boxes, we expect 2.11 distinct prizes on average.
+
+1.  $\E(Y) = 0\times (8/27) + 1\times (12/27) + 2 \times (6/27) + 3 \times (1/ 27) = 1$.
+Over many sets of 3 boxes, we expect 1 box containing prize 1 on average.
+
+
+```{r}
+#| echo: false
+#| label: fig-distribution-intro-collector3
+#| fig-cap: Joint distribution of $X$ and $Y$ in @exr-distribution-intro-collector3
+
+x = c(1, 1, 2, 2, 2, 3)
+y = c(0, 3, 0, 1, 2, 1)
+p = c(2, 1, 6, 6, 6, 6) / 27
+
+
+data.frame(x, y, p) |>
+  ggplot(aes(x = x,
+              y = y,
+              fill = p)) +
+  geom_tile(colour = "grey50") +
+  geom_text(aes(label = round(p, 3)), col = "white") +
+  scale_x_continuous(breaks = 1:3) +
+  labs(fill = "Probability") +
+  theme_classic()
+
+```
+
+
+
+```{r}
+#| echo: false
+#| label: fig-distribution-intro-collector3-X
+#| fig-cap: Marginal distribution of $X$ in @exr-distribution-intro-collector3
+
+
+ggplot(data.frame(x = 1:3, p = c(3, 18, 6)/ 27),
+       aes(x = x,
+           xend = x,
+           y = 0,
+           yend = p)) +
+  geom_segment(linewidth = 1.2, col = "skyblue") +
+  # scale_color_manual(values = c("#56B4E9", "#E69F00", "#999999")) +
+  scale_x_continuous(breaks = 0:3, limits = c(0, 3)) +
+  scale_y_continuous(expand = c(0, 0)) +
+  theme_classic() +
+  theme(legend.position = "none") +
+  labs(x = "x",
+       y = "P(X = x)")
+
+```
+
+
+```{r}
+#| echo: false
+#| label: fig-distribution-intro-collector3-Y
+#| fig-cap: Marginal distribution of $Y$ in @exr-distribution-intro-collector3
+
+
+ggplot(data.frame(x = 0:3, p = c(8, 12, 6, 1)/ 27),
+       aes(x = x,
+           xend = x,
+           y = 0,
+           yend = p)) +
+  geom_segment(linewidth = 1.2, col = "orange") +
+  # scale_color_manual(values = c("#56B4E9", "#E69F00", "#999999")) +
+  scale_x_continuous(breaks = 0:3, limits = c(0, 3)) +
+  scale_y_continuous(expand = c(0, 0)) +
+  theme_classic() +
+  theme(legend.position = "none") +
+  labs(x = "y",
+       y = "P(Y = y)")
+
+```
+
+
+ 
+## Solution to @exr-distribution-conditional-collector3
+
+1.  Each row of the table below represents a different conditional distribution of $Y$ given $X=x$. 
+For example, the row for $x=1$ represents the conditional distribution of $Y$ given $X=1$: Given $X=1$, $Y$ is 0 with probability 2/3 and 3 with probability 1/3.
+
+    |     |     |     |     |     |       |
+    |-----|----:|----:|----:|----:|------:|
+    |     | $y$ |     |     |     |       |
+    |     |   0 |   1 |   2 |   3 | Total |
+    | $x$ |     |     |     |     |       |
+    | 1   | 2/3 |   0 |   0 | 1/3 |     1 |
+    | 2   | 1/3 | 1/3 | 1/3 |   0 |     1 |
+    | 3   |   0 |   1 |   0 |   0 |     1 |
+
+
+1.  Take expected values according to each conditional distribution. 
+In general, $\text{E}(Y|X=x)$ depends on $x$, but in this case $\text{E}(Y|X=x) = 1$ for all values of $x$.; regardless of how many distinct prizez people obtain in their, the average number of prize 1s obtains is 1.
+
+    \begin{align*}
+    x & \quad \text{E}(Y|X=x)\\
+    1 & \quad 0(2/3) + 3(1/3) = 1\\
+    2 & \quad 0(1/3) + 1(1/3) + 2(1/3) = 1\\
+    3 & \quad 1(1) = 1
+    \end{align*}
+
+1.  Each column of the table below represents a different conditional distribution of $X$ given $Y=y$. 
+For example, the column for $y=1$ represents the conditional distribution of $X$ given $Y=1$: Given $Y=1$, $X$ is 1 with probability 1/4 and 2 with probability 3/4.
+
+    |       |     |     |     |     |
+    |-------|----:|----:|----:|----:|
+    |       | $y$ |     |     |     |
+    |       |   0 |   1 |   2 |   3 |
+    | $x$   |     |     |     |     |
+    | 1     | 1/4 |   0 |   0 |   1 |
+    | 2     | 3/4 | 1/2 |   1 |   0 |
+    | 3     |   0 | 1/2 |   0 |   0 |
+    | Total |   1 |   1 |   1 |   1 |
+
+
+1.  Take expected values according to each conditional distribution. 
+For example, $\text{E}(X|Y = 0) = 1.75$; among the people who never get prize 1 in their 3 boxes, the average number of distinct prizes they obtain is 1.75.
+
+    \begin{align*}
+    y & \quad \text{E}(X|Y=y)\\
+    0 & \quad 1(1/4) + 2(3/4) = 1.75\\
+    1 & \quad 2(1/2) + 3(1/2) = 2.5\\
+    2 & \quad 2(1) = 2\\
+    3 & \quad 1(1) = 1
+    \end{align*}
+
+
 
 ## Solution to @exr-ltp-multiple-choice
 
@@ -315,6 +475,246 @@ Use the law of total probability to find the probability that your prediction is
 
 
 
+## Solution to @exr-bayes-elisa
+
+1.  We don't know what you guessed, but from experience many people guess 80-100%.
+Afterall, the test is correct for most of people who carry HIV, and also correct for most people who don't carry HIV, so it seems like the test is correct most of the time.
+But this argument ignores one important piece of information that has a huge impact on the results: most people do not carry HIV.
+1.  Let $H$ denote the event that the person carries HIV (hypothesis), and let $E$ denote the event that the test is positive (evidence).
+Therefore, $H^c$ is the event that the person does not carry HIV, another hypothesis.
+We are given
+
+-   prior probability: $P(H) = 0.005$
+-   likelihood of testing positive, if the person carries HIV: $P(E|H) = 0.977$
+-   $P(E^c|H^c) = 0.926$
+-   likelihood of testing positive, if the person does not carry HIV: $P(E|H^c) = 1-P(E^c|H^c) = 1-0.926 = 0.074$
+-   We want to find the posterior probability $P(H|E)$. 
+
+1.  Assuming 1000000 Americans
+
+    |                    | Tests positive | Does not test positive |   Total |
+    |--------------------|---------------:|-----------------------:|--------:|
+    | Carries HIV        |           4885 |                    115 |    5000 |
+    | Does not carry HIV |          73630 |                 921370 |  995000 |
+    | Total              |          78515 |                 921485 | 1000000 |
+
+    Among the 78515 who test positive, 4885 carry HIV, so the probability that an American who tests positive actually carries HIV is 4885/78515 = 0.062.
+1.  See @tbl-bayes-elisa.
+1.  The result says that only 6.2% *of Americans who test positive* actually carry HIV.
+It is true that the test is correct for most Americans with HIV (4885 out of 5000) and incorrect only for a small proportion of Americans who do not carry HIV (73630 out of 995000).
+But since so few Americans carry HIV, the sheer *number* of false positives (73630) swamps the *number* of true positives (4885).
+1.  Prior to observing the test result, the prior probability that an American carries HIV is $P(H) = 0.005$. 
+The posterior probability that an American carries HIV given a positive test result is $P(H|E)=0.062$.
+$$
+  \frac{P(H|E)}{P(H)} = \frac{0.062}{0.005} =  12.44
+$$
+An American who tests positive is about 12.4 times more likely to carry HIV than an American whom the test result is not known.  
+So while 0.067 is still small in absolute terms, the posterior probability is much larger relative to the prior probability.
+1.  In this risk group
+
+-   a person is 19 times more likely to not have HIV than to have it ($0.95/0.05 = 19$).
+-   A positive test is 13.2 times *less* likely when the person does not have HIV than when they have it ($0.074/0.977 = 1/13.2$).
+-   The product of these ratios is $19(1/13.2) = 1.44$.
+
+Since posterior is proportional to the product of prior and likelihood, a person in this risk group who tests positive is 1.44 times more likely to not have HIV than to have HIV.
+
+1.  The posterior probabilities of not having HIV and having HIV are in a 1.44 to 1 ratio, the so the posterior probability of not having HIV is $1.44/(1+1.44) = 0.59$ and the posterior probability of having HIV is 0.41.
+1.  Yes, the posterior probability is influenced by the prior probability.
+Even though the prior probability of 5% is still relatively small in absolute terms, the posterior probability given a positive test is not close to 50/50.
+
+
+```{r}
+#| echo: false
+#| label: tbl-bayes-elisa
+#| tbl-cap: Bayes table for @exr-bayes-elisa
+
+
+hypothesis = c("Carries HIV", "Does not carry HIV")
+
+prior = c(0.005, 1 - 0.005)
+
+likelihood = c(0.977, 1 - 0.926) # given positive test
+
+product = prior * likelihood
+
+posterior = product / sum(product)
+
+bayes_table = data.frame(hypothesis,
+                         prior,
+                         likelihood,
+                         product,
+                         posterior) |>
+  add_row(hypothesis = "sum",
+          prior = sum(prior),
+          likelihood = NA,
+          product = sum(product),
+          posterior = sum(posterior))
+
+kable(bayes_table, digits = 4, align = 'r')
+
+```
+
+
+
+
+## Solution to @exr-bayes-best-player
+
+1.  Hypotheses are which player is best (A, B, C). 
+Evidence is that A beats B. 
+The likelihood is the probability that A beats B given each of the best players.
+
+-   If A is best, probability A beats B is 2/3.
+-   If B is best, probability A beats B is 1/3.
+-   If C is best, probability A beats B is 1/2.
+
+Compute the posterior probabilities as in the following Bayes table.
+
+```{r}
+#| echo: false
+
+best_player = c("A", "B", "C")
+
+prior = c(0.5, 0.35, 0.15)
+
+likelihood_A_beats_B = c(2 / 3, 1 / 3, 1 / 2)
+
+product = prior * likelihood_A_beats_B
+
+posterior = product / sum(product)
+
+bayes_table = data.frame(best_player,
+                         prior,
+                         likelihood_A_beats_B,
+                         product,
+                         posterior)
+
+bayes_table |>
+  adorn_totals("row") |> 
+  kbl(digits = 4) |>
+  kable_styling()
+
+posterior_first = posterior
+
+```
+
+1.  A's probability of being the best increased, which makes sense because A won the match.
+B's probability of being the best decreased considerably, which makes sense because B lost the match.
+C's probability of being the best decreased slightly, despite C not being involved in the match.
+(We have now observed some actual evidence in A's favor while we don't have any observations about C yet, and this information asymmetry results in a decrease in C's posterior probability.)
+
+
+1.  Hypotheses are which player is best (A, B, C).
+Evidence is that B beats A.
+The likelihood is the probability that B beats A given each of the best players.
+
+-   If A is best, probability B beats A is 1/3.
+-   If B is best, probability B beats A is 2/3.
+-   If C is best, probability B beats A is 1/2.
+
+```{r}
+#| echo: false
+
+best_player = c("A", "B", "C")
+
+prior = c(0.5, 0.35, 0.15)
+
+likelihood_B_beats_A = c(1 / 3, 2 / 3, 1 / 2)
+
+product = prior * likelihood_B_beats_A
+
+posterior = product / sum(product)
+
+bayes_table = data.frame(best_player,
+                         prior,
+                         likelihood_B_beats_A,
+                         product,
+                         posterior)
+
+bayes_table |>
+  adorn_totals("row") |>
+  kbl(digits = 4) |>
+  kable_styling()
+
+```
+
+1.  A's probability of being the best decreased, which makes sense because A lost the match.
+B's probability of being the best increased, which makes sense because B won the match.
+C's probability of being the best changed slightly, despite C not being involved in the match.
+
+1.  The prior is the posterior from the first part.
+Evidence is that A beats C.
+The likelihood is the probability that A beats C given each of the best players.
+
+-   If A is best, probability A beats C is 2/3.
+-   If B is best, probability A beats C is 1/2.
+-   If C is best, probability A beats C is 1/3.
+
+```{r}
+#| echo: false
+
+prior = posterior_first
+
+likelihood_A_beats_C = c(2 / 3, 1 / 2, 1/ 3)
+
+product = prior * likelihood_A_beats_C
+
+posterior = product / sum(product)
+
+bayes_table = data.frame(best_player,
+                         prior,
+                         likelihood_A_beats_C,
+                         product,
+                         posterior)
+
+bayes_table |>
+  adorn_totals("row") |>
+  kbl(digits = 4) |>
+  kable_styling()
+
+```
+
+1.  By winning both matches, A's probability of being the best has increased considerably.
+By losing their only matches, B's and C's probabilities of being the best have decreased considerably.
+
+
+
+## Solution to @exr-bayes-best-player-predict
+
+1.  You'd pick A and your subjective probability of being correct is 0.5.
+1.  Use the law of total probability, conditioning on who is the best player (A, B, C)
+\begin{align*}
+\text{P}(\text{A beats B}) & = \text{P}(\text{A beats B}|A)\text{P}(A) + \text{P}(\text{A beats B}|B)\text{P}(B) + \text{P}(\text{A beats B}|C)\text{P}(C)\\
+& = (2/3)(0.5) + (1/3)(0.35) + (1/2)(0.15) = 0.525
+\end{align*}
+1.  Given that A beats B, we would predict A to be the best player, and we would have probability 0.6349 of being correct.
+1.  Given that B beats A, we would predict B to be the best player, and we would have probability 0.4912 of being correct.
+1.  Use the law of total probability, conditioning on the result of the first match (A beats B or B beats A).
+\begin{align*}
+\text{P}(\text{correct}) & = \text{P}(\text{correct} | \text{A beats B})\text{P}(\text{A beats B}) + \text{P}(\text{correct} | \text{B beats A})  \text{P}(\text{B beats A})\\
+& = (0.6349)(0.5250) + (0.4912)(0.4750) = 0.5666
+\end{align*}
+The information gained from observing the first match increases our probability of being correct from 0.5 to 0.5666.
+
+
+### Solution to @exr-independent-geometric
+
+1.  $X$ can take values 1, 2, 3, $\ldots$. 
+Even though it is unlikely that $X$ is very large, there is no fixed upper bound. 
+Even though $X$ can take infinitely many values, $X$ is a discrete random variables because it takes *countably* many possible values.
+1.  $X= 1$ only if she makes her first attempt, so $\text{P}(X = 1) = 0.4$. If Maya does this every practice, then in about 40% of practices she will make her first three pointer on her first attempt.
+1.  $X= 2$ only if she misses her first attempt and makes her second attempt, so since the attempts are independent $\text{P}(X = 2) = (0.6)(0.4)=0.24$. 
+If Maya does this every practice, then in about 24% of practices she will make her first three pointer on her second attempt.
+1.  In order for $X$ to be 3, Maya must miss her first two attempts and make her third. 
+Since the attempts are independent $\text{P}(X=3)=(1-0.4)^2(0.4)=0.144$. 
+If Maya does this every practice, then in about 14.4% of practices she will make her first three pointer on her third attempt.
+1.  The key is to realize that Maya requires more than 3 attempts to obtain her first success if and only if the first 5 attempts are failures.
+Therefore,
+$$
+P(X > 3) = (1-0.4)^3  = 0.216
+$$
+
+
+
 ## Solution to @exr-branching-extinction
 
 
@@ -343,7 +743,169 @@ Solving gives two solutions, 1 and $1/s - 1$.
 However, if $s<1/2$ then $1/s - 1 > 1$, which is not a valid probability. Therefore the probability of eventual extinction is 1 if $s \le 1/2$, and $1/s - 1<1$ if $s > 1/2$.
 
 
+## Solution to @exr-best-of-five
 
+1.  It is helpful to construct a two-way table to answer the following questions.
+
+    |                |                          |                                   |                                               |       |
+    |:-------------|-------------:|-------------:|---------------:|-------------:|
+    |                |                      *x* |                                   |                                               |       |
+    |                |                        3 |                                 4 |                                             5 | Total |
+    | A wins         | 0.55<sup>3</sup> = 0.166 | 3(0.55<sup>3</sup>)(0.45) = 0.225 | 6(0.55<sup>3</sup>)(0.45)<sup>2</sup> = 0.202 | 0.593 |
+    | A does not win | 0.45<sup>3</sup> = 0.091 | 3(0.45<sup>3</sup>)(0.55) = 0.150 | 6(0.45<sup>3</sup>)(0.55)<sup>2</sup> = 0.165 | 0.407 |
+    | Total          |                    0.258 |                             0.375 |                                         0.368 |     1 |
+
+    There is only one outcome for which A wins in 3 games: AAA.
+    There are three outcomes in which A wins in 4 games: AABA, ABAA, BAAA.
+    (Not AAAB because then the series would be over in 3 games.) Since the games are independent, an outcome like AABA has probability $(0.55^3)(0.45)$, so the probability that A wins in 4 games is $3(0.55^3)(0.45)$.
+    There are six outcomes in which A wins in 5 games: AABBA, ABABA, BAABA, ABBAA, BABAA, BBAAA.
+    (Not outcomes like AAABB or AABAB because then the series would be over in 3 or 4 games.) Since the games are independent, an outcome like AABBA has probability $(0.55^3)(0.45)^2$, so the probability that A wins in 5 games is $6(0.55^3)(0.45)$.
+    You can fill in the rest of the table similarly.
+
+    The probability that team A wins the series in 3 games is $\text{P}(X=3, A) = 0.55^3=0.166$.
+
+1.  Either the stronger team wins 3 in a row or loses 3 in a row.
+    The probability is $0.55^3+(1-0.55)^3=0.2575$.
+
+1.  The probability that team A wins the series is the sum of first row: $\text{P}(A) = 0.593$.
+
+1.  No. $\text{P}(X=3, A) = 0.55^3=0.166 \neq 0.152 = (0.2575)(0.593) = \text{P}(X=3)\text{P}(A)$.
+    Alternatively, $\text{P}(X = 3 | A) = 0.166/0.593 = 0.2799 \neq 0.2575 = \text{P}(X = 3)$.
+    Given that $A$ wins the series the series it more likely to end in 3 games than when B wins the series.
+
+1.  Total row above.
+    $X$ can take values 3, 4, or 5.
+    Consider first the ways in which the stronger team wins in 4 games: AABA, ABAA, BAAA.
+    (For example AABA, means the stronger team wins game 1, 2, and 4, and the weaker team wins game 3).
+    Each of these outcomes has probability $0.55^3(0.45)$ so the probability that team A wins in 4 games in $3(0.55)^3(0.45)$.
+    Similarly, the probability that team B wins in 4 games is $3(0.45)^3(0.55)$.
+    So
+    $$
+    \text{P}(X = 4) = 3(0.55)^3(0.45) + 3(0.45)^3(0.55) = 0.3750
+    $$
+    You could find $\text{P}(X=5)$ in a similar way, or just use the fact that the probabilities have to add up to 1.
+    The distribution of $X$ is given by the following table.
+    \begin{align*}
+     x & \qquad & & \qquad \text{P}(X = x)\\
+     3 & \qquad & & \qquad 0.2575\\
+     4 & \qquad & & \qquad 0.3750\\
+     5 & \qquad & & \qquad 0.3675\\
+    \end{align*}
+
+
+
+## Solution to @exr-bayes-best-player-iterate
+
+1.  The prior is the posterior from the first part.
+Evidence is that A beats C.
+The likelihood is the probability that A beats C given each of the best players.
+
+-   If A is best, probability A beats C is 2/3.
+-   If B is best, probability A beats C is 1/2.
+-   If C is best, probability A beats C is 1/3.
+
+```{r}
+#| echo: false
+
+prior = posterior_first
+
+likelihood_A_beats_C = c(2 / 3, 1 / 2, 1/ 3)
+
+product = prior * likelihood_A_beats_C
+
+posterior = product / sum(product)
+
+bayes_table = data.frame(best_player,
+                         prior,
+                         likelihood_A_beats_C,
+                         product,
+                         posterior)
+
+bayes_table |>
+  adorn_totals("row") |>
+  kbl(digits = 4) |>
+  kable_styling()
+
+```
+
+
+By winning both matches, A’s probability of being the best has increased considerably.
+By losing their only matches, B’s and C’s probabilities of being the best have decreased considerably.
+
+1.  The prior is the posterior from the previous part.
+Evidence is that B beats C.
+The likelihood is the probability that B beats C given each of the best players.
+
+-   If A is best, probability B beats C is 1/2.
+-   If B is best, probability B beats C is 2/3.
+-   If C is best, probability B beats C is 1/3.
+
+```{r}
+#| echo: false
+
+prior = posterior
+
+likelihood_B_beats_C = c(1 / 2, 2 / 3, 1/ 3)
+
+product = prior * likelihood_B_beats_C
+
+posterior = product / sum(product)
+
+bayes_table = data.frame(best_player,
+                         prior,
+                         likelihood_B_beats_C,
+                         product,
+                         posterior)
+
+bayes_table |>
+  adorn_totals("row") |>
+  kbl(digits = 4) |>
+  kable_styling()
+
+```
+
+
+By winning both matches, A’s probability of being the best has increased considerably.
+By losing one match and winning one, B’s probability of being the best decreased somewhat.
+By losing both matches, C’s probability of being the best has decreased considerably.
+
+1.  The prior is the original prior.
+Evidence is that A beats B and A beats C and B beats C in three conditionally independent matches.
+The likelihood is the probability of these match results given each of the best players.
+
+-   If A is best, likelihood is (2/3)(2/3)(1/2).
+-   If B is best, likelihood is (1/3)(1/2)(2/3).
+-   If C is best, likelihood is (1/2)(1/3)(1/3)
+
+```{r}
+#| echo: false
+
+
+prior = c(0.5, 0.35, 0.15)
+
+likelihood = likelihood_A_beats_B *
+  likelihood_A_beats_C *
+  likelihood_B_beats_C
+
+product = prior * likelihood
+
+posterior = product / sum(product)
+
+bayes_table = data.frame(best_player,
+                         prior,
+                         likelihood,
+                         product,
+                         posterior)
+
+bayes_table |>
+  adorn_totals("row") |>
+  kbl(digits = 4) |>
+  kable_styling()
+
+```
+
+The posterior is the same.
+It doesn't matter if the posterior is updated after each match, or at once after all three matches.
 
 
 

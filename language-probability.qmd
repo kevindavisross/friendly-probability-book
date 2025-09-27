@@ -4181,16 +4181,35 @@ Explain.
 
 
 
+::: {#exr-distribution-intro-collector3}
 
+Continuing @exr-rv-collector3.
+
+The latest series of collectible Lego Minifigures contains 3 different Minifigure prizes (labeled 1, 2, 3).
+Each package contains a single unknown prize.
+Suppose we only buy 3 packages and we consider as our sample space outcome the results of just these 3 packages (prize in package 1, prize in package 2, prize in package 3).
+For example, 323 (or (3, 2, 3)) represents prize 3 in the first package, prize 2 in the second package, prize 3 in the third package.
+Let $X$ be the number of distinct prizes obtained in these 3 packages.
+Let $Y$ be the number of these 3 packages that contain prize 1.
+Suppose that each package is equally likely to contain any of the 3 prizes, regardless of the contents of other packages.
+There are 27 possible, equally likely outcomes
+
+
+1.  Construct a two-way table representing the *joint distribution* of $X$ and $Y$.
+1.  Sketch a plot representing the joint distribution of $X$ and $Y$.
+1.  Identify the *marginal* distribution of $X$, and sketch a plot of it.
+1.  Identify the *marginal* distribution of $Y$, and sketch a plot of it.
+1.  Compute and interpret $\text{E}(X)$.
+1.  Compute and interpret $\text{E}(Y)$.
+
+:::
 
 ## Conditioning {#sec-cond}
 
-
-
-
+All probabilities are conditional on some information.
 Conditioning concerns how probabilities of events or distributions of random variables are influenced by information about the occurrence of events or the values of random variables.
 We discussed some ideas related to conditioning in @sec-literacy-conditioning.
-Now we will explore conditioning in more detail, introducing some of the notation and math.
+This section---really a chapter within a chapter---explores conditioning in more detail, introducing some of the notation and math.
 
 
 ### Conditional probability
@@ -5340,6 +5359,72 @@ bayes_table |>
   kable_styling()
 ```
 
+:::: {.callout-note appearance="simple"}
+::: {#exm-bayes-gorilla}
+True story: On a camping trip in Vermont, my wife and I were driving when a very large, hairy, black animal ran across the road in front of us and into the woods on the other side. It happened very quickly, and at first I said "It's a gorilla!" But then after some thought, and much derision from my wife, I said "it was probably a bear."
+
+I think this story provides an anecdote about Bayesian reasoning, albeit bad reasoning at first but then good.
+Put the story in a Bayesian context by identifying hypotheses, prior, evidence, and likelihood.
+What was the mistake I made initially?
+:::
+::::
+
+
+:::: {.callout-tip collapse=true}
+::: {#sol-bayes-gorilla}
+
+"Type of animal running across the road in Vermont" is playing the role of the hypothesis.
+It could be a gorilla or a bear, but it could also be a cow, deer, dog, rabbit, squirrel, etc.
+
+That the animal is "very large, hairy, black, and running" is the evidence.
+
+The likelihood is the probability of being "very large, hairy, black, and running" given each of the animals.
+
+-   The likelihood of a gorilla being "very large, hairy, black, and running" is relatively high; a high percentage of gorillas are "very large, hairy, and black" and they can run.
+-   The likelihood of a bear being "very large, hairy, black, and running" is also relatively high; a high percentage of bears are "very large, hairy, and black" and they can also run.
+-   The likelihood of a dog being "very large, hairy, black, and running" is more middling; some dogs are "very large, hairy, and black" but many aren't.
+-   The likelihood of a squirrel being "very large, hairy, black, and running" is basically 0; thankfully, squirrels are not very large.
+-   The likelihood of a deer being "very large, hairy, black, and running" is also very small, because most deer are not black.
+
+We have identified hypotheses, evidence, and likelihood.
+Did you notice the important element that we skipped?
+The mistake I made initially was to neglect the base rates and not consider my prior probabilities.
+For a moment, let's say the likelihood is 1 for both gorilla and bear and 0 for all other animals[^bayes-gorilla-cow].
+Then based solely on these likelihoods, the posterior probability would be 50/50 for gorilla and bear, which maybe is why I guessed gorilla.
+
+[^bayes-gorilla-cow]: Wouldn't it also be a mistake to not consider other animals like cow? Yes, but that's also a mistake about prior probabilities. If you forget to include an animal like cow then you're assigning it a prior probability of 0, so its posterior probability will automatically be 0 regardless of the likelihood.
+
+After my initial reaction, I paused to think about my prior probabilities for the animal crossing the road, which considering I was in Vermont should assign much higher probability to a bear than a gorilla.
+My prior probabilities should also have given even higher probability to animals such as deer and squirrels; maybe even cows and dogs would have a higher probability than a bear.
+
+By combining prior and likelihood in the appropriate way, the posterior probability is
+
+-   very high for a bear, due to high likelihood and not-too-small prior
+-   close to 0 for a gorilla, due to the essentially 0 prior (even though the likelihood is basically 1)
+-   very low for a squirrel or deer because of the essentially 0 likelihood, even if the prior is large.
+
+After considering both prior and likelihood, the posterior probability is essentially 0 for a gorilla and relatively high for a bear, so it was good that I revised my conclusion from gorilla to bear[^bayes-gorilla-cow2].
+
+
+
+
+[^bayes-gorilla-cow2]: You still might be thinking: what about cows? Or dogs? Or moose? Or horses?
+Cows would have a high prior probability, and they are often very large, hair, and black.
+So it depends on how likely it is for a cow to be running.
+Depending on the prior probabilities and likelihoods, a cow---or dog or moose or horse---might end up with an even higher posterior probability than a bear.
+In any case, the point is that a gorilla should have a posterior probability of basically 0.
+"Tt's a gorilla" was not a great initial proclamation, but maybe "it's probably just a cow (or dog/moose/horse)" would have been a fine conclusion.
+
+:::
+::::
+
+::: {.callout-warning appearance="default"}
+Posterior probabilities can be highly influenced by the original prior probabilities (a.k.a., base rates).
+@exm-bayes-gorilla illustrates that ignoring prior probabilities can lead to wildly inaccurate conclusions.
+Don't neglect the prior probabilities when evaluating posterior probabilities!
+
+:::
+
 
 Like the scientific method, applying Bayes rule is often an iterative process.
 
@@ -5348,6 +5433,7 @@ Like the scientific method, applying Bayes rule is often an iterative process.
 Suppose that you are presented with six boxes, labeled 0, 1, 2, $\ldots$, 5, each containing five marbles.
 Box 0 contains 0 green and 5 gold marbles, box 1 contains 1 green and 4 gold, and so on with box $i$ containing $i$ green and $5-i$ gold.
 One of the boxes is chosen uniformly at random (perhaps by rolling a fair six-sided die), and then you will randomly select marbles from that box, without replacement.
+Imagine the boxes appear identical and you can't see inside; all you observe is the color of the marbles you select.
 Based on the colors of the marbles selected, you will update the probabilities of which box had been chosen.
 
 
@@ -5555,8 +5641,90 @@ Posterior probabilities can be sequentially updated as new data becomes availabl
 The final posterior probabilities only depend upon the cumulative data.  It doesn't matter if we sequentially update the posterior after each new piece of data or only once after all the data is available; the final posterior probabilities will be the same either way.
 Also, the final posterior probabilities are not impacted by the order in which the data are observed.
 
+:::: {.callout-note appearance="simple"}
+::: {#exm-bayes-marbles-predict}
+Continuing @exm-bayes-marbles.
+Imagine we haven't selected the box or any marbles yet.
 
 
+
+1.  If one of the boxes is selected uniformly at random and a marble is selected at random from the box, what is the probability that the first marble we select from the box is green?
+Hint: the answer is a single number.
+1.  We select a box, select a marble, and observe that it is green.
+what is the probability that the next marble we select from the box will be green?
+Hint: use the result of part 1 of @exm-bayes-marbles.
+1.  We select a box, select two marbles, and observe that they are both green.
+what is the probability that the next marble we select from the box will be green?
+
+
+:::
+::::
+
+:::: {.callout-tip collapse=true}
+::: {#sol-bayes-marbles-predict}
+
+1.  The *conditional* probability that the selected marble is green depends on which box is selected: 0, 1/5, 2/5, 3/5, 4/5, 1 for boxes 0, 1, 2, 3, 4, 5, respectively.
+To compute the *unconditional* probability that the selected marble we using, we use the law of total probability, conditioning on the different boxes.
+Since prior to observing any marbles the boxes are equally likely, the probability of selecting a green marble is just the average of the six conditional probabilities.
+$$
+(0)(1/6) + (1/5)(1/6) + (2/5)(1/6) + (3/5)(1/6) + (4/5)(1/6) + (1)(1/6) = 0.5
+$$ 
+The probability that the selected marble is green is 0.5.
+1.  This is similar to the previous part.
+But now the probability of each box being the one selected has changed based on observing a green marble from the box.
+We use the law of total probability, but now the weights are the posterior probabilities given a green marble which we computed in part 1 of  @exm-bayes-marbles.
+$$
+(0)(0) + (1/5)(1/15) + (2/5)(2/15) + (3/5)(3/15) + (4/5)(4/15) + (1)(5/15) = 0.7333
+$$ 
+The probability that the next marble selected is green is given that the first marble selected is green is 0.7333.
+1.  Again we will use the law of total probability, but now we need to find the posterior probability for each box given that the first two marbles are green.
+We didn't do this in @exm-bayes-marbles, but it's similar to how we computed the posterior probabilities after one green and one gold marble; see @tbl-bayes-marbles-5.
+Using the posterior probabilities for the boxes given the two marbles selected are green from @tbl-bayes-marbles-5, the law of total probability calculation is now
+$$
+(0)(0) + (1/5)(0) + (2/5)(0.05) + (3/5)(0.15) + (4/5)(0.3) + (1)(0.5) = 0.85
+$$ 
+The probability that the next marble selected is green is given that the first two marbles selected are green is 0.85.
+As we draw more green marbles, our posterior probability that the box had a lot of green marbles to begin with increases, which increases the probability that the next marble selected will be green.
+:::
+::::
+
+```{r}
+#| label: tbl-bayes-marbles-5
+#| tbl-cap: Bayes table given two green marbles in @exm-bayes-marbles. The likelihood is the probability of selecting two green marbles given each of the boxes.
+#| echo: false
+
+Green = 0:5
+
+prior = rep(1 / 6, 6)
+
+likelihood = choose(Green, 2)  / choose(5, 2)
+
+product = prior * likelihood
+
+posterior = product / sum(product)
+
+bayes_table = data.frame(Green = as.character(Green),
+                         prior,
+                         likelihood,
+                         product,
+                         posterior) %>%
+  add_row(Green = "sum",
+          prior = sum(prior),
+          likelihood = NA,
+          product = sum(product),
+          posterior = sum(posterior))
+
+kbl(bayes_table, digits = 4, align = 'r') %>%
+  kable_styling()
+
+
+
+```
+
+
+The probabilities we computed in @sol-bayes-marbles-predict are examples of "predictive probabilities"; the value is part 1 is a *prior predictive probability* and the values in parts 2 and 3 are *posterior predictive probabilities*.
+Recall that prior or posterior probabilities assess the uncertainty of the different hypotheses or cases either before (prior) or after (posterior) observing some data.
+On the other hand, prior or posterior *predictive* probabilities assess the probability of *potential data*---while also accounting for the uncertainty of the hypotheses or cases---either before (prior predictive) or after (posterior predictive) observing some data.
 
 
 
@@ -5946,7 +6114,7 @@ Randomly select a question from this test. What is the probability that you answ
 1.  For any given question on the exam, your probability of answering it correctly is either 1, 0.5, or 0.25, depending on if you know it, can eliminate two choices, or are just guessing.
 How does your probability of correcting answering a randomly selected question relate to these three values?
 Which value --- 1, 0.5, or 0.25 ---is the overall probability closest to, and why?
-1.  
+
 
 ::: 
 
@@ -5966,7 +6134,121 @@ Compute the probability of correctly predicting any single item in the sequence 
 
 :::
 
+::: {#exr-bayes-elisa}
 
+The ELISA test for HIV was widely used in the mid-1990s for screening blood donations. 
+As with most medical diagnostic tests, the ELISA test is not perfect. 
+If a person actually carries the HIV virus, experts estimate that this test gives a positive result 97.7% of the time. 
+(This number is called the *sensitivity* of the test.) 
+If a person does not carry the HIV virus, ELISA gives a negative (correct) result 92.6% of the time (the *specificity* of the test). 
+Estimates at the time were that 0.5% of the American public carried the HIV virus.
+
+Suppose that a randomly selected American tests positive; we are interested in the conditional probability that the person actually carries the virus.
+
+ 
+
+1.  Before proceeding, make a guess for the probability in question.
+1.  Denote the probabilities provided in the setup using proper notation
+1.  Construct an appropriate two-way table and use it to compute the probability of interest.
+1.  Construct a Bayes table and use it to compute the probability of interest.
+1.  Explain why this probability is small, compared to the sensitivity and specificity.
+1.  By what factor has the probability of carrying HIV increased, given a positive test result, as compared to before the test?
+1.   Now suppose that 5% of individuals in a high-risk group carry the HIV virus.
+Consider a randomly selectd person from this group who takes the test. 
+Given that the test is positive, how many times more likely is it for the person not to have HIV than to have it?
+Answer without first computing a two-way or Bayes table.
+1.  Using the result from the previous part, compute the conditional probability that a person in this risk group who tests positive has HIV.
+1.  Is the posterior probability influenced by the prior probability?
+Discuss.
+:::
+
+
+
+
+
+::: {#exr-bayes-best-player}
+
+Consider three tennis players A, B, and C[^bayes-best-player-names].
+One of these players is better than the other two, who are equally good/bad.
+When the best player plays either of the others, she has a 2/3 probability of winning the match.
+When the other two players play each other, each has a 1/2 probability of winning the match.
+But you do not know which player is the best.
+Based on watching the players warm up, you start with subjective probabilities of 0.5 that A is the best, 0.35 that B is the best, and 0.15 that C is the best.
+(Note: the fact that these are subjective probabilities doesn't change at all how you would solve the problems.)
+A and B will play the first match.
+
+1.  Suppose that A beats B in the first match.
+Compute your posterior probability that each of A, B, C is best given that A beats B in the first match.
+1.  Compare the posterior probabilities from the previous part to the prior probabilities.
+Explain how your probabilities changed, and why that makes sense.
+1.  Suppose instead that B beats A in the first match.
+Compute your posterior probability that each of A, B, C is best given that B beats A in the first match.
+1.  Compare the posterior probabilities from the previous part to the prior probabilities.
+Explain how your probabilities changed, and why that makes sense.
+1.  Now suppose again that A beats B in the first match, and also that A beats C in the second match.
+1.  Compute your posterior probability that each of A, B, C is best given the results of the first two matches.
+(Hint: use as the prior your posterior probabilities from the previous part.)
+Explain how your probabilities changed, and why that makes sense.
+
+:::
+
+[^bayes-best-player-names]: Please replace A, B, and C with your favorite names. Possible choices: Ahsoka, Boba, Cassian. Ant-Man, Black Panther, Captain America. Arthur Ashe, Bjorn Borg, Chris Evert. 
+
+
+::: {#exr-bayes-best-player-predict}
+
+Continuing @exr-bayes-best-player.
+Suppose A will play B in the first match.
+
+1.  Before any matches, if you had to choose the one player you think is best, who would you choose?
+What is your subjective probability that your choice is correct?
+(This should be a short answer, not requiring any calculations.
+The main reason to think about this is to compare to the last part.)
+1.  Compute your subjective probability that A will beat B in the first match.
+1.  If A beats B in the first match, you will update your subjective probabilities so they are: 0.6349 that A is the best, 0.2222 that B is the best, and 0.1429 that C is the best.
+(See @exr-bayes-best-player.)
+Suppose that A beats B in the first match.
+If you had to choose the one player you think is best based on your updated subjective probabilities, who would you choose?
+What is your subjective probability that your choice is correct given that A beats B in the first match?
+1.  If B beats A in the first match, you will update your subjective probabilities so they are: 0.3509 that A is the best, 0.4912 that B is the best, and 0.1579 that C is the best.
+(See @exr-bayes-best-player.)
+Suppose that B beats A in the first match.
+If you had to choose the one player you think is best based on your updated subjective probabilities, who would you choose? 
+What is your subjective probability that your choice is correct given that B beats A in the first match?
+1.  After the first match you make your choice of who you think is the best player. 
+Compute your subjective probability that your choice is correct.
+(Hint: this should be a single number, but you need to consider the two cases.)
+Compare to the first part; what is the "value" of observing the winner of the first match?
+
+
+
+:::
+
+
+
+
+
+::: {#exr-distribution-conditional-collector3}
+
+Continuing @exr-distribution-intro-collector3.
+
+The latest series of collectible Lego Minifigures contains 3 different Minifigure prizes (labeled 1, 2, 3).
+Each package contains a single unknown prize.
+Suppose we only buy 3 packages and we consider as our sample space outcome the results of just these 3 packages (prize in package 1, prize in package 2, prize in package 3).
+For example, 323 (or (3, 2, 3)) represents prize 3 in the first package, prize 2 in the second package, prize 3 in the third package.
+Let $X$ be the number of distinct prizes obtained in these 3 packages.
+Let $Y$ be the number of these 3 packages that contain prize 1.
+Suppose that each package is equally likely to contain any of the 3 prizes, regardless of the contents of other packages.
+There are 27 possible, equally likely outcomes
+
+
+1.  Find the conditional distribution of $Y$ given $X=x$ for each possible value of $x$ of $X$.
+1.  Compute and interpret $\text{E}(Y|X=x)$ for each possible value of $x$ of $X$.
+1.  Find the conditional distribution of $X$ given $Y=y$ for each possible value of $y$ of $Y$.
+1.  Compute and interpret $\text{E}(X|Y=y)$ for each possible value of $y$ of $Y$.
+
+
+:::
 
 
 ## Independence {#sec-independence}
@@ -6427,7 +6709,7 @@ In problems with complicated relationships, determining joint and conditional pr
 
 But when events are independent, the multiplication rule simplifies greatly.
 $$
-\IP(A_1 \cap A_2 \cap A_3 \cap \cdots) = \IP(A_1)\IP(A_2)\IP(A_3)\cdots \quad \text{if $A_1, A_2, A_3, \ldots are independent}
+\IP(A_1 \cap A_2 \cap A_3 \cap \cdots) = \IP(A_1)\IP(A_2)\IP(A_3)\cdots \quad \text{if $A_1, A_2, A_3, \ldots$ are independent}
 $$
 
 When a problem involves independence, you will want to take advantage of it.
@@ -6540,6 +6822,24 @@ The moral: there are better things to do with $12,000 dollars.
 
 ### Exercises
 
+
+::: {#exr-independent-geometric}
+
+Maya is a basketball player who makes 40% of her three point field goal attempts.
+Suppose that at the end of every practice session, she attempts three pointers until she makes one and then stops.
+Let $X$ be the total number of shots she attempts in a practice session.
+Assume shot attempts are independent, each with probability of 0.4 of being successful.
+
+1.  What are the possible values that $X$ can take? Is $X$ discrete or continuous?
+1.  Compute and interpret $\text{P}(X=1)$.
+1.  Compute and interpret $\text{P}(X=2)$.
+1.  Compute and interpret $\text{P}(X=3)$.
+1.  Compute $\text{P}(X>3)$ without summing the values from the previous parts.
+Hint: what needs to be true about the first 3 attempts for $X > 3$?
+
+:::
+
+
 ::: {#exr-branching-extinction}
 A very large petri dish starts with a single microorganism.
 After one minute, the microorganism either splits into two with probability $s$, or dies.
@@ -6549,6 +6849,53 @@ All subsequent microorganisms behave in the same way --- splitting into two or d
 (Hint: condition on the first step.)
 1.  Compute the probability that the population eventually goes extinct as a function of $s$. 
 For what values of $s$ is the extinction probability 1?
+
+:::
+
+
+::: {#exr-best-of-five}
+
+Consider a "best-of-5" series of games between two teams: games are played until one of the teams has won 3 games (requiring at most 5 games total).
+Suppose one team, team A, is better than the other, having a 0.55 probability of winning any particular game.
+Assume the results of the games are independent (and ignore advantage, etc).
+Let $X$ represent the number of games played in the series.
+Hint: It's helpful to first construct a two-way table of probabilities with the number of games played and which team wins, and then use it to answer the following questions.
+It will also help to list some outcomes, like AABA (team A wins game 1, 2, and 4, and B wins game 3).
+
+1.  Compute the probability that team A wins the series in 3 games.
+1.  Compute the probability that the series ends in 3 games.
+1.  Compute the probability that team A wins the series.
+1.  Are the events "team A wins the series" and "the series ends in 3 games" independent?
+Explain by comparing relevant probabilities.
+1.  Let $X$ represent the number of games played in the series.
+Find the distribution of $X$.
+
+
+
+::: {#exr-bayes-best-player-iterate}
+
+Continuing @exr-bayes-best-player.
+Now we'll consider multiple matches.
+Assume that the results of matches are conditionally independent given the best player.
+
+
+1.  Suppose that A beats B in the first match, and also that A beats C in the second match.
+Construct a Bayes table to compute your posterior probability that each of A, B, C is best given the results of the first two matches.
+Use as the prior your posterior probabilities from part 1 of @exr-bayes-best-player.
+Explain how your probabilities changed, and why that makes sense.
+1.  Now suppose that after A beats B in the first match and A beats C in the second match, then B beats C in the third match. 
+Construct a Bayes table to compute your posterior probability that each of A, B, C is best given the results of the first three matches.
+Use as the prior your posterior probabilities from the previous part.
+Explain how your probabilities changed, and why that makes sense.
+1.  In the previous parts we updated posterior probabilities after each match.
+What if we waited until the results of all three matches?
+Construct a Bayes table to find your posterior probability that each of A, B, C is best given the results of the first three matches (A beats B, A beats C, B beats C).
+Use your original prior probabilities from @exr-bayes-best-player (0.5 for A, 0.35 for B, 0.15 for C).
+The likelihood should now reflect the results of the three matches.
+
+
+
+
 
 :::
 
