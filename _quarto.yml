@@ -1,26 +1,85 @@
 project:
   type: book
   output-dir: docs
+  resources:
+    - "*_files/**"            # <-- copy chapter figure dirs into _book/
 
 book:
-  title: "friendly-probability-book"
-  author: "Norah Jones"
-  date: "9/26/2025"
+  title: "A Friendly Introduction to Probability"
+  subtitle: "A Simulation-based Approach with Python"
+  author: "Kevin Ross"
+  date: today
+  date-format: "MMM D, YYYY"
+  search: true
   chapters:
     - index.qmd
-    - intro.qmd
-    - summary.qmd
+    # - about-the-author.qmd
+    - literacy-probability.qmd
+    - language-probability.qmd
+    # should anything from math-probability go in language-probability or separate chapter here?
+    # specifically, where should Bayes rule go?
+    # - language-simulation.qmd
+    # - simulation-marginal-discrete.qmd
+    # - simulation-marginal-continuous.qmd
+    # chapter on simulation of multiple RVs (joint, conditional, transformations, sums)
+    # - maybe two chapters (one joint, one transformations)
+    # chapter on simulation expected value? Or is everything already in earlier chapters? Maybe it's like "a closer look at averages"?
+    # simulation random processes: random walk, PP, Markov chain, BM???
+    # chapter on case studies/interesting problems here?
+    # should statistics chapter go here?
+    # - simulation-marginal.qmd REVISED
+    # - simulation-joint.qmd
+    # - simulation-distributions.qmd REVISED
+    # - simulation-expected-values.qmd REVISED
+    # - math-probability-rules.qmd
+    # - math-distributions.qmd
+    # - math-common-discrete.qmd
+    # - math-common-continuous.qmd
+    # - statistics.qmd
+    - language-probability-exercises.qmd
+    - appendix.qmd
     - references.qmd
+
 
 bibliography: references.bib
 
+execute:
+  dir: project              # <-- consistent working dir for all chapters
+  freeze: false             # (turn back on later if you use it)
+  # cache: false              # (turn back on later if you use it)
+
 format:
   html:
-    theme:
-      - cosmo
-      - brand
+    theme: cosmo
+    embed-resources: true
+    callout-appearance: default
+    callout-icon: false
   pdf:
+    callout-appearance: default
+    callout-icon: false
     documentclass: scrreprt
+    fig-format: png         # or: png
+    keep-tex: true
 
+language:
+  callout-note-title: "Example"
+  callout-tip-title: "Solution (click to expand)"
 
+  # pdf:
+  #   fig-format: png
+  #   dpi: 300
+  #   documentclass: krantz
+  #   include-in-header: 
+  #     - "_macros.tex"
+  #   include-after-body: 
+  #     text: |
+  #       \printindex
+  #   pdf-engine: pdflatex
+  #   toc: true
+  #   keep-tex: true
+  #   lof: true
+  #   lot: true
+  #   fontsize: 12pt
+  #   hyperrefoptions:
+  #     - linktoc=none
 

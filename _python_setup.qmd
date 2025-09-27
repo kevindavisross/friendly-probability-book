@@ -1,0 +1,27 @@
+```{r}
+#| echo: false
+
+library(reticulate)
+# use_condaenv("Anaconda3")
+```
+
+```{python}
+#| echo: false
+
+import numpy as np
+
+import pandas as pd
+
+from matplotlib import pyplot as plt
+```
+
+```{python}
+#| echo: false
+
+from symbulate import *
+
+from tabulate import tabulate
+```
+
+
+

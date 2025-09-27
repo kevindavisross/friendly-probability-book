@@ -1,0 +1,350 @@
+# Chapter 2 Exercise Solutions
+
+{{< include _r_setup.qmd >}}
+
+{{< include _python_setup.qmd >}}
+
+::: {.content-hidden}
+$$
+{{< include _macros.tex >}}
+$$
+:::
+
+
+## Solution to @exr-collector4-outcome
+
+
+1.  There are 3 possible prizes in each of 3 boxes, so there are $3^3 = 27$ possible outcomes.
+1.  See @tbl-collector3 (ignore $X$ and $Y$ columns for now); there are 27 rows, each row for a different possible outcome.
+
+```{r}
+#| label: tbl-collector3
+#| tbl-cap: "Sample space for @exr-collector4-outcome"
+#| echo: false
+#| warning: false
+
+k = 3
+
+outcomes = expand.grid(1:k, 1:k, 1:k)
+
+
+n_outcomes = nrow(outcomes)
+
+X = rep(NA, n_outcomes)
+Y = rep(NA, n_outcomes)
+
+for (i in 1:n_outcomes) {
+  X[i] = outcomes %>% slice(i) %>% unlist() %>% n_distinct()
+  Y[i] = sum(outcomes[i, ] == 1)
+}
+
+outcomes <- outcomes %>%
+  bind_cols(X, Y)
+
+names(outcomes) = c(paste("box", 1:k, sep = ""), "X", "Y")
+
+outcomes %>%
+  kbl() %>%
+  kable_styling(fixed_thead = TRUE)
+
+```
+
+
+
+
+
+## Solution to @exr-event-collector3
+
+See the sample space $\Omega$ of 27 possible outcomes in @tbl-collector3.
+
+
+1.  $A_1^c = \{222, 223, 232, 322, 233, 323, 332, 333\}$ is the event that none of the boxes contain prize 1, so $A_1$ consists of the $27-8 = 19$ other outcomes.
+1.  $B_1 = \{111\}$
+1.  $A_1 \cap A_2 \cap A_3 = \{123, 132, 213, 231, 312, 321\}$ is the event that at least one of each prize is obtained (that is, a complete set of prizes)
+1.  $A_1 \cup A_2 \cup A_3 = \Omega$, the set of all possible outcomes; you have to get at least 1 of one of the prizes.
+1.  $B_1 \cap B_2 \cap B_3=\emptyset$; you can't get only prize 1 and only prize 2
+1.  $B_1 \cup B_2 \cup B_3 = \{111, 222, 333\}$ is the event you only obtain one of the prizes (in every box)
+
+
+
+
+## Solution to @exr-event-dartboard 
+
+See @fig-event-dartboard
+
+1.  @fig-event-dartboard-1: $A$, Katniss's dart lands within 1 inch of the center of the dartboard.
+1.  @fig-event-dartboard-2: $B$, Katniss's dart lands more than 1 inch but less than 2 inches away from the center of the dartboard.
+1.  @fig-event-dartboard-3: $E$, Katniss's dart lands within 1 inch of the outside edge of the dartboard.
+
+
+```{r}
+#| label: fig-event-dartboard
+#| echo: false
+#| fig-cap: "Events in @exr-event-dartboard"
+#| fig-subcap: 
+#|   - "Within 1 inch of center"
+#|   - "More than 1 but less than 2 inches from center"
+#|   - "Within 1 inch of edge"
+#| layout-ncol: 3
+
+
+# Draw 12 equally spaced annuli with the outermost shaded and a center dot
+
+circle_xy <- function(cx = 0, cy = 0, r = 1, n = 720) {
+  t <- seq(0, 2*pi, length.out = n)
+  cbind(x = cx + r*cos(t), y = cy + r*sin(t))
+}
+
+R <- 1
+n_annuli <- 12
+radii <- seq(0, R, length.out = n_annuli + 1)
+
+# INNER 
+par(mar = c(1,1,1,1))
+plot(0, 0, type = "n", asp = 1, xlab = "", ylab = "",
+     xlim = c(-1.05, 1.05), ylim = c(-1.05, 1.05), axes = FALSE, bty = "n")
+
+
+# --- Shade inner annulus (just a filled circle of radius 1/12) ---
+inner <- circle_xy(r = radii[2])   # radius = 1/12
+polygon(inner, col = "orange", border = NA)
+
+# Draw annulus boundaries
+for (r in radii[-1]) {
+  boundary <- circle_xy(r = r)
+  lines(boundary, lwd = 1.2)
+}
+
+# Add center dot
+points(0, 0, pch = 19, cex = 0.5)
+
+
+# SECOND INNER
+
+par(mar = c(1,1,1,1))
+plot(0, 0, type = "n", asp = 1, xlab = "", ylab = "",
+     xlim = c(-1.05, 1.05), ylim = c(-1.05, 1.05), axes = FALSE, bty = "n")
+
+# --- Shade the 2nd innermost annulus (between r=1/12 and r=2/12) ---
+outer_ring <- circle_xy(r = radii[3])  # radius = 2/12
+polygon(outer_ring, col = "orange", border = NA)
+inner_hole <- circle_xy(r = radii[2])  # radius = 1/12
+polygon(inner_hole, col = "white", border = NA)
+
+# Draw annulus boundaries
+for (r in radii[-1]) {
+  boundary <- circle_xy(r = r)
+  lines(boundary, lwd = 1.2)
+}
+
+# Add center dot
+points(0, 0, pch = 19, cex = 0.5)
+
+
+# OUTER
+
+par(mar = c(1,1,1,1))
+plot(0, 0, type = "n", asp = 1, xlab = "", ylab = "",
+     xlim = c(-1.05, 1.05), ylim = c(-1.05, 1.05), axes = FALSE, bty = "n")
+
+# Shade the outer annulus
+outer <- circle_xy(r = R)
+polygon(outer, col = "orange", border = NA)
+inner_hole <- circle_xy(r = radii[n_annuli])
+polygon(inner_hole, col = "white", border = NA)
+
+# Draw annulus boundaries
+for (r in radii[-1]) {
+  boundary <- circle_xy(r = r)
+  lines(boundary, lwd = 1.2)
+}
+
+# Add center dot
+points(0, 0, pch = 19, cex = 0.5)
+
+
+
+
+```
+
+
+## Solution to @exr-rv-collector3
+
+
+
+
+
+1.  See @tbl-collector3
+1.  The possible values of $X$ are $\{1, 2, 3\}$
+1.  The possible values of $Y$ are $\{0, 1, 2, 3\}$
+1.  The possible $(X, Y)$ pairs are $\{(1, 0), (1, 3), (2, 0), (2, 1) (2, 2), (3, 1)\}$,
+In particular, the following pairs are NOT possible: $(1, 1), (1, 2), (2, 3), (3, 0), (3, 2), (3, 3)$
+1.  $\{X = 1\} = \{111, 222, 333\}$ is the event that only one distinct prize is obtained (that is, you get the same prize in every box) 
+1.  $\{X=2\}$ is the event you get two distinct prizes, which consists of 18 putcomes.
+It's easier to write $\{X = 2\}^c = \{111, 222, 333, 123, 132, 213, 231, 312, 321\}$.
+1.  $\{X = 3\} = \{123, 132, 213, 231, 312, 321\}$ is the event that you get all 3 prizes; that is, the event that you get the complete set
+1.  $\{Y = 0\}=\{222, 223, 232, 322, 233, 323, 332, 333\}$ is the event that none of the boxes contain prize 1
+1.  $\{Y = 1\}=\{122, 123, 132, 133, 212, 213, 312, 313, 221, 231, 321, 331\}$ is the event that exactly one of the boxes contains prize 1
+1.  $\{Y = 2\}=\{112, 113, 121, 131, 211, 311\}$ is the event that exactly two of the boxes contain prize 1.
+1.  $\{Y = 3\}=\{111\}$ is the event that all three of the boxes contain prize 1.
+1.  $\{X = 2, Y = 1\} = \{122, 133, 212, 313, 221, 331\}$ is the event that one box contains prize one and the other two boxes contain either both prize 2 or both prize 3.
+1.  $\{X = Y\} = \{112, 113, 121, 131, 211, 311\}$ is the event that the number of boxes that contain prize 1 is equal to the number of distinct prizes obtained (in this case it only happens if both $X$ and $Y$ equal 2)
+1.  Let $I_1$ be the indicator random variable that prize 1 is obtained (in at least one of the three packages).
+Identify and intepret $\{I_1 = 0\}$.
+1.  $X = I_1+ I_2+ I_3$
+1.  Label the boxes instead of the prizes.
+Let $J_1$ be the indicator random variable that box 1 contains prize 1, $J_2$ that box 2 contains prize 1, and $J_3$ that box 3 contains prize 1.
+Then $Y = J_1+ J_2+ J_3$.
+
+
+
+
+
+
+
+## Solution to @exr-rv-dartboard
+
+1.  @fig-event-dartboard-1: $\{X \le 1\}$, Katniss's dart lands within 1 inch of the center of the dartboard.
+1.  @fig-event-dartboard-2: $\{1 < X < 2\}$, Katniss's dart lands more than 1 inch but less than 2 inches away from the center of the dartboard.
+1.  @fig-event-dartboard-3: $\{X > 11\}$, Katniss's dart lands within 1 inch of the outside edge of the dartboard.
+1.  $\{X = 0\}$, the event that the dart hits exactly in the center, is just the single point in the center
+1.  $\{X = 1\}$, the event that the dart hits exactly 1 inch from the center, is the circle with radius 1 inch (the *outside egde* of the shaded region in @fig-event-dartboard-1)
+
+
+
+
+
+
+## Solution to @exr-probspace-collector3-a
+
+The latest series of collectible Lego Minifigures contains 3 different Minifigure prizes (labeled 1, 2, 3).
+Each package contains a single unknown prize.
+Suppose we only buy 3 packages and we consider as our sample space outcome the results of just these 3 packages (prize in package 1, prize in package 2, prize in package 3).
+For example, 323 (or (3, 2, 3)) represents prize 3 in the first package, prize 2 in the second package, prize 3 in the third package.
+Suppose that each package is equally likely to contain any of the 3 prizes, regardless of the contents of other packages, so that there are 27 equally likely outcomes, and let $\IP$ be the corresponding probability measure.
+
+
+-   Let $A_1$ be the event that prize 1 is obtained---that is, *at least one* of the packages contains prize 1---and define $A_2, A_3$ similarly for prize 2, 3.
+-   Let $B_1$ be the event that *only* prize 1 is obtained---that is, *all three* packages contain prize 1---and define $B_2, B_3$ similarly for prize 2, 3.
+
+
+1.  Compute $\IP(A_1)$
+1.  Compute $\IP(B_1)$
+1.  Interpret the values from parts 1 and 2 as long run relative frequencies.
+1.  Interpret the values from parts 1 and 2 as relative likelihoods.
+1.  Compute $\IP(A_1 \cap A_2 \cap A_3)$
+1.  Compute $\IP(A_1 \cup A_2 \cup A_3)$
+1.  Compute $\IP(B_1 \cap B_2 \cap B_3)$
+1.  Compute $\IP(B_1 \cup B_2 \cup B_3)$
+
+1.  $A_1^c = \{222, 223, 232, 322, 233, 323, 332, 333\}$ is the event that none of the boxes contain prize 1, so $A_1$ consists of the $27-8 = 19$ other outcomes.
+Since the outcomes are equally likely, $\text{P}(A_1) = 18/27=0.667$.
+1.  There is only one outcome that satisfies $B_1$ so $\text{P}(B_1) = 1/27 = 0.037$.
+1.  Over many sets of 3 boxes, about 66.7% of sets of 3 boxes will contain at least one prize 1, and about 3.7% of sets of 3 boxes will contain only prize 1.
+1.  It is 18 times more likely to obtain at least one prize 1 than it is to obtain only prize 1.
+Also, it is 2 times more likely to obtain at least one prize 1 than to not obtain it (18/9), and it is 26 times less likely to obtain only prize 1 than it is to obtain any other collection of prizes.
+1.  $A_1 \cap A_2 \cap A_3 = \{123, 132, 213, 231, 312, 321\}$ is the event that at least one of each prize is obtained (that is, a complete set of prizes) so $\IP(A_1 \cap A_2 \cap A_3) = 6/27 = 0.222$
+1.  $A_1 \cup A_2 \cup A_3 = \Omega$, the set of all possible outcomes; you have to get at least 1 of one of the prizes so $\IP(A_1 \cup A_2 \cup A_3) = 1$
+1.  $B_1 \cap B_2 \cap B_3=\emptyset$; you can't get only prize 1 and only prize 2, so $\IP(B_1 \cap B_2 \cap B_3) = 0$
+1.  $B_1 \cup B_2 \cup B_3 = \{111, 222, 333\}$ is the event you only obtain one of the prizes (in every box), so $\IP(B_1 \cup B_2 \cup B_3) = 3/27 = 0.111$
+
+
+
+
+
+## Solution to @exr-probspace-dartboard-b
+
+Since the dart lands uniformly at random anywhere on the dartboard, probabilities are computed as the ratio between the area corresponding to the event of interest divided by the area of the total dartboard ($12^2\pi$)
+
+See @fig-event-dartboard.
+Find the area of the shaded pieces by subtracting areas of circles.
+
+1.  $\text{P}(X \le 1) = \frac{1^2\pi}{12^2\pi} = 1/144 = 0.00694$
+1.  $\text{P}(1 < X < 2) = \frac{2^2\pi - 1^2\pi}{12^2\pi} = 3/144 = 0.021$
+1.  $\text{P}(X > 11) = 1 - \frac{11^2\pi}{12^2\pi} = 1 - (11/12)^2 = 0.160$
+
+
+
+## Solution to @exr-probspace-dartboard-c
+
+Since the dart lands uniformly at random anywhere on the dartboard, probabilities are computed as the ratio between the area corresponding to the event of interest divided by the area of the total dartboard ($12^2\pi$)
+
+Find the area of the events of interest by finding areas of corresponding circles and subtracting as needed.
+
+1.  $\IP(X \le 0.1) = \frac{0.1^2\pi}{12^2\pi} = (0.1/12)^2 = 0.0000694$
+1.  $\IP(X \le 0.01) = \frac{0.01^2\pi}{12^2\pi} = (0.01/12)^2 = 0.000000694$
+1.  $\IP(X = 0) = 0$, the single point has no area
+1.  $\IP(X \ge 11.9) = 1 - \frac{11.9^2\pi}{12^2\pi} = 1 - (11.9/12)^2 = 0.0166$
+1.  $\IP(X \ge 11.99) = 1 - \frac{11.99^2\pi}{12^2\pi} = 1 - (11.99/12)^2 = 0.00166$
+1.  $\IP(X = 12) = 0$, the circle representing the outside edge has no area
+1.  Well, both of these events---the dart lands exactly in the center and the darts lands exactly on the edge---have 0 probability.
+However for practical purposes we would never be interested in probabilities like $\IP(X = 0.000000000\ldots)$ or  $\IP(X = 12.000000000\ldots)$ with infinite precision.
+1.  However we define "close to"---within 1 inch or within 0.1 inch or within 0.01 inch, etc---the dart is more likely to land close to the edge than close to the center.
+
+
+## Solution to @exr-ltp-multiple-choice
+
+1. Suppose there are 1000 questions on the test. (That's a long test! But remember, 1000 is just a convenient round number.) We can classify each question by its type (know, eliminate, guess) and whether we answer it correctly or not. The probability that we answer a question correctly is 1 given that we know it, 0.5 given that we can eliminate two choices, or 0.25 given that we guess randomly.
+
+    |           | Know | Eliminate | Guess | Total |
+    |-----------|-----:|----------:|------:|------:|
+    | Correct   |  700 |       100 |    25 |   825 |
+    | Incorrect |    0 |       100 |    75 |   175 |
+    | Total     |  700 |       200 |   100 |  1000 |
+
+    The probability that we answer a randomly selected question correctly is 825/1000 = 0.825.
+    
+1. The overall probability of answering a question correctly is closer to 1 than 0.5 or 0.25. To construct the table and obtain the value 0.825, we basically did the following calculation
+
+    $$
+    0.825 = (1)(0.7) + (0.5)(0.2) + (0.25)(0.1)
+    $$
+    
+    We see that the overall probability, 0.825, is a weighted average of the case-by-case probabilities 1, 0.5, and 0.25, where 1 gets the most weight in the average because there is a higher percentage of questions that we know.
+
+
+## Solution to #exr-ltp-rats
+
+1.  Most people produce a sequence that has 30 G’s and 10 R’s, or close to those proportions, because they are trying to generate a sequence for which each outcome has a 75% chance for G and a 25% chance for R.
+That is, they use a strategy in which they predict G with probability 0.75, and R with probability 0.25.
+1.  There are two cases: the true flash is either green (with probability 0.75) or red (with probability 0.25). Given that the flash is green, your probability of correctly predicting it is 0.75 (because your probability of guessing "G" is 0.75).
+Given that the flash is red, your probability of correctly predicting it is 0.25 (because your probability of guessing "R" is 0.25).
+Use the law of total probability to find the probability that your prediction is correct: $(0.75)(0.75) + (0.25)(0.25) = 0.625$.
+1.  Just pick G every time! Picking green every time has a 0.75 probability of correctly predicting any flash. When events are *independent*, trying to guess the pattern doesn't help.
+
+
+
+
+## Solution to @exr-branching-extinction
+
+
+
+1.  Let $D$ be the probability that the original microorganism dies after the first minute; $\IP(D) = 1/4$.
+Condition on the first "step" and use the law of total probability
+$$
+p = \IP(E) = \IP(E|D)\IP(D) + \IP(E|D^c)\IP(D^c) = (1)(1/4) + \IP(E|D^c)(3/4)
+$$
+$\IP(E|D) = 1$ since if the first microorganism dies the population goes extinct immediately.
+
+    The key is to find an expression for $\IP(E|D^c)$ in terms of $p$. If the first microorganism does not die ($D^c$) there are 2 microorganisms at the start of the second minute; let's call them Marge and Homer. In order for the population to go extinct, we need Marge and all her descendants to go extinct, and the same for Homer. But Marge is just a single microorganism, so the probability that her line eventually goes extinct is $p$; similarly the probability that Homer's line goes extinct is $p$. Since all microorganisms behave independently, the probability that both Marge and Homer's lines eventually go extinct is $(p)(p)=p^2$. That is, $\IP(E | D^c) = p^2$.
+
+    Plugging into the equation above yields
+    $$
+    p = (1)(1/4) + p^2(3/4)
+    $$
+    
+    Solve (quadratic formula) this equation to get^[Technically, there are two solutions, 1 and $1/3$. There are some technical justifications that can be made to show that the extinction probability is the smaller of the two solutions, but this is beyond our scope.] $p= 1/3$. The probability that the population eventually goes extinct is 1/3. This microorganism population is 2 times more likely to survive forever than to go extinct!
+
+1.  The process is the same as the above, with 3/4 replaced by $s$
+$$
+p = (1)(1-s) + p^2s
+$$
+Solving gives two solutions, 1 and $1/s - 1$.
+However, if $s<1/2$ then $1/s - 1 > 1$, which is not a valid probability. Therefore the probability of eventual extinction is 1 if $s \le 1/2$, and $1/s - 1<1$ if $s > 1/2$.
+
+
+
+
+
+
+

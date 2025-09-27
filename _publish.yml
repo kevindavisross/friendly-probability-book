@@ -1,0 +1,4 @@
+- source: project
+  quarto-pub:
+    - id: 01a5cf56-f770-4aed-9798-6ed8c644c791
+      url: https://kevin-davisross.quarto.pub/a-friendly-introduction-to-probability

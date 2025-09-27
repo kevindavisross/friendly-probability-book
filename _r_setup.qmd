@@ -1,0 +1,141 @@
+
+```{r}
+#| echo: false
+#| include: false
+
+library(tidyverse)
+library(knitr)
+library(janitor)
+library(waffle)
+library(viridis)
+library(gtools)
+library(ggpubr)
+library(kableExtra)
+library(scales)
+library(bookdown)
+library(geomtextpath)
+library(gridExtra)
+library(kableExtra)
+library(scatterplot3d)
+library(viridisLite)
+library(ggdensity)
+library(patchwork)
+
+set.seed(21234)
+
+options(ggplot2.continuous.colour = "viridis")
+
+cb_palette <- c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
+  
+options(ggplot2.discrete.colour = cb_palette,
+        ggplot2.discrete.fill = cb_palette)
+
+blank_theme <- theme_void()
+```
+
+
+```{r}
+#| echo: false
+#| include: false
+library(reticulate)
+use_condaenv("base", required = TRUE)
+```
+
+```{r}
+#| echo: false
+#| include: false
+
+
+dbvn <- function(x, y, mu_x, mu_y, sigma_x, sigma_y, rho) {
+  z_x = (x - mu_x) / sigma_x
+  z_y = (y - mu_y) / sigma_y
+  exp(-0.5 * (z_x ** 2 + z_y ** 2 - 2 * rho * z_x * z_y) / (1 - rho ** 2)) /
+    (2 * pi * sigma_x * sigma_y * sqrt(1 - rho ** 2))
+}
+```
+
+
+
+
+```{r}
+#| echo: false
+#| include: false
+
+create_normal_percentogram = function(q_increment = 0.05, mu = 0, sigma = 1, min_x = NULL, max_x = NULL) {
+  
+  # equal area bars, unequal widths
+  
+  if (is.null(min_x)) min_x = mu - 3.5 * sigma
+  
+  if (is.null(max_x)) max_x = mu + 3.5 * sigma
+  
+  # endpoints
+  breaks <- c(min_x,
+              mu + sigma * qnorm(seq(q_increment, 1 - q_increment, q_increment)),
+              max_x)
+  
+  # midpoints
+  midpoints <- (breaks[-1] + breaks[-length(breaks)]) / 2
+  
+  # widths
+  widths = diff(breaks)
+  
+  # density height
+  densities = q_increment / widths
+  
+  data <- data.frame(midpoints, densities, widths)
+  
+  # percentogram
+  ggplot(data,
+         aes(x = midpoints,
+             y = densities)) +
+    geom_bar(stat = "identity",
+             width = widths,
+             fill = "skyblue", color = "black") +
+    scale_x_continuous(breaks = round(breaks, 2)) +
+    scale_y_continuous(expand = c(0, 0)) +
+    labs(x = "x", y = "Density") +
+    theme_classic()
+}
+```
+
+```{r}
+#| echo: false
+#| include: false
+
+plot_standardized_normal <- function(mu, sigma, value, variable_name = "Variable", shade_lt = TRUE, shade_color = "skyblue") {
+  zmin = -3.5
+  zmax = 3.5
+  
+  z = (value - mu) / sigma
+  
+  if (shade_lt == TRUE) {
+    limit_shade = c(zmin, z)
+    limit_unshade = c(z, zmax)}
+  else {
+    limit_shade = c(z, zmax)
+    limit_unshade = c(zmin, z)
+  }
+  
+  ggplot(data.frame(x = c(zmin, zmax)),
+         aes(x = x)) +
+    geom_area(stat = "function", fun = dnorm, color = "black", fill = "white", xlim = limit_unshade) +
+    geom_area(stat = "function", fun = dnorm, color = "black", fill = shade_color, xlim = limit_shade) + 
+    scale_y_continuous(expand = c(0, 0), limits = c(0, 0.45)) + 
+    scale_x_continuous(breaks = seq(-3, 3),
+                       labels = ~paste(. * sigma + mu, ., sep = "\n"),
+                       name = paste(variable_name,"\nStandardized value", sep = "")) +
+    theme_classic() +
+    theme(
+      axis.title.y = element_blank(),
+      axis.text.y = element_blank(),
+      axis.ticks.y = element_blank(),
+      axis.text.x = element_text(size = 12),
+      axis.ticks.length.x = unit(0.25, "cm")
+    )
+}
+
+```
+
+
+

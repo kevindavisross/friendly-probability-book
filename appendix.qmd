@@ -1,0 +1,23 @@
+\cleardoublepage 
+
+# (APPENDIX) Appendix {-}
+
+TBA 
+
+<!-- ## Logarithms and exponential
+
+## Linear vs log scaling
+
+
+## Integrals as averages
+
+## General Statistics???
+
+Might not need at all since it's covered in simulation (histograms, sd, correlation, etc)
+
+
+## Data sets
+
+Include code for retrieving and cleaning data - see Martin's files -->
+
+

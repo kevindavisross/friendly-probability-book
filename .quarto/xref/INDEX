@@ -10,5 +10,17 @@
   },
   "references.qmd": {
     "references.html": "3703556d"
+  },
+  "literacy-probability.qmd": {
+    "literacy-probability.html": "829eb0d0"
+  },
+  "language-probability.qmd": {
+    "language-probability.html": "4ace76e8"
+  },
+  "language-probability-exercises.qmd": {
+    "language-probability-exercises.html": "c1371343"
+  },
+  "appendix.qmd": {
+    "appendix.html": "b5d45be9"
   }
 }
