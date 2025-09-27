@@ -1011,11 +1011,14 @@ Nevertheless, there is always a sample space in the background representing poss
 Donny Don't is asked a series of questions involving a pair of rolls of six-sided dice, such as "identify the event that the sum of the dice is at least 10".
 Donny's responses are below; explain to him what is wrong with his responses and help him understand the correct answers.
 
-1. The possible rolls are 1 through 6, so the sample space is $\{1, 2, 3, 4, 5, 6\}$.
-1. The sum of the two dice can be 2 through 12, so the event that the sum of the two dice is at least 10 is $\{10, 11, 12\}$.
-1. The event that the first roll is a 3 is $\{3\}$.
-1. The event that the first roll is a 3 and the second roll is a 1 is $\{3, 1\}$
-1. Donny's sample space from the first question might correspond to what dice rolling scenario? What does $\{3, 1\}$ represent in this scenario?
+1.  The possible rolls are 1 through 6, so the sample space is $\{1, 2, 3, 4, 5, 6\}$.
+1.  The sum of the two dice can be 2 through 12, so the event that the sum of the two dice is at least 10 is $\{10, 11, 12\}$.
+1.  The event that the first roll is a 3 is $\{3\}$.
+1.  The event that the first roll is a 3 and the second roll is a 1 is $\{3, 1\}$
+1.  Donny's sample space from the first question might correspond to what dice rolling scenario?
+1.  Donny says "OK, I get that $\{1, 2, 3, 4, 5, 6\}$ is the sample space for a *single* roll of a six-sided die. 
+But $\{3, 1\}$ doesn't make any as an event because the die can't land on both 1 and 3."
+Explain to Donny what the event $\{3, 1\}$ represents in this scenario.
 :::
 ::::
 
@@ -1026,7 +1029,7 @@ Donny's responses are below; explain to him what is wrong with his responses and
 
 
 
-1. The questions involve a pair of rolls, so best to record an outcome as an ordered pair, e.g., (5, 2) for 5 on the first roll and 2 on the second.
+1.  The questions involve a pair of rolls, so best to record an outcome as an ordered pair, e.g., (5, 2) for 5 on the first roll and 2 on the second.
 Therefore, the sample space would be the following set of 36 possible outcomes.
 \begin{align*}
 \Omega  = & \{
@@ -1036,23 +1039,26 @@ Therefore, the sample space would be the following set of 36 possible outcomes.
 & \;\; (6, 1), (6, 2), \ldots, (6, 6)
 \}
 \end{align*}
-1. Donny's answers to the first two parts are inconsistent, since there is always a single sample space.
+1.  Donny's answers to the first two parts are inconsistent, since there is always a single sample space.
 So if he says the answer to the first part is $\{1, \ldots, 6\}$, then any event must be a subset of that sample space and his answer to the second part must be wrong.
 Using the sample space of 36 ordered pairs from the previous answer, the correct event that the sum of the two dice is at least 10 is
 $\{(4, 6), (5, 5), (5, 6), (6, 4), (6, 5), (6, 6)\}$.
 If Donny's sample space in the first part had been $\{2, \ldots, 12\}$, corresponding to the sum of the two dice, then his answer of $\{10, 11, 12\}$ would have been correct.
 However, using such a sample space, he would not have been able to answer the remaining questions (which don't involve the sum of the rolls).
 There is always one sample space on which all events are defined.
-1. Donny didn't take into account that an outcome is a pair of rolls.
+1.  Donny didn't take into account that an outcome is a pair of rolls.
 The correct event is $\{(3, 1), (3, 2), (3, 3), (3, 4), (3, 5), (3, 6)\}$, the set of all pairs of rolls for which the first roll is 3.
-1. Maybe Donny is just using sloppy notation here, but it sure looks like he is confusing an outcome with an event.
+1.  Maybe Donny is just using sloppy notation here, but it sure looks like he is confusing an outcome with an event.
 The answer should be $\{(3, 1)\}$, the set containing the single outcome $(3, 1)$.
 Notice that this is not the same set as $\{(1, 3)\}$.
 (But the set $\{3, 1\}$ is the same as the set $\{1, 3\}$.) 
-1. The sample space of $\{1, 2, 3, 4, 5, 6\}$ could correspond to a *single* roll of a fair six-sided die.
-In this case, the event $\{3, 1\}$ would be the event that the single roll results in either either a 3 or a 1.
-(The set $\{3, 1\}$ is the same as the set $\{1, 3\}$.)
-
+1.  The sample space of $\{1, 2, 3, 4, 5, 6\}$ could correspond to a *single* roll of a fair six-sided die.
+The possible outcomes for a single roll would be $\{1, 2, 3, 4, 5, 6\}$. 
+1.  For a single roll, $\{3, 1\}$ is the event the the die lands on 3 or 1, that is, "1 or 3"; the set $\{3, 1\}$ is the same as the set $\{1, 3\}$.
+The event "1 or 3" occurs if the die lands on 1, so 1 satisifies the event and is in the corresponding set; The event "1 or 3" occurs if the die lands on 3, so 3 satisifies the event and is in the corresponding set.
+Therefore the event "1 or 3" corresponds to the set $\{1, 3\}$.
+The event occurs if any of the outcomes that satisfy the event occurs (not if they all do).
+(Donny is right that the die can't land on both 1 and 3, but the event "1 and 3" would be $\{1\}\cap \{3\}=\emptyset$; there are no outcomes that satisfy the event "1 and 3".)
 :::
 ::::
 
@@ -1076,10 +1082,52 @@ Don't confuse this scenario with many other examples that involve *two* rolls.
 :::
 
 
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-die-sigma-field}
+Consider a *single* roll of a four-sided die.
+The sample space consists of the four possible outcomes $\Omega = \{1, 2, 3, 4\}$.
+
+
+1.  Identify $A$, the event that the die lands on 1.
+1.  Identify $B$, the event that the die lands on an odd number.
+1.  Identify $C$, the event that the die lands on 1 or 2.
+1.  Identify $D$, the event that the die does not land on 4.
+1.  Which of the events $A, B, C, D$ occur if the die lands on 3?
+1.  Identify all possible *events* for this sample space, and determine whether or not each event occurs if the die lands on 3.
+:::
+::::
+
+
+
+:::: {.callout-tip collapse=true}
+::: {#sol-die-sigma-field}
+
 For a *single* roll of a four-sided die, the sample space consists of the four possible outcomes $\Omega = \{1, 2, 3, 4\}$.
 (Again, don't confuse this scenario with other examples!)
 Any subset of this sample space is an event.
-@tbl-die-events lists the collection of all events ($\mathcal{F}$), and whether they occur if the single roll results in a 3 (that is, for the outcome $\omega=3$).
+
+1.  $A = \{1\}$ is the event that the die lands on 1.
+1.  $B = \{1, 3\}$ is the event that the die lands on an odd number.
+(This event occurs if the die lands on 1 so 1 is in $B$; it also occurs if the die lands on 3 so 3 is in $B$.)
+1.  $C = \{1, 2\}$ is the event that the die lands on 1 or 2.
+1.  $D = \{1, 2, 3\}$ is the event that the die does not land on 4.
+1.  If the die lands on 3 then events $B$ and $D$ occur and events $A$ and $C$ do not occur.
+Notice that 3 is an element of the sets $B$ and $D$ but not $A$ and $C$.
+1.  Any subset of $\{1, 2, 3, 4\}$ is an event, including $\emptyset$ and $\{1, 2, 3, 4\}$ itself.
+@tbl-die-events lists all possible events, and whether they occur if the single roll results in a 3 (that is, for the outcome $\omega=3$).
+:::
+::::
+
+
+
+::: {.callout-caution appearance="default"}
+We usually think of a table as a list of all possible *outcomes*, with one row for each outcome.
+@tbl-die-events is a different kind of table.
+Each row of @tbl-die-events is an *event*, and the table lists the collection of all events ($\mathcal{F}$)
+:::
+
+
 
 | Event | Description | Occurs upon observing outcome $\omega=3$?
 | --- | --- | --- |
@@ -1100,7 +1148,7 @@ $\{1, 3, 4\}$ | Roll a 1, 3, or 4 (a.k.a. do not roll a 2) | Yes |
 $\{2, 3, 4\}$ | Roll a 2, 3, or 4 (a.k.a. do not roll a 1) | Yes |
 $\{1, 2, 3, 4\}$ | Roll something | Yes |
 
-: All possible events associated with a single roll of a four-sided die. {#tbl-die-events}
+: All possible *events* associated with a single roll of a four-sided die. {#tbl-die-events}
 
 A random phenomenon corresponds to a single sample space, but there are many events of interest.
 Listing the collection of all possible events as in the previous table is rarely done in practice, but we do so here to provide a concrete example of $\mathcal{F}$.
@@ -2341,17 +2389,27 @@ But it is much more common for a probability measure to be defined only implicit
 ### Some probability measures for a four-sided die
 
 
-Consider a *single* roll of a four-sided die.
 
 ::: {.callout-caution appearance="default"}
 This section concerns a *single* roll of a fair four-sided die.
 Don't confuse this scenario with many other examples that involve *two* rolls.
+This section also discusses all possible *events* (beyond just all possible outcomes).
+We encourage you to review @sec-sigmafield before reading this section.
 :::
 
+
+Consider a *single* roll of a four-sided die.
 The sample space consists of four possible outcomes, $\Omega = \{1, 2, 3, 4\}$.
 Events concern what might happen on a single roll.
-For example, if $A$ is the event that we roll an odd number then $A = \{1, 3\}$, consisting of the outcomes 1 and 3.
+For example, if $A$ is the event that we roll an odd number then $A = \{1, 3\}$; "roll an odd number" occurs if we roll a 1 so 1 is an $A$, or "roll an odd number" occurs if we roll a 3 so 3 is in $A$.
 @tbl-die-events lists the collection of all events.
+
+::: {.callout-caution appearance="default"}
+We usually think of a table as a list of all possible *outcomes*, with one row for each outcome.
+@tbl-die-events and the tables in this section (@tbl-die-events-fair, @tbl-die-events-weighted, @tbl-die-events-weighted2) are different kinds of tables.
+Each row of these tables is an *event*, and the tables list the collection of all events.
+:::
+
 
 :::: {.callout-note appearance="simple"}
 ::: {#exm-die-measure-fair}
@@ -2378,14 +2436,11 @@ Let $\IP$ denote the probability measure corresponding to a single roll of a fai
 1. Given the probability of each outcome^[Probabilities are always defined for events (sets). When we say loosely "the probability of an outcome $\omega$" we really mean the probability of the event $\{\omega\}$ consisting of the single outcome $\omega$.
 In this example $\IP(\{1\})=\IP(\{2\})=\IP(\{3\})=\IP(\{4\})=1/4$.], we can find the probability of an event via countable additivity---sum the probabilities of the distinct outcomes that comprise the event.
 For example, if $A=\{1, 3\}$ is the event that the die lands on an odd number, then
-
 $$
 \IP(A) = \IP(\{1, 3\}) = \IP(\{1\}\cup \{3\}) = \IP(\{1\}) + \IP(\{3\}) = 1/4+ 1/4 = 2/4.
 $$
-
 @tbl-die-events-fair lists all the possible events, and their probabilities according to the probability measure $\IP$.
 1. Since there are four equally likely outcomes, the probability of any event is
-
 $$
 \IP(A) = \frac{\text{number of outcomes that satisfy $A$}}{4}, \qquad{\text{$\IP$ assumes a fair four-sided die}}
 $$
@@ -2452,7 +2507,6 @@ For example, the probability that a single roll of this die lands on an odd numb
 $$
 \IQ(\{1, 3\}) = \IQ(\{1\}\cup \{3\}) = \IQ(\{1\}) + \IQ(\{3\}) = 0.1+ 0.3 = 0.4.
 $$
-
 We can similarly find the probabilities of all possible events for this particular weighted die, displayed in @tbl-die-events-weighted.
 
 :::
@@ -4325,7 +4379,7 @@ The conditional probabilities that the selected adult uses Snapchat given that t
 \IP(C|A_4) & = 0.02
 \end{align*}
 1. $\IP(C|A_1) = \frac{\IP(A_1 \cap C)}{\IP(A_1)}$ so $\IP(A_1 \cap C) = \IP(C|A_1)\IP(A_1) = 0.65\times 0.20 = 0.13$ is the probability that a randomly selected American adult is age 18-29 and uses Snapchat.
-(This value was provided to use directly in @exm-conditional-probability-def.)
+(This value was provided to us directly in @exm-conditional-probability-def.)
 1. $\IP(C^c|A_2) = 1 - \IP(C|A_2) = 1 - 0.24 = 0.76$ is the probability that the selected adult does not use Snapchat given that they are in the 30-49 age group.
 Then $\IP(A_2 \cap C^c) = \IP(C^c|A_2)\IP(A_2) = 0.76 \times 0.33 = 0.2508$ is the probability that a randomly selected American adult is age 30-49 and does not use Snapchat.
 1. Multiply as in the previous parts to complete the table.
@@ -4375,6 +4429,21 @@ The single vertical bar on the right displays the marginal probabilities of usin
 
 @fig-conditional-probability-def2-mosaic-2 represents conditioning on Snapchat use.
 Now the widths of the vertical bars represent the probabilities of using/not using Snapchat, the heights within the bars represent conditional probabilities of each age group given Snapchat use, and the single bar to the right represents the marginal probabilities of age group.
+
+
+```{r}
+#| label: fig-conditional-probability-def2-mosaic
+#| echo: false
+#| fig-cap: "Mosaic plots for @exm-conditional-probability-def2"
+#| fig-subcap: 
+#|   - "Conditioning on age group"
+#|   - "Conditioning on Snapchat use"
+#| layout-ncol: 2
+
+knitr::include_graphics(c("_graphics/snapchat-use-given-age.png", "_graphics/snapchat-age-given-use.png"))
+
+```
+
 
 ### Multiplication rule
 
@@ -4452,7 +4521,7 @@ There are 13 hearts out of 52 cards in the deck, so the probability that the fir
 So the conditional probability that the second card is a heart given that the first card is a heart is 12/51 = 0.235.
 1.  Use the multiplication rule: the probability the both cards are hearts is the product of the probability that the first card is a heart and the conditional probability that the second card is a heart given that the first card is a heart, (13/52)(12/51) = 0.0588.
 If we imagine 132600 repetitions (a convenient choice given these fractions), then we would expect the first card to be a heart in 33150=132600(13/52) repetitions, and among these 33150 repetitions we would expect the second card to be a heart in 7800=33150(12/51) repetitions, so the proportion of repetitions in which both cards are hearts is 7800/132600 = 0.0588.
-1.  The third card adds a third "stage" but the multiplication rule extended naturally.
+1.  The third card adds a third "stage" but the multiplication rule extends naturally.
 The probability the first two cards dealt are hearts and the third card dealt is a diamond is (13/52)(12/51)(13/50)= 0.0153, the product of:
     -   13/52, the probability that the first card is a heart,
     -   12/51, the conditional probability that the second card is a heart given that the first card is a heart, and
@@ -4505,7 +4574,7 @@ What is the probability that persons 1 and 2 have different birthdays?
 What is the probability that 4 people all have different birthdays?
 1.  When $n = 4$, what is the probability that at least two people share a birthday?
 1.  For $n=30$, compute the probability that none of the people have the same birthday.
-1.  For $n=30$, cind the probability that at least two people have the same birthday.
+1.  For $n=30$, compute the probability that at least two people have the same birthday.
 1.  Write a clearly worded sentence interpreting the probability in the previous part as a long run relative frequency.
 1.  When $n=30$, how much more likely than not is it for at least two people to have the same birthday?
 1.  Provide an expression of the probability for a general $n$ and find the smallest value of $n$ for which the probability is over 0.5. (You can just try different values of $n$.)
@@ -4527,14 +4596,17 @@ Notice the importance of the conditioning; if persons 1 and 2 share the same bir
 1.  Exactly one of the following must be true: (1) all 3 people are born on different days, or (2) at least two people share a birthday.
 Use the complement rule: when $n=3$, the probability that at least two people share a birthday is $1-(364/365)(363/365) = 0.008$.
 1.  Now consider $n=4$.
-In order for all 4 people to have different birthdays, the first three people have to have different birthdays and the fourth also has to be different from theirs.
+In order for all 4 people to have different birthdays, the first three people must have different birthdays and the fourth also has to be different from theirs.
     -   The probability that the first three people have different birthdays is $(364/365)(363/365)$ (from a previous part).
     -   Given that the first three people have different birthdays, the conditional probability that the fourth person's birthday is also different is 362/365.
     Notice the importance of the conditioning; if for example, persons 1 and 2 and 3 all shared the same birthday, then the probability that person 4 is born on a different day is 364/365.
-    -   Using the multiplication rule, the probability that the first three people have to have different birthdays and the fourth is also different from theirs is $(364/365)(363/365)(362/365) = 0.983$
+    -   Using the multiplication rule, the probability that the first three people have different birthdays and the fourth is also different from theirs is $(364/365)(363/365)(362/365) = 0.983$
 1.  Exactly one of the following must be true: (1) all 4 people are born on different days, or (2) at least two people share a birthday.
 Use the complement rule: when $n=4$, the probability that at least two people share a birthday is $1-(364/365)(363/365)(362/365) = 0.016$.
-1.  We can use the method for $n=3$. Imagine lining the 30 people up in some order.  Let $A_2$ be the event that the first two people have different birthdays, $A_3$ be the event that the first three people have different birthdays, and so on, until $A_{30}$, the event that all 30 people have different birthdays. Notice $A_{30}\subseteq A_{29} \subseteq \cdots \subseteq A_3 \subseteq A_2$, so $\IP(A_{30}) = \IP(A_2 \cap A_3 \cap \cdots \cap A_{30})$.  
+1.  We can use the method for $n=3$ and $n=4$.
+Imagine lining the 30 people up in some order. 
+Let $A_2$ be the event that the first two people have different birthdays, $A_3$ be the event that the first three people have different birthdays, and so on, until $A_{30}$, the event that all 30 people have different birthdays. 
+Notice $A_{30}\subseteq A_{29} \subseteq \cdots \subseteq A_3 \subseteq A_2$, so $\IP(A_{30}) = \IP(A_2 \cap A_3 \cap \cdots \cap A_{30})$.  
     -   The first person's birthday can be any one of 365 days.  In order for the second person's birthday to be different, it needs to be on one of the remaining 364 days. So the probability that the second person's birthday is different from the first is $\IP(A_2)=\frac{364}{365}$.
     -   Now if the first two people have different birthdays, in order for the third person's birthday to be different it must be on one of the remaining 363 days.
      So $\IP(A_3|A_2) = \frac{363}{365}$.  Notice that this is a conditional probability. (If the first two people had the same birthday, then the probability that the third person's birthday is different would be $\frac{364}{365}$.)
@@ -4556,7 +4628,7 @@ $$
 See @fig-birthday-function which plots this probability as a function of $n$. 
 When $n=23$ this probability is 0.507.
 1.  Maybe, but not because of the 0.999997.
-That probability is the probability that *at least two people* in the group of 100 share a birthday.
+0.999997 is the probability that *at least two people* in the group of 100 share a birthday.
 It is NOT the probability that someone shares YOUR birthday.
 The probability that no one shares your birthday is about $0.76$---we'll see how to compute this later---so it's about 3.1 times more likely than not that someone in a group of 100 people shares your birthday.
 
@@ -4564,7 +4636,7 @@ The probability that no one shares your birthday is about $0.76$---we'll see how
 ::::
 
 
-[^birthday-mistake]: Sometimes students mistake this for $(1/365)^2$; $(1/365)^2$ would be the probability that person 1 and person 2 both have a particular birthday, like the probability that both are born on January 1. There are $365^2$ possible (person 1, person 2) birthday pairs, of which 365 --- (Jan 1, Jan 1), (Jan 2, Jan 2), etc --- result in the same birthday, so the probability of sharing a birthday is $365/365^2 = 1/365$.
+[^birthday-mistake]: Sometimes students mistake this for $(1/365)^2$, but $(1/365)^2$ would be the probability that person 1 and person 2 both have a particular birthday, like the probability that both are born on January 1. There are $365^2$ possible (person 1, person 2) birthday pairs, of which 365 --- (Jan 1, Jan 1), (Jan 2, Jan 2), etc --- result in the same birthday, so the probability of sharing a birthday is $365/365^2 = 1/365$.
 
 
 
@@ -4591,12 +4663,12 @@ ggplot(df, aes(x = n, y = pn)) +
                linetype = "dashed", linewidth = 1, color = "skyblue") +
   geom_segment(aes(x = 0, xend = n0, y = pn[n0], yend = pn[n0]),
                linetype = "dashed", linewidth = 1, color = "skyblue") +
-  annotate("text", x = n0 + 2, y = pn[n0], 
-           label = paste0("P ≈ ", round(pn[n0], 3)), 
-           hjust = 0, vjust = -0.5, color = "skyblue4") +
-  annotate("text", x = n0, y = -0.03, 
-           label = paste0("n = ", n0), 
-           vjust = 1.5, color = "skyblue4") +
+  # annotate("text", x = n0 + 2, y = pn[n0], 
+  #          label = paste0("P ≈ ", round(pn[n0], 3)), 
+  #          hjust = 0, vjust = -0.5, color = "skyblue4") +
+  # annotate("text", x = n0, y = -0.03, 
+  #          label = paste0("n = ", n0), 
+  #          vjust = 1.5, color = "skyblue4") +
   labs(
     x = "Number of people in room",
     y = "Probability of at least one birthday match"
@@ -4670,7 +4742,7 @@ The marginal probabilities of the age groups differ, partly because the age grou
 The previous example illustrates another version of the law of total probability.
 
 ::: {#lem-ltp name="Law of total probability"}
-If $C_1, C_2, C_3\ldots$ are disjoint events with $C_1\cup C_2 \cup C_3\cup \cdots =\Omega$, then^[Proof: start with Lemma @lem-ltp1 and use the multiplication rule to write $\IP(A \cap C_1)=\IP(A|C_1)\IP(C_1)$, etc.]
+If $C_1, C_2, C_3\ldots$ are disjoint events with $C_1\cup C_2 \cup C_3\cup \cdots =\Omega$, then^[Proof: start with @lem-ltp1 and use the multiplication rule to write $\IP(A \cap C_1)=\IP(A|C_1)\IP(C_1)$, etc.]
 :::
 \begin{align*}
     \IP(A) & = \IP(A |C_1)\IP(C_1) + \IP(A | C_2)\IP(C_2) + \IP(A | C_3)\IP(C_3) + \cdots
@@ -4693,19 +4765,6 @@ The influence of the weighting is even more apparent in the mosaic plot in @fig-
 Since the marginal probability of not using Snapchat is greater than the marginal probability of using Snapchat, the marginal probabilities of the age groups are closer to those for the conditional probabilities of the age groups given the adult does not use Snapchat than those given that the adult uses Snapchat.
 
 
-```{r}
-#| label: fig-conditional-probability-def2-mosaic
-#| echo: false
-#| fig-cap: "Mosaic plots for @exm-conditional-probability-def2"
-#| fig-subcap: 
-#|   - "Conditioning on age group"
-#|   - "Conditioning on Snapchat use"
-#| layout-ncol: 2
-
-knitr::include_graphics(c("_graphics/snapchat-use-given-age.png", "_graphics/snapchat-age-given-use.png"))
-
-```
-
 Conditioning and using the law of probability is an effective strategy in solving many problems, even when the problem doesn't seem to involve conditioning.
 For example, when a problem involves iterations or steps it is often useful to *condition on the result of the first step*.
 
@@ -4718,7 +4777,7 @@ The game consists of possibly multiple rounds. In the first round, you point in 
 The game ends, and the current "pointer" wins, whenever the  "looker" looks in the same direction as the pointer.
 
 Suppose that each player is equally likely to point/look in each of the four directions, independently from round to round.
-What is the probability that you win the *game*?
+What is the probability that you, starting as the pointer, win the *game*?
 
 
 1.  Why might you expect the probability to not be equal to 0.5?
@@ -4799,12 +4858,12 @@ Continuing @exm-conditional-probability-def2.
 ::: {#sol-conditional-probability-def-slicing}
 
 
-1. Use the joint probabilities we computed in @exm-conditional-probability-def-slicing; see the "uses Snapchat" column of the two-way table in the solution to part 4.
+1. Use the joint probabilities we computed in @exm-conditional-probability-def2; see the "uses Snapchat" column of the two-way table in the solution to part 4.
 The joint probability that an American *adult* is a Snapchat user and age 18-29 is:
     a. $\frac{0.1300}{0.0792} = 1.64$ times greater than the joint probability that an American *adult* is a Snapchat user and age 30-49
     a. $\frac{0.1300}{0.0300} = 4.33$ times greater than the joint probability that an American *adult* is a Snapchat user and age 50-64
     a. $\frac{0.1300}{0.0044} = 29.55$ times greater than the joint probability that an American *adult* is a Snapchat user and age 65+
-1. Use the conditional probabilities we computed in @exm-conditional-probability-def-slicing; see the solution to part 7.
+1. Use the conditional probabilities we computed in @exm-conditional-probability-def2; see the solution to part 7.
 The conditional probability that an American adult is age 18-29 *given that they use Snapchat* is:
     a. $\frac{0.5337}{0.3251} = \frac{0.1300/0.2436}{0.0792/0.2436} = 1.64$ times greater than the conditional probability that an American adult is age 30-49 *given that they use Snapchat*.
     a. $\frac{0.5337}{0.1232} = \frac{0.1300/0.2436}{0.0300/0.2436}= 4.33$ times greater than the conditional probability that an American adult is age 50-64 *given that they use Snapchat*.
@@ -4839,7 +4898,7 @@ The "slice" determines the shape of the bar plot: The bar for age 18-29 is 1.64 
 Summing the joint probabilities in @fig-conditional-probability-def-slicing-1 over the age groups yields 0.2436, the marginal probability that an adult uses Snapchat.
 Given that the adult uses Snapchat, we want the conditional probabilities of the age groups to sum to 1.
 Thus we "renormalize" the joint probabilities on the vertical axis---by dividing each by 0.2436---so that they sum to 1 to obtain the conditional probabilities of each age group given that the adult uses Snapchat, displayed in @fig-conditional-probability-def-slicing-2.
-Renormalizing only changes the absolute scale of the plot; compare the values on the vertical axes, which correspond to joint probabilities on the left and conditional probabilities on the right.
+Renormalizing only changes the absolute scale of the plot; compare the values on the vertical axes in @fig-conditional-probability-def-slicing, which correspond to joint probabilities on the left and conditional probabilities on the right.
 Both plots have the same relative shape:
 the bar for age 18-29 is 1.64 times higher than the bar for age 30-49, 4.33 times higher than the bar for age 50-64, and 29.55 times higher than the bar for age 65+.
 
@@ -4908,7 +4967,7 @@ Be sure to indicate what represents the "slice" in each scenario.
 ```{r}
 #| label: fig-venn-conditional-plot
 #| echo: false
-
+#| fig-cap: Three sample spaces with 16 equally outcomes
 
 knitr::include_graphics(c("_graphics/venn-conditional.png"))
 
@@ -4918,16 +4977,15 @@ knitr::include_graphics(c("_graphics/venn-conditional.png"))
 :::: {.callout-tip collapse=true}
 ::: {#sol-venn-condition}
 
-In each case, the slice represents the 4 blue outcomes.
+In each case we're conditioning on event $B$, so the slice represents the 4 blue outcomes.
 Imagine zooming in on the blue (including green) area of each plot: remove the slice with the 4 blue outcomes (and erase the rest) and then magnify (renormalize) the slice so that it is the size of the original rectangle.
 
-1. Left: $\IP(A|B)=0$.
-After conditioning on $B$, there are now 4 equally likely outcomes, of which none satisfy $A$.
-1. Middle: $\IP(A|B) = 2/4=1/2$.
-After conditioning on $B$, there are now 4 equally likely outcomes, of which 2 satisfy $A$.
+1. Left: $\IP(A|B)=0$. After conditioning on $B$, there are now 4 equally likely outcomes, of which none satisfy $A$. 
+1. Middle: $\IP(A|B) = 2/4=1/2$. 
+After conditioning on $B$, there are now 4 equally likely outcomes, of which 2 satisfy $A$. 
 The green part represents 1/2 of the area of the blue slice. 
-1. Right: $\IP(A|B) = 1/4$.
-After conditioning on $B$, there are now 4 equally likely outcomes, of which 1 satisfies $A$.
+1. Right: $\IP(A|B) = 1/4$. 
+After conditioning on $B$, there are now 4 equally likely outcomes, of which 1 satisfies $A$. 
 The green part represents 1/4 of the area of the blue slice.
 
 :::
@@ -5053,7 +5111,7 @@ Continuing @exm-bayes-rule-iterative-twoway.
 Randomly select an American adult.
 
 1.  Consider the conditional probability that a randomly selected American adult agrees that the scientific method is "iterative" given that they have a postgraduate degree.
-Identify the prior probability, hypothesis, evidence, likelihood, and posterior probability, and use Bayes' rule to compute the posterior probability. 
+Identify the hypothesis, prior probability, evidence, likelihood, and posterior probability, and use Bayes' rule to compute the posterior probability. 
 1.  Compute the conditional probability that a randomly selected American adult with a postgraduate degree agrees that the scientific method is "unchanging".
 1.  Compute the conditional probability that a randomly selected American adult with a postgraduate degree is not sure about which statement is best.
 1.  How many times more likely is it for an *American adult* to have a postgraduate degree and agree with the "iterative" statement than to have a postgraduate degree and agree with the "unchanging" statement?
@@ -5161,7 +5219,7 @@ The table has one row for each hypothesis and columns for
 
 ```{r}
 #| label: tbl-bayes-rule-iterative-bayestable
-#| tbl-cap: Bayes table representation of the posterior probabilities of each opinion about the scientific method (the hypotheses) given a postgraduate degree (the evidence) in exm-bayes-rule-iterative-bayestable
+#| tbl-cap: Bayes table representation of the posterior probabilities of each opinion about the scientific method (the hypotheses) given a postgraduate degree (the evidence) in @exm-bayes-rule-iterative-bayestable
 #| echo: false
 
 hypothesis = c("iterative", "unchanging", "not sure")
@@ -5188,7 +5246,7 @@ bayes_table |>
 ```
 
 The likelihood column in a Bayes table depends on the evidence.
-In @tbl-bayes-rule-iterative-bayestable the evidece is that the American has a postgraduate degree; the likelihood column contains the probability of the same event, $E$ = "the American has a postgraduate degree", under each of the distinct hypotheses:
+In @tbl-bayes-rule-iterative-bayestable the evidence is that the American has a postgraduate degree; the likelihood column contains the probability of the same event, $E$ = "the American has a postgraduate degree", under each of the distinct hypotheses:
 
 -   $\IP(E |H_1) = 0.182$, given the American agrees with the "iterative" statement
 -   $\IP(E |H_2) = 0.103$, given the American agrees with the "unchanging" statement
@@ -5698,9 +5756,9 @@ To find the conditional distribution of $X$ given $Y=4$, remove the slice corres
 
 For each fixed $x$, the conditional distribution of $Y$ given $X=x$ is a different distribution on values of the random variable $Y$.
 There is not one "conditional distribution of $Y$ given $X$", but rather a *family of conditional distributions of $Y$ given different values of $X$.*
-In @exm-dice-conditional), @fig-dice-conditional-plots-given-sum) depicts the conditional distribution of $Y$ given $X=x$ for each value $x$ of $X$, and @fig-dice-conditional-plots-given-max) depicts the conditional distribution of $X$ given $Y=y$ for each value $y$ of $Y$.
-Notice how each conditional distribution corresponds to a renormalized slice of the joint distribution depicted in @fig-dice-joint-3d).
-We can also think of conditioning as slicing (and renormalizing) the joint distribution depicted in the tile plot in @fig-dice-joint-tile), just remember that color represents probability in the tile plot.
+In @exm-dice-conditional, @fig-dice-conditional-plots-given-sum depicts the conditional distribution of $Y$ given $X=x$ for each value $x$ of $X$, and @fig-dice-conditional-plots-given-max depicts the conditional distribution of $X$ given $Y=y$ for each value $y$ of $Y$.
+Notice how each conditional distribution corresponds to a renormalized slice of the joint distribution depicted in @fig-dice-joint-3d.
+We can also think of conditioning as slicing (and renormalizing) the joint distribution depicted in the tile plot in @fig-dice-joint-tile, just remember that color represents probability in the tile plot.
 
 
 
@@ -5777,11 +5835,12 @@ ggplot(data.frame(x, p) |>
 
 
 We can also depict families of conditional distributions in mosaic plots; see @fig-dice-mosaic.
-Be careful to distinguish between mosaic plots and tile plots.
-A tile plot represents a joint distribution and color represents probability.
 A mosaic plot represents a family of conditional distributions where color represents the possible values of one variable and area represents probability.
 
-
+::: {.callout-warning appearance="default"}
+Be careful to distinguish between mosaic plots (like @fig-dice-mosaic) and tile plots (like @fig-dice-joint-tile).
+A tile plot represents a joint distribution and color represents probability.
+:::
 
 ```{r}
 #| label: fig-dice-mosaic
@@ -5798,14 +5857,8 @@ knitr::include_graphics(c("_graphics/dice-mosaic-given-sum.png", "_graphics/dice
 
 
 ```{python}
-#| label: fig-dice-mosaic2
 #| eval: false
 #| echo: false
-#| fig-cap: "Mosaic plots for @exm-dice-conditional, where $X$ is the sum and $Y$ is the max of two rolls of a fair four-sided die."
-#| fig-subcap: 
-#|   - "Conditional distributions of $Y$ given each value of $X$; color represents values of $Y$."
-#|   - "Conditional distributions of $X$ given each value of $Y$; color represents values of $X$."
-#| layout-ncol: 2
 
 P = DiscreteUniform(1, 4) ** 2
 
@@ -5872,7 +5925,7 @@ Since each value of $x$ typically corresponds to a different conditional distrib
 
 
 
-We will explore conditioning in more detail throughout the book, including conditional distributions when continuous continuous random variables are involved.
+We will explore conditioning in more detail throughout the book, including conditional distributions when continuous random variables are involved.
 We will also see how to use conditioning as a problem-solving tool.
 
 
@@ -5988,7 +6041,7 @@ In this case, the joint probability is a product of the marginal probabilities.
 ::::
 
 ::: {#def-independent-events}
-For a probability space with probability measure $\IP$, two events $A$ and $B$ are^[Technically, we should say "$\IP$-independent; see @sec-independence-is-an-assumption] **independent**\index{independence!of events} if $\IP(A \cap B) = \IP(A)\IP(B)$.
+For a probability space with probability measure $\IP$, two events $A$ and $B$ are^[Technically, we should say "$\IP$-independent"; see @sec-independence-is-an-assumption] **independent**\index{independence!of events} if $\IP(A \cap B) = \IP(A)\IP(B)$.
 :::
 
 
@@ -6067,21 +6120,12 @@ In these situations $\IP(B|A) = \IP(B|A^c) = \IP(B)$.
 :::: {.callout-note appearance="simple"}
 ::: {#exm-venn-independent}
 
-Each of the three Venn diagrams below represents a sample space with 16 equally likely outcomes.
-Let $A$ be the yellow `/`  event, $B$ the blue `\` event, and their intersection $A\cap B$ the green $\times$ event.
-Suppose that areas represent probabilities, so that for example $\IP(A) = 4/16$.
-
-In which of the scenarios are events $A$ and $B$ independent?
+Continuing @exm-venn-conditional.
+In which of the three scenarios represented in @fig-venn-conditional are events $A$ and $B$ independent?
 Try your intuition first, and then determine which scenarios represent independence by computing and comparing appropriate probabilities.
 :::
 ::::
 
-
-```{r venn-independent-plot, echo = FALSE}
-
-knitr::include_graphics(c("_graphics/venn-conditional.png"))
-
-```
 
 :::: {.callout-tip collapse=true}
 ::: {#sol-venn-independent}
@@ -6104,11 +6148,13 @@ If we zoom into the blue part of the picture (slice) and then resize it to the s
 :::
 ::::
 
-
+::: {.callout-warning appearance="default"}
 Do not confuse "disjoint" with "independent".
 Disjoint means two events do not "overlap". Independence means two events *"overlap in just the right way"*.
 You can pretty much forget "disjoint" exists; you will naturally apply the addition rule for disjoint events correctly without even thinking about it.
 Independence is much more important and useful, but also requires more care.
+:::
+
 
 :::: {.callout-note appearance="simple"}
 ::: {#exm-dice-independent}
@@ -6320,7 +6366,7 @@ We have focused on independence of events, but random variables can also be inde
 :::: {.callout-note appearance="simple"}
 ::: {#exm-dice-independence-rv}
 
-Continuing @exm-dice-conditional).
+Continuing @exm-dice-conditional.
 Let $U_1$ be the result of the first roll.
 
 
@@ -6341,9 +6387,10 @@ Support your answer by computing and comparing appropriate probabilities.
 See the solution to part 3 of @exm-dice-independent).
 1. Intuitively, $U_1$ and $X$ are not independent.
 But remember that independence is a statement about probabilities, so we need to compare appropriate probabilities.
-For example, $\IP(x = 8 | U_1 = 1) = 0$ but $\IP(X = 8) = 1/16$.
+For example, $\IP(X = 8 | U_1 = 1) = 0$ but $\IP(X = 8) = 1/16$.
 Knowing that $U_1=1$ changes the distribution of $X$.
 1. If $U_2$ is the result of the second roll, then intuitively $U_1$ and $U_2$ are independent.
+$U_2$ is equally likely to be 1, 2, 3, or 4, regardless of the value of $U_1$.
 
 :::
 ::::
@@ -6373,14 +6420,14 @@ knitr::include_graphics(c("_graphics/independent-mosaic1.png", "_graphics/indepe
 
 Remember the general multiplication rule involves successive conditional probabilities
 $$
-\IP(A_1\cap A_2 \cap A_3 \cap \cdots \cap A_{n}) = \IP(A_1)\IP(A_2|A_1)\IP(A_3|A_1\cap A_2) \times \cdots \times \IP(A_n|A_1 \cap A_2 \cap \cdots \cap A_{n-1})
+\IP(A_1\cap A_2 \cap A_3 \cap A_4 \cap \cdots) = \IP(A_1)\IP(A_2|A_1)\IP(A_3|A_1\cap A_2)\IP(A_4|A_1\cap A_2 \cap A_4)\cdots
 $$
 In problems with complicated relationships, determining joint and conditional probabilities can be difficult.
 
 
 But when events are independent, the multiplication rule simplifies greatly.
 $$
-\IP(A_1 \cap A_2 \cap A_3 \cap \cdots \cap A_n) = \IP(A_1)\IP(A_2)\IP(A_3)\cdots\IP(A_n) \quad \text{if $A_1, A_2, A_3, \ldots, A_n$ are independent}
+\IP(A_1 \cap A_2 \cap A_3 \cap \cdots) = \IP(A_1)\IP(A_2)\IP(A_3)\cdots \quad \text{if $A_1, A_2, A_3, \ldots are independent}
 $$
 
 When a problem involves independence, you will want to take advantage of it.
@@ -6428,12 +6475,14 @@ It is almost always better to work with "and" events and multiplying rather than
 The complement rule is often useful in probability problems that involve finding "the probability of at least one...," which on the surface involves unions (OR).
 It usually more convenient to use the complement rule and compute "the probability of at least one..." as one minus "the probability of none..."; the latter probability involves intersections (AND).
 Don't forget to actually use the complement rule to get back to the original probability of interest!
-Subtracting a computed probability from 1 seems like a small computational step, but it's an important one.
+
+::: {.callout-warning appearance="default"}
+When using the complement rule, subtracting a computed probability from 1 seems like a small computational step, but it's an important one.
 Getting 90% correct on a test is very different than getting 10% correct!
 Unfortunately, the complement rule step is often overlooked when doing probability calculations.
 It's a good idea to ask yourself if the probability you are computing should be greater than or less than 50%.
 If your computed value seems to be on the wrong side of 50%, check your calculations to see if you have forgotten (or misapplied) the complement rule.
-
+:::
 
 
 
@@ -6464,24 +6513,25 @@ Under this set up, there are 292,201,338 possible winning numbers.
 1.  Each of the possible winning numbers is equally likely, so the  probability is $1/292,201,338\approx 3\times 10^{-9}$. See @exm-probability-interpret2 and the discussion following it.
 1.  Each of the possible winning numbers is equally likely. 
 Remember, don't confuse a general event with a specific outcome; see @exm-probability-interpret2.
-1.  The drawings are independent.
+1.  The probability that you lose in any single drawing is $(1-1/292201338)$.
+The drawings are independent so the probability that you lose all 6000 is $(1-1/292201338)^{6000}$.
 The probability that you win at least once is $1 - (1-1/292201338)^{6000}\approx 0.00002$. 
 If many people each play 6000 drawings, about 2 in every 100,000 people win will at least once.
-1.  If you play 6000 different numbers, the events that each different number wins are disjoint.
+1.  If you play 6000 different numbers, the events that each different number wins are disjoint. 
 So the probability you win at least once is $6000/292201338\approx 0.00002$. 
-This is about the same as the probability in the previous part.  
-When you play 6000 different independent drawings, there is a possibility that you win multiple times, so the events of winning in each different drawing are not disjoint.  
-But the probability of winning *multiple* lotteries is so small that it's negligible.  
-The probability of winning any single drawing is about 1 in 300 million.  
-The probability of winning any two drawings is about 1 in 85 quadrillion.
-1.  You pay \$12,000 in total.  
-Let $w$ be the value of the jackpot.  
-You win either 0 or $w$ so your "expected" profit is $w(6000/292201338)-12000$.  
+This is about the same as the probability in the previous part. 
+When you play 6000 different independent drawings, there is a possibility that you win multiple times, so the events of winning in each different drawing are not disjoint. 
+But the probability of winning *multiple* lotteries is so small that it's negligible. 
+The probability of winning any single drawing is about 1 in 300 million. 
+The probability of winning twice in any two drawings is about 1 in 85 quadrillion.
+1.  You pay \$12,000 in total. 
+Let $w$ be the value of the jackpot. 
+You win either 0 or $w$ so your "expected" profit is $w(6000/292201338)-12000$. 
 But this not what you expect in a single repetition. Rather, it is the profit you would expect to see on average in the long run. 
 You probably won't be buying 6000 tickets for a large number of drawings, so your long run average isn't really relevant. 
-In any case, we must have $w>584,402,676$ for the expected profit to be positive.  
-Sometimes, but not often, the jackpot does get this high; even so, this just guarantees that your expected profit is positive.  
-In order for your expected long run average profit to be greater than just \$100,000, the jackpot must be over 5 billion dollars, and the largest jackpot ever was 1.6 billion.  
+In any case, we must have $w>584,402,676$ for the expected profit to be positive. 
+Sometimes, but not often, the jackpot does get this high; even so, this just guarantees that your expected profit is positive. 
+In order for your expected long run average profit to be greater than just \$100,000, the jackpot must be over 5 billion dollars, and the largest jackpot ever was 1.6 billion. 
 The moral: there are better things to do with $12,000 dollars.
 
 :::

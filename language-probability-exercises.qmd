@@ -303,7 +303,7 @@ However for practical purposes we would never be interested in probabilities lik
     We see that the overall probability, 0.825, is a weighted average of the case-by-case probabilities 1, 0.5, and 0.25, where 1 gets the most weight in the average because there is a higher percentage of questions that we know.
 
 
-## Solution to #exr-ltp-rats
+## Solution to @exr-ltp-rats
 
 1.  Most people produce a sequence that has 30 G’s and 10 R’s, or close to those proportions, because they are trying to generate a sequence for which each outcome has a 75% chance for G and a 25% chance for R.
 That is, they use a strategy in which they predict G with probability 0.75, and R with probability 0.25.
