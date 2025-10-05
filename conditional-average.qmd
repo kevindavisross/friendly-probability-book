@@ -3,6 +3,317 @@ title: "Untitled"
 format: html
 ---
 
+
+## covariance
+
+Quantities like long run average, variance, and standard deviation summarize characteristics of the *marginal* distribution of a single random variable.
+When there are multiple random variables their *joint* distribution is of interest.
+Covariance and correlation each summarize in a single number a characteristic of the joint distribution of two random variables, namely, the degree to which they "co-deviate from the their respective means".
+
+We'll illustrate the computations using the Bivariate Normal model of arrival times in the meeting problem from @sec-language-simulation-computer-meeting-bvn.
+Covariance is the average of the paired deviations from the respective means.
+Let $T$ and $W$ be the first arrival time and waiting time random variables from the meeting problem in the previous section. 
+Recall that we have already simulated some $(T, W)$ pairs
+
+```{python}
+t_and_w = meeting_sim[2, 3]
+```
+
+The simulated long run averages are (notice that calling `mean` returns the pair of averages)
+
+```{python}
+t_and_w.mean()
+```
+
+Now within each simulated $(t, w)$ pair, we subtract the mean of the $T$ values from $t$ and the mean of the $W$ values from $w$,
+We can do this subtract in a "vectorized" way: the following code subtracts the first component of `t_and_w.mean()` (the average of the $T$) from the first component of each of the `t_and_w` values (the individual $t$ value), and similarly for the second.
+
+```{python}
+t_and_w - t_and_w.mean()
+```
+
+
+For each simulated pair, we now have a pair of deviations from the respective mean.
+To measure the interaction between these deviations, we take the *product* of the deviations within each pair.
+First, we split the paired deviations into two separate columns and then take the product within each row
+
+```{python}
+t_deviations = (t_and_w - t_and_w.mean())[0] # first column (Python 0)
+w_deviations = (t_and_w - t_and_w.mean())[1] # second column (Python 1)
+
+t_deviations * w_deviations
+
+```
+
+
+Now we take the average of the products of the paired deviations.
+
+```{python}
+(t_deviations * w_deviations).mean()
+```
+
+This value is the *covariance*, which we could have arrived at more quickly by calling `cov` on the simulated pairs.
+
+```{python}
+t_and_w.cov()
+
+```
+
+The **covariance** of random variables $X$ and $Y$ is defined as the long run average of the product of the paired deviations from the respective means
+
+$$
+\text{Covariance($X$, $Y$)} = \text{Average of} ((X - \text{Average of }X)(Y - \text{Average of }Y))
+$$
+It turns out that covariance is equivalent to the average of the product minus the product of the averages.
+
+$$
+\text{Covariance($X$, $Y$)} = \text{Average of} XY  - (\text{Average of }X)(\text{Average of }Y)
+$$
+
+```{python}
+(t_and_w[0] * t_and_w[1]).mean() - (t_and_w[0].mean()) * (t_and_w[1].mean()) 
+```
+
+Unfortunately, the value of covariance is hard to interpret as it depends heavily on the measurement unit scale of the random variables.
+In the meeting problem, covariance is measured in squared-minutes. If we converted the $T$ values from minutes to seconds, then the value of covariance would change accordingly and would be measured in (minutes $\times$ seconds).
+
+But the sign of the covariance does have practical meaning.
+
+-   A positive covariance indicate an overall *positive association*: above average values of $X$ tend to be associated with above average values of $Y$
+-   A negative covariance indicates am overall *negative association*: above average values of $X$ tend to be associated with below average values of $Y$
+-   A covariance of zero indicates that the random variables are  **uncorrelated**: there is no overall positive or negative association.
+But be careful: if $X$ and $Y$ are  uncorrelated there can still be a relationship between $X$ and $Y$.
+We will see examples later that demonstrate that being uncorrelated does not necessarily imply that random variables are independent.
+
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-dice-covariance}
+Consider the probability space corresponding to two rolls of a fair four-sided die.
+Let $X$ be the sum of the two rolls, $Y$ the larger of the two rolls, $W$ the number of rolls equal to 4, and $Z$ the number of rolls equal to 1.
+Without doing any calculations, determine if the covariance between each of the following pairs of variables is positive, negative, or zero.
+Explain your reasoning conceptually.
+
+1.  $X$ and $Y$
+1.  $X$ and $W$ 
+1.  $X$ and $Z$ 
+1.  $X$ and $V$, where $V = W + Z$.
+1.  $W$ and $Z$
+
+:::
+::::
+
+:::: {.callout-tip collapse=true}
+::: {#sol-dice-covariance}
+
+
+1.  Positive. There is an overall positive association; above average values of $X$ tend to be associated with above average values of $Y$ (e.g., (7, 4), (8, 4)), and below average values of $X$ tend to be associated with below average values of $Y$ (e.g., (2, 1), (3, 2)).
+1.  Positive.  If $W$ is large (roll many 4s) then $X$ (sum) tends to be large.
+1.  Negative.  If $Z$ is large (roll many 1s) then $X$ (sum) tends to be small.
+1.  Zero.. Basically, the positive association between $X$ and $W$ cancels out with the negative association of $X$ and $Z$.  $V$ is large when there are many 1s or many 4s, or some mixture of 1s and 4s.
+So knowing that W is large doesn't really tell you anything about the sum.
+1.  Negative.  There is a fixed number of rolls.  If you roll lots of 4s ($W$ is large) then there must be few rolls of 1s ($Z$ is small).
+
+:::
+::::
+
+
+
+
+
+The numerical value of the covariance depends on the measurement units of both variables, so interpreting it can be difficult.
+Covariance is a measure of joint association between two
+random variables that has many nice theoretical properties, but the *correlation (coefficient)* is often a more practical measure.
+(We saw a similar idea with variance and standard deviation. Variance has many nice theoretical properties.
+However, standard
+deviation is often a better practical measure of variability.)
+
+
+
+  
+The correlation for two random variables is the covariance between the corresponding standardized random variables.  Therefore, correlation is a *standardized* measure of the association between two random variables.
+
+Returning to the $(T, W)$ example, we carry out the same process, but first standardize each of the simulated values of $T$ by subtracting their mean and dividing by their standardization, and similarly for $W$.
+
+```{python}
+t_and_w.standardize()
+```
+
+Now we compute the covariance of the standardized values.
+
+```{python}
+t_and_w.standardize().cov()
+```
+
+Recall that we already computed the correlation in the previous section.
+
+```{python}
+t_and_w.standardize().corr()
+```
+
+
+We see that the correlation is the covariance of the standardized random variables.
+
+$$
+\text{Correlation}(X, Y) = \text{Covariance}\left(\frac{X- \text{Average of }X}{\text{Standard Deviation of }X}, \frac{Y- \text{Average of }Y}{\text{Standard Deviation of }Y}\right)
+$$
+
+
+When standardizing, subtracting the means doesn't change the scale of the possible pairs of values; it merely shifts the center of the joint distribution.
+Therefore, **correlation** is the covariance divided by the product of the standard deviations.
+
+$$
+\text{Correlation}(X, Y) = \frac{\text{Covariance}(X, Y)}{(\text{Standard Deviation of }X)(\text{Standard Deviation of }Y)}
+$$
+
+
+A correlation coefficient has no units and is measured on a universal scale.
+Regardless of the original measurement units of the random variables $X$ and $Y$
+$$
+-1\le \textrm{Correlation}(X,Y)\le 1
+$$
+
+- $\textrm{Correlation}(X,Y) = 1$ if and only if $Y=aX+b$ for some $a>0$
+- $\textrm{Correlation}(X,Y) = -1$ if and only if $Y=aX+b$ for some $a<0$
+
+
+Therefore, correlation is a standardized measure of the strength of the *linear* association between two random variables.
+The closer the correlation is to 1 or $-1$, the closer the joint distribution of $(X, Y)$ pairs hugs a straight line, with positive or negative slope.
+
+
+
+Because correlation is computed between standardized random variables,  correlation is not affected by a linear rescaling of either variable.
+A value that is "one standard deviation above the mean" is "one standard deviation above the mean", whether the variable measured in feet or inches or meters.
+
+
+
+### Joint Normal distributions {#sec-sim-bvn}
+
+Just as Normal distributions are commonly assumed for marginal distributions of individual random variables, joint Normal distributions are often assumed for joint distributions of several random variables.
+We'll focus "Bivariate Normal" distributions which describe a specific pattern of joint variability for *two* random variables.
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-dd-bvn-spinner}
+
+Donny Don't has just completed a problem where it was assumed that SAT Math scores follow a Normal(500, 100) distribution. Now a follow up problem asks Donny how he could simulate a single (Math, Reading) pair of scores. Donny says: "That's easy; just spin the Normal(500, 100) twice, once for Math and once for Reading."
+Do you agree?
+Explain your reasoning.
+
+:::
+::::
+
+:::: {.callout-tip collapse=true}
+::: {#sol-dd-bvn-spinner}
+
+You should not agree with Donny, for two reasons.
+
+-   It's possible that the distribution of SAT Math scores follow a different pattern than SAT Reading scores.  So we might need one spinner to simulate a Math score, and a second spinner to simulate the Reading score.  (In reality, SAT Math and Reading scores do follow pretty similar distributions.  But it's possible that they could follow different distributions.)
+-   Furthermore, there is probably some relationship between scores.  It is plausible that students who do well on one test tend to do well on the other.  For example, students who score over 700 on Math are probably more likely to score above than below average on Reading.  If we simulate a pair of scores by spinning one spinner for Math and a separate spinner for Reading, then there will be no relationship between the scores because the spins are physically independent.
+
+:::
+::::
+
+In the previous problem, hat we really need is a spinner that generates a pair of scores simultaneously to reflect their association.
+This is a little harder to visualize, but we could imagine spinning a "globe" with lines of latitude corresponding to SAT Math score and lines of longitutde to SAT Reading score.
+But this would not be a typical globe:
+
+-   The lines of latitude would not be equally spaced, since SAT Math scores are not equally likely.  (We have seen similar issues for one-dimensional Normal spinners.) Similarly for lines of longitude.
+-   The scale of the lines of latitude would not necessarily match the scale of the lines of longitude, since Math and Reading scores could follow difference distributions.  For example, the equator (average Math) might be 500 while the prime meridian (average Reading) might be 520.
+-   The "lines" would be tilted or squiggled to reflect the relationship between the scores.  For example, the region corresponding to Math scores near 700 and Reading scores near 700 would be larger than the region corresponding to Math scores near 700 but Reading scores near 200. 
+
+So we would like a model that
+
+-   Simulates Math scores that follow a Normal distribution pattern, with some mean and some standard deviation.
+-   Simulates Reading scores that follow a Normal distribution pattern, with possibly a different mean and standard deviation.
+-   Reflects how strongly the scores are associated.
+
+Such a model is called a "Bivariate Normal" distribution.
+There are five parameters: the two means, the two standard deviations, and the *correlation* which reflects the strength of the association between the two scores.
+
+We have already encountered a Bivariate Normal model.
+Recall that in one case of the meeting problem we assumes that Regina and Cady tend to arrive around the same time.
+One way to model pairs of values that have correlation is with a BivariateNormal distribution, like in the following.
+We assumed a Bivariate Normal distribution for the $(R, Y)$ pairs, with mean (30, 30), standard deviation (10, 10) and correlation 0.7.
+(We could have assumed different means and standard deviations.)
+
+
+```{python}
+#| eval: false
+R, Y = RV(BivariateNormal(mean1 = 30, sd1 = 10, mean2 = 30, sd2 = 10, corr = 0.7))
+
+(R & Y).sim(1000).plot()
+```
+
+```{python}
+#| echo: false
+R, Y = RV(BivariateNormal(mean1 = 30, sd1 = 10, mean2 = 30, sd2 = 10, corr = 0.7))
+
+plt.figure()
+(R & Y).sim(1000).plot()
+plt.show()
+```
+
+Now we see that the points tend to follow the $R = Y$ line, so that Regina and Cady tend to arrive near the same time, similar to @fig-meeting-probmeasure3.
+
+
+Recall that in some of the previous examples the shapes of one-dimensional histograms could be approximated with a smooth density curve.
+Similarly, a two-dimensional histogram can sometimes be approximated with a smooth density surface.
+As with histograms, the height of the density surface at a particular $(X, Y)$ pair of values can be represented by color intensity.  A marginal Normal distribution is a "bell-shaped curve"; a Bivariate Normal distribution is a "mound-shaped" curve --- imagine a pile of sand.
+(Symbulate does not yet have the capability to display densities in a three-dimensional-like plot such as [this plot](https://en.wikipedia.org/wiki/Multivariate_normal_distribution#/media/File:Multivariate_Gaussian.png).)
+
+```{r}
+#| echo: false
+#| warning: false
+
+unit_grid = seq(0, 1, 0.001) * 60
+
+unit_box <- expand_grid(x = unit_grid, y = unit_grid)
+
+waiting_corr = 0.7
+waiting_sd = 10
+waiting_mean = 30
+
+unit_box_prob <- unit_box |>
+  mutate(independent_uniform = (1 / 60) ^ 2,
+         independent_normal = dnorm(x, waiting_mean, waiting_sd) * dnorm(y, waiting_mean, waiting_sd),
+         bivariate_normal = dbvn(x, y, waiting_mean, waiting_mean, waiting_sd, waiting_sd, waiting_corr))
+
+unit_box_max_prob = unit_box_prob |>
+  dplyr::select(!(1:2)) |>
+  pivot_longer(cols = everything()) |>
+  summarize(max(value)) |>
+  pull()
+
+```
+
+```{r}
+#| label: fig-meeting-probmeasure33
+#| echo: false
+#| warning: false
+#| message: false
+#| fig-cap: "A Bivariate Normal distribution"
+
+
+ggplot(unit_box_prob,
+       aes(x = x,
+           y = y,
+           z = bivariate_normal)) +
+  geom_raster(aes(fill = bivariate_normal), interpolate = TRUE) +
+  geom_contour(color = "white") +
+  scale_x_continuous(expand = c(0, 0), limits = c(0, 60)) +
+  scale_y_continuous(expand = c(0, 0), limits = c(0, 60)) +
+  scale_fill_viridis(limits = c(0, unit_box_max_prob)) +
+  labs(x = "Regina's arrival time (minutes after noon)",
+       y = "Cady's arrival time (minutes after noon)",
+       fill = "Density") +
+  coord_fixed() +
+  theme_classic()
+
+```
+
+
+## conditional average
+
+
 Section here about how all things can change with conditioning: EV, SD, correlation
 
 Conditioning on the value of a random variable $X$ in general changes the distribution of another random variable $Y$.  If a distribution changes, its summary characteristics like expected value and variance can change too.
@@ -194,4 +505,451 @@ x_given_Yeq3.mean()
 
 ```
 
+
+
+
+## Simulating from distributions
+
+The distribution of a random variable specifies the long run pattern of variation  of values of the random variable over many repetitions of the underlying random phenomenon, or the relative degree of likelihood of possible values.
+The distribution of a random variable $X$ can be approximated by
+
+-   simulating an outcome of the underlying random phenomenon $\omega$ according to the assumptions encoded in the probability measure $\IP$
+-   observing the value of the random variable for that outcome $X(\omega)$
+-   repeating this process many times
+-   then computing relative frequencies involving the simulated values of the random variable to approximate probabilities of events involving the random variable, e.g., $\IP(X\le x)$.
+
+We have carried out this process for several examples, including the dice rolling example in @sec-tactile and @sec-technology-intro, where each repetition involved simulating a pair of rolls (outcome $\omega$) and then finding the sum ($X(\omega)$) and max ($Y(\omega)$).
+
+Now we'll discuss another method for simulating values of a random variable.
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-dice-spinners-ex}
+Recall @exm-dice-probspace, @tbl-dice-sum-dist-table, and @tbl-dice-max-dist-table.
+
+1.  Construct a spinner to represent the marginal distribution of $X$.
+1.  How could you use the spinner from the previous part to simulate a value of $X$?
+1.  Construct a spinner to represent the marginal distribution of $Y$.
+1.  How could you use the spinner from the previous part to simulate a value of $Y$?
+1.  Donny Don't says:
+"Great! I can simulate an $(X, Y)$ pair just by spinning the spinner in @fig-dice-spinners-marginal-1 to generate $X$ and the one in @fig-dice-spinners-marginal-2 to generate $Y$."
+Is Donny correct?
+If not, can you help him see why not?
+
+:::
+::::
+
+:::: {.callout-tip collapse=true}
+::: {#sol-dice-spinners-ex}
+
+1.  The spinner in @fig-dice-spinners-marginal-1 represents the marginal distribution of $X$ in @tbl-dice-sum-dist-table.
+1.  Just spin it! The spinner returns the possible values of $X$ according to the proper probabilities.
+If we're interested in simulating the sum of two rolls of a fair four-sided dice, we don't have to roll the dice; we can just spin the $X$ spinner once.
+1.  The spinner in @fig-dice-spinners-marginal-2 represents the marginal distribution of $Y$ in @tbl-dice-max-dist-table.
+1.  Just spin it! The spinner returns the possible values of $Y$ according to the proper probabilities.
+If we're interested in simulating the larger of two rolls of a fair four-sided dice, we don't have to roll the dice; we can just spin the $Y$ spinner once.
+1.  Donny is incorrect.
+Yes, spinning the $X$ spinner in @fig-dice-spinners-marginal-1 will generate values of $X$ according to the proper marginal distribution, and similarly with @fig-dice-spinners-marginal-2 and $Y$.
+However, spinning each of the spinners will *not* produce $(X, Y)$ pairs with the correct *joint* distribution.
+For example, Donny's method could produce $X=2$ and $Y=4$, which is not a possible $(X, Y)$ pair.
+Donny's method treats the values of $X$ and $Y$ as if they were *independent*; the result of the $X$ spin would not change what could happen with the $Y$ spin (since the spins are physically independent).
+However, the $X$ and $Y$ values are related.
+For example, if $X=2$ then $Y$ must be 1; if $X=4$ then $Y$ must be 2 or 3; etc.
+Later we'll see a spinner which does properly simulate $(X, Y)$ pairs.
+
+:::
+::::
+
+
+```{r}
+#| label: fig-dice-spinners-marginal
+#| echo: false
+#| fig-cap: "Spinner representing the marginal distributions of $X$ and $Y$ in @exm-dice-probspace"
+#| fig-subcap: 
+#|   - "The marginal distribution of $X$; see @tbl-dice-sum-dist-table"
+#|   - "The marginal distribution of $Y$; see @tbl-dice-max-dist-table"
+#| layout-ncol: 2
+
+n = 7
+
+xp <- data.frame(
+  x = 2:8,
+  p = c(1,2,3,4,3,2,1)/16
+  )
+
+cdf = c(0, cumsum(xp$p))
+
+plotp = (cdf[-1] + cdf[-length(cdf)]) / 2
+  
+spinner <- ggplot(xp, aes(x="", y=p, fill=x))+
+  geom_bar(width = 1, stat = "identity", color="black", fill="white") + 
+  coord_polar("y", start=0) +
+  blank_theme +
+  # plot the possible values on the outside
+  scale_y_continuous(breaks = plotp, labels=xp$x) +
+  theme(axis.text.x=element_text(size=14, face="bold")) +
+  # plot the probabilities as percents inside
+  geom_text(aes(y = plotp,
+                label = percent(p)), size=4)
+
+spinner
+
+
+n = 7
+
+xp <- data.frame(
+  x = 1:4,
+  p = c(1,3,5,7)/16
+  )
+
+cdf = c(0, cumsum(xp$p))
+
+plotp = (cdf[-1] + cdf[-length(cdf)]) / 2
+  
+spinner <- ggplot(xp, aes(x="", y=p, fill=x))+
+  geom_bar(width = 1, stat = "identity", color="black", fill="white") + 
+  coord_polar("y", start=0) +
+  blank_theme +
+  # plot the possible values on the outside
+  scale_y_continuous(breaks = plotp, labels=xp$x) +
+  theme(axis.text.x=element_text(size=14, face="bold")) +
+  # plot the probabilities as percents inside
+  geom_text(aes(y = plotp,
+                label = percent(p)), size=4)
+
+spinner
+
+```
+
+
+
+In principle, there are always two ways of simulating a value $x$ of a random variable $X$.
+
+1. **Simulate from the probability space.**
+Simulate an outcome $\omega$ from the underlying probability space and set $x = X(\omega)$.
+1. **Simulate from the distribution.**
+Simulate a value $x$ directly from the distribution of $X$.
+
+The "simulate from the distribution" method corresponds to constructing a spinner representing the distribution of $X$ and spinning it once to generate $x$.
+
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-donny-sim-from-distribution}
+Donny Don't says: "The "simulate from the distribution" method is dumb.
+In order to use it, I first need to know the distribution.
+But the whole point of simulation is to approximate a distribution.
+If I know the distribution, why do I need to approximate it?"
+How would you respond to Donny?
+Hint: it might help to consider the brown bag analogy in @sec-rv-function.
+It might also help to consider how we use simulation in the meeting problem in this chapter.
+:::
+::::
+
+:::: {.callout-tip collapse=true}
+::: {#sol-donny-sim-from-distribution}
+
+
+:::
+::::
+
+This method does require that the distribution of $X$ is known.
+However, as we will see in many examples, *it is common to specify the distribution of a random variable directly without defining the underlying probability space*.
+
+
+Any marginal distribution can be represented by a single spinner, as the following example illustrates.
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-dice-marginal-sim-from-dist}
+In @sec-technology-intro we saw the Symbulate code for the "simulate from the probability space" method in the dice rolling example.
+Now we consider the "simulate from the distribution method".
+
+1.  Write the Symbulate code to define $X$ by specifying its marginal distribution.
+1.  Write the Symbulate code to define $Y$ by specifying its marginal distribution.
+
+:::
+::::
+
+:::: {.callout-tip collapse=true}
+::: {#sol-dice-marginal-sim-from-dist}
+
+We simulate a value of $X$ from its marginal distribution by spinning the spinner in @fig-dice-spinners-marginal-1.
+Similarly, we simulate a value of $Y$ from its marginal distribution by spinning the spinner in @fig-dice-spinners-marginal-2.
+We can define a `BoxModel` corresponding to each of these spinners, and then define a random variable through the identify function.
+Essentially, we define the random variable by specifying its distribution, rather specifying the underlying probability space.
+Note that the default `size` argument in `BoxModel` is `size = 1`, so we have omitted it.
+
+Careful: the method below will not work if we want to simulate $(X, Y)$ pairs.
+
+:::
+::::
+
+```{python}
+X = RV(BoxModel([2, 3, 4, 5, 6, 7, 8], probs = [1 / 16, 2 / 16, 3 / 16, 4 / 16, 3 / 16, 2 / 16, 1 / 16]))
+
+x = X.sim(10000)
+```
+
+```{python}
+x.tabulate(normalize = True)
+```
+
+
+```{python}
+#| eval: false
+x.plot()
+```
+
+
+```{python}
+#| echo: false
+plt.figure()
+x.plot()
+plt.show()
+```
+
+
+Similarly we can define $Y$ as
+
+```{python}
+Y = RV(BoxModel([1, 2, 3, 4], probs = [1 / 16, 3 / 16, 5 / 16, 7 / 16]))
+
+
+```
+
+`BoxModel` with the `probs` option can be used to define general discrete distributions (when there are finitely many possible values).
+Many commonly encountered distributions have special names, and in Symbulate we can define a random variable to have a specific named distribution through code of the form `RV(Distribution(parameters))`.
+
+In @exm-binomial-capture we used the "simulate from the probability space" method to simulate values of $X$.
+We can also "simulate from the distribution" in Symbulate by defining `X = RV(Binomial(5, 0.25))`; read this as "$X$ is a random variable with a Binomial(5, 0.25) distribution".
+This code basically says that values of $X$ will be simulated using the spinner in @fig-binomial-capture-2.
+
+
+```{python}
+X = RV(Binomial(5, 0.25))
+
+X.sim(10)
+```
+
+```{python}
+X.sim(10000).tabulate(normalize = True)
+```
+
+
+
+## Do not confuse a random variable with its distribution {#sec-rv-versus-distribution}
+
+We close this chapter with a warning.
+
+::: {.callout-warning appearance="default"}
+Do not confuse a random variable with its distribution.
+:::
+
+A *random variable* measures a numerical quantity which depends on the outcome of a random phenomenon.
+The *distribution* of a random variable specifies the long run pattern of variation of values of the random variable over many repetitions of the underlying random phenomenon[^do-not-confuse-subjective].
+The distribution of a random variable can be approximated by simulating an outcome of the random process, observing the value of the random variable for that outcome, repeating this process many times, and summarizing the results.
+But a random variable is not its distribution.
+
+[^do-not-confuse-subjective]: A distribution can also be interpreted as a subjective assessment of relative likelihood or plausibility, but here we'll focus on the long run relative frequency interpretation.
+
+Recall the brown bag analogy in @sec-rv-function.
+The probability space corresponds to the random selection of fruits to put in the bag.
+The random variable is weight.
+The distribution of weight can be obtained by randomly selecting fruits to put in the bag, weighing the bag, and then repeating this process many times to observe many weights, summarize the values, and describe the pattern of variability (e.g., 10% of bags have weights less than 5 pounds, 75% of bags have weights less than 20 pounds, etc).
+But the random variable is like the scale itself.
+
+A distribution is determined by:
+
+-   The underlying probability measure $\IP$, which represents all the assumptions about the random phenomenon.
+-   The random variable $X$ itself, that is, the function which maps sample space outcomes to numbers.
+
+Changing either the probability measure or the random variable itself can change the distribution of the random variable.
+For example, consider the sample space of two rolls of a fair four-sided die.
+In each of the following scenarios, the random variable $X$ has a different distribution.
+
+1.  The die is fair and $X$ is the sum of the two rolls
+2.  The die is fair and $X$ is the larger of the two rolls
+3.  The die is weighted to land on 1 with probability 0.1 and 4 with probability 0.4 and $X$ is the sum of the two rolls.
+
+In particular,
+
+1.  $X$ takes the value 2 with probability $1/16$
+1.  $X$ takes the value 2 with probability $3/16$
+1.  $X$ takes the value 2 with probability 0.01.
+
+In (1) and (2), the probability measure is the same (fair die) but the function defining the random variable is different (sum versus max).
+In (1) and (3), the function defining the random variable is the same, and the sample space of outcomes is the same, but the probability measure is different.
+
+We often specify the distribution of a random variable directly without explicit mention of the underlying probability space or function defining the random variable.
+For example, in the meeting problem we might assume that arrival times follow a Uniform(0, 60) or a Normal(30, 10) distribution.
+In situations like this, you can think of the probability space as being the distribution of the random variable and the function defining the random variable to be the identity function.
+In other words, we construct a spinner to represent the distribution of the random variable and spin it to simulate a value of the random variable.
+
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-dd-same-distribution}
+
+Donny Dont is thoroughly confused about the distinction between a random variable and its distribution. 
+Help him understand by by providing a simple concrete example of *two different random variables* $X$ and $Y$ that have the *same distribution*. 
+Can you think of $X$ and $Y$ for which $\IP(X = Y) = 0$? 
+How about a discrete example and a continuous example?
+
+:::
+::::
+
+:::: {.callout-tip collapse=true}
+::: {#sol-dd-same-distribution}
+
+Flip a fair coin 3 times and let $X$ be the number of heads and $Y$ be the number of tails.  Then $X$ and $Y$ have the same distribution, because they have the same long run pattern of variability. Each variable takes values 0, 1, 2, 3 with probability 1/8, 3/8, 3/8, 1/8.
+But they are not the same random variable; they are measuring different things.
+If the outcome is HHT then $X$ is 2 but $Y$ is 1. In this case $\IP(X = Y)=0$; in an odd number of flips it's not possible to have the same number of heads and tails on any single outcome.
+
+:::
+::::
+
+In some cases of the meeting time problem we assumed the distribution of Regina's arrival time $R$ is Uniform(0, 60) and the distribution of Cady's arrival time $Y$ is Uniform(0, 60).  So $R$ and $Y$ have the same distribution.
+But these are two random variables; one measures Regina's arrival time and one measure Cady's.  If Regina and Cady met every day for a year, then the day-to-day pattern of Regina's arrival times would look like the day-to-day pattern of Cady's arrival times.  But on any given day, their arrival times would not be the same, since $R$ and $Y$ are continuous random variables so $\IP(R = Y) = 0$.
+
+
+
+
+
+A distribution, like a spinner, is a blueprint for simulating values of the random variable.
+If two random variables have the same distribution, you could use the same spinner to simulate values of either random variable.
+But a distribution is not the random variable itself.
+(In other words, "the map is not the territory.")
+
+Two random variables can have the same (long run) distribution, even if the values of the two random variables are never equal on any particular repetition (outcome).
+If $X$ and $Y$ have the same distribution, then the spinner used to simulate $X$ values can also be used to simulate $Y$ values; in the long run the patterns would be the same.
+
+At the other extreme, two random variables $X$ and $Y$ are the same random variable only if for every outcome of the random phenomenon the resulting values of $X$ and $Y$ are the same.
+That is, $X$ and $Y$ are the same random variable only if they are the same *function*: $X(\omega)=Y(\omega)$ for all $\omega\in\Omega$.
+It is possible to have two random variables for which $\IP(X=Y)$ is large, but $X$ and $Y$ have different distributions.
+
+Many commonly encountered distributions have special names.
+For example, the distribution of $X$, the number of heads in 3 flips of a fair coin, is called the "Binomial(3, 0.5)" distribution.
+If a random variable has a Binomial(3, 0.5) distribution then it takes the possible values 0, 1, 2, 3, with respective probability 1/8, 3/8, 3/8, 1/8.
+The random variable in each of the following situations has a Binomial(3, 0.5) distribution.
+
+-   $Y$ is the number of Tails in three flips of a fair coin
+-   $Z$ is the number of even numbers rolled in three rolls of a fair six-sided die
+-   $W$ is the number of female babies in a random sample of three births at a hospital (assuming boys and girls are equally likely[^distribution-2])
+
+[^distribution-2]: [Which isn't quite true](https://www.npr.org/sections/health-shots/2015/03/30/396384911/why-are-more-baby-boys-born-than-girls).
+
+Each of these situations involves a different sample space of outcomes (coins, dice, births) with a random variable which counts different things (Heads, Tails, evens, boys).
+But all the scenarios have some general features in common:
+
+-   There are 3 "trials" (3 flips, 3 rolls, 3 babies)
+-   Each trial can be classified as "success"[^distribution-3] (Tails, even, female) or "failure".
+-   Each trial is equally likely to result in success or not (fair coin, fair die, assuming boys and girls are equally likely)
+-   The trials are independent. For coins and dice the trials are physically independent. For births independence follows from random selection from a large population.
+-   The random variable counts the number of successes in the 3 trials (number of T, number of even rolls, number of female babies).
+
+[^distribution-3]: There is no value judgment; sSuccess" just refers to whatever we're counting. Did the thing we're counting happen on this trial ("success) or not ("failure").
+    Success isn't necessarily good.
+
+These examples illustrate that knowledge that a random variable has a specific distribution (e.g., Binomial(3, 0.5)) does not necessarily convey any information about the underlying outcomes or random variable (function) being measured.
+(We will study Binomial distributions in more detail later.)
+
+The scenarios involving $W, X, Y, Z$ illustrate that two random variables do not have to be defined on the same sample space in order to determine if they have the same distribution.
+This is in contrast to computing quantities like $\IP(X=Y)$: $\{X=Y\}$ is an event which cannot be investigated unless $X$ and $Y$ are defined for the same outcomes.
+For example, you could not estimate the probability that a student has the same score on both SAT Math and Reading exams unless you measured pairs of scores for each student in a sample.
+However, you could collect SAT Math scores for one set of students to estimate the marginal distribution of Math scores, and collect Reading scores for a separate set of students to estimate the marginal distribution of Reading scores.
+
+A random variable can be defined explicitly as a function on a probability space, or implicitly through its distribution.
+The distribution of a random variable is often assumed or specified directly, without mention of the underlying probabilty space or the function defining the random variable.
+For example, a problem might state "let $Y$ have a Binomial(3, 0.5) distribution" or "let $Y$ have a Normal(30, 10) distribution".
+But remember, such statements do not necessarily convey any information about the underlying sample space outcomes or random variable (function) being measured.
+In Symbulate the `RV` command can also be used to define a RV implicitly via its distribution.
+A definition like `X = RV(Binomial(3, 0.5))` effectively defines a random variable `X` on an unspecified probability space via an unspecified function.
+
+```{python}
+
+W = RV(Binomial(3, 0.5))
+
+plt.figure()
+W.sim(10000).plot()
+plt.show()
+
+```
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-dd-same-joint-distribution}
+
+Suppose that $X$, $Y$, and $Z$ all have the same distribution.  Donny Dont says
+
+1.  The pair $(X, Y)$ has the same joint distribution as the pair $(X, Z)$.
+1.  $X+Y$ has the same distribution as $X+Z$.
+1.  $X+Y$ has the same distribution as $X+X=2X$.
+
+Determine if each of Donny's statements is correct.  If not, explain why not using a simple example.
+
+:::
+::::
+
+
+:::: {.callout-tip collapse=true}
+::: {#sol-dd-same-joint-distibution}
+
+First of all, Donny's statements wouldn't even make sense unless the random variables were all defined on the same probability space.  For example, if $X$ is SAT Math score and $Y$ is SAT reading score it doesn't makes sense to consider $X+Y$ unless $(X, Y)$ pairs are measured for the same students.  But even assuming the random variables are defined on the same probability space, we can find counterexamples to Donny's statements.
+
+As just one example, flip a fair coin 4 times and let
+
+-   $X$ be the number of heads in flips 1 through 3
+-   $Y$ be the number of tails in flips 1 through 3
+-   $Z$ be the number of heads in flips 2 through 4.
+
+1.  The joint distribution of $(X, Y)$ is not the same as the joint distribution of $(X, Z)$. For example, $(X, Y)$ takes the pair $(3, 3)$ with probability 0, but $(X, Z)$ takes the pair $(3, 3)$ with nonzero probability (1/16).
+1.  The distribution of $X+Y$ is not the same as the distribution of $X+Z$; $X+Y$ is 3 with probability 1, but the probability that $X+Z$ is 3 is less than 1 (4/16). 
+1.  The distribution of $X+Y$ is not the same as the distribution of $2X$; $X+Y$ is 3 with probability 1, but $2X$ takes values 0, 2, 4, 6 with nonzero probability. 
+
+:::
+::::
+
+Remember that a joint distribution is a probability distribution on pairs of values.
+Just because $X_1$ and $X_2$ have the same marginal distribution, and $Y_1$ and $Y_2$ have the same marginal distribution, doesn't necessary imply that $(X_1, Y_1)$ and $(X_2, Y_2)$ have the same joint distributions.
+In general, information about the marginal distributions alone is not enough to determine information about the joint distribution.
+We saw a related two-way table example in @sec-dist-intro).
+Just because two two-way tables have the same totals, they don't necessarily have the same interior cells.
+
+The distribution of any random variable obtained via a transformation of multiple random variables will depend on the joint distribution of the random variables involved; for example, the distribution of $X+Y$ depends on the joint distribution of $X$ and $Y$.
+
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-uniform-same-dist}
+
+Consider the probability space corresponding to two spins of the Uniform(0, 1) spinner and let $U_1$ be the result of the first spin and $U_2$ the result of the second.  For each of the following pairs of random variables, determine whether or not they have the same distribution as each other.  No calculations necessary; just think conceptually.
+
+
+1.  $U_1$ and $U_2$
+2.  $U_1$ and $1-U_1$
+3.  $U_1$ and $1+U_1$
+4.  $U_1$ and $U_1^2$
+5.  $U_1+U_2$ and $2U_1$
+6.  $U_1$ and $1-U_2$
+7.  Is the joint distribution of $(U_1, 1-U_1)$ the same as the joint distribution of $(U_1, 1 - U_2)$?
+
+:::
+::::
+
+:::: {.callout-tip collapse=true}
+::: {#sol-uniform-same-dist}
+
+1.  Yes, each has a Uniform(0, 1) distribution.
+1.  Yes, each has a Uniform(0, 1) distribution.  For $u\in[0, 1]$, $1-u\in[0, 1]$, so $U_1$ and $1-U_1$ have the same possible values, and a linear rescaling does not change the shape of the distribution. Changing from $U_1$ to $1-U_1$ essentially amounts to switching the [0, 1] labels on the spinner from clockwise to counterclockwise.
+1.  No, the two variables do not have the same possible values.  The shapes would be similar though; $1+U_1$ has a Uniform(1, 2) distribution.
+1.  No, a non-linear rescaling generally changes the shape of the distribution.  For example, $\IP(U_1\le0.49) = 0.49$, but $\IP(U_1^2 \le 0.49) = \IP(U_1 \le 0.7) = 0.7$  Squaring a number in [0, 1] makes the number even smaller, so the distribution of $U_1^2$ places higher density on smaller values than $U_1$ does.
+1.  No, $U_1+U_2$ has a triangular shaped distribution on (0, 2) with a peak at 1. (The shape is similar to that of the distribution of $X$ in @sec-sim-transform-joint), but the possible values are (0, 2) rather than (2, 8).) But $2U_1$ has a Uniform(0, 2) distribution.  Do not confuse a random variable with its distribution.  Just because $U_1$ and $U_2$ have the same distribution, you cannot replace $U_2$ with $U_1$ in transformations. The random variable $U_1+U_2$ is not the same random variable as $2U_1$; spinning a spinner and adding the spins will not necessarily produce the same value as spinner a spinner once and multiplying the value by 2.
+1.  Yes, just like $U_1$ and $1-U_2$ have the same distribution.
+1.  No. The marginal distributions are the same, but the joint distribution of $(U_1, 1-U_1)$ places all density along a line, while the joint density of $(U_1, 1-U_2)$ is distributed over the whole two-dimensional region $[0, 1]\times[0,1]$.
+
+:::
+::::
+
+
+Do not confuse a random variable with its distribution.
+This is probably getting repetitive by now, but we're emphasizing this point for a reason.
+Many common mistakes in probability problems involve confusing a random variable with its distribution.
+For example, we will soon that if a continuous random variable $X$ has probability density function $f(x)$, then the probability density function of $X^2$ is NOT $f(x^2)$ nor $(f(x))^2$.
+Mistakes like these, which are very common, essentially involve confusing a random variable with its distribution.
+Understanding the fundamental difference between a random variable and its distribution will help you avoid many common mistakes, especially in problems involving a lot of calculus or mathematical symbols.
 

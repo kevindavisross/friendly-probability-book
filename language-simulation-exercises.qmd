@@ -535,7 +535,7 @@ plt.show()
 
 
 Simulate 10000 repetitions and find the relative frequency of repetitions on which at least 2 people share a birthday.
-The margin of error is $1/sqrt{10000} = 0.01$
+The margin of error is $1/\sqrt{10000} = 0.01$
 
 
 ```{python}
@@ -551,17 +551,24 @@ X = RV(P, count_distinct)
 B = (X < n)
 
 p_hat = B.sim(10000).count_eq(True) / 10000
+
+p_hat
+```
+
+```{r}
+#| echo: false
+p_hat = py$p_hat
 ```
 
 
-We estimate (with 95% confidence) that the probability that at least two people in a group of 30 share the same birthday is `{python} round(p_hat, 3)` with a margin of error of 0.01.
-In other words, we estimate (with 95% confidence) that the probability that at least two people in a group of 30 share the same birthday is between `{python} round(p_hat - 0.01, 2)` and `{python} round(p_hat + 0.01, 2)`.
+We estimate (with 95% confidence) that the probability that at least two people in a group of 30 share the same birthday is `{r} round(p_hat, 3)` with a margin of error of 0.01.
+In other words, we estimate (with 95% confidence) that the probability that at least two people in a group of 30 share the same birthday is between `{r} round(p_hat - 0.01, 2)` and `{r} round(p_hat + 0.01, 2)`.
 
 
 
 ## Solution to @exr-approximate-moe-collector
 
-The margin of error for any single probability would be $1/\sqrt{10000} = 0.01$, but since we are estimate many probabilities simultaneously we would use a margin of error of $2\times 0.01$.
+The margin of error for any single probability would be $1/\sqrt{10000} = 0.01$, but since we are estimating many probabilities simultaneously we would use a margin of error of $2\times 0.01$.
 For example, if the simulated relative frequency of $X = 2$ is 0.662, then we approximate $\IP(X = 2)$ to be 0.662 with a margin of error of 0.02; in other words, we estimate that $\IP(X = 2)$ is between 0.642 and 0.682.
 
 ## Solution to @exr-simulation-ev-class-size
@@ -749,7 +756,7 @@ Also, the values of $Y$ tend to be closer to their mean (around 3.0) than the va
 The values of $X$ can be anywhere from 0 to 3 units away from the mean of 5, but more values are closer than farther; we might estimate the SD to be less than 1.5.
 (Remember, the squaring then averaging then taking the square root makes it hard to guess the actual number)
 
-We would estimate the SD of $Y$ to be less, maybe a little less than 1, since a large percentage of values are between 2 and 4 (hence less than 1 unit away from the mean).
+We would estimate the SD of $Y$ to be less that of $X$, and maybe a little less than 1, since a large percentage of values are between 2 and 4 (hence less than 1 unit away from the mean).
 
 **Part 3**
 
@@ -848,7 +855,7 @@ plt.show()
 
 
 
-## Solution to @simulation-condition-dartboard
+## Solution to @exr-simulation-condition-dartboard
 
 
 In the code below
@@ -909,3 +916,97 @@ r.mean()
 r.sd()
 ```
 
+## Solution to @exr-simulation-condition-continuous-dice
+
+We condition on $X$ being "close to" 3.5, say within 0.1 of 3.5
+
+```{python}
+P = Uniform(1, 4) ** 2
+
+X = RV(P, sum)
+
+Y = RV(P, max)
+```
+
+
+
+```{python}
+( (X & Y) | (abs(X - 3.5) < 0.1) ).sim(10)
+```
+
+```{python}
+y_given_Xeq3p5 = ( Y | (abs(X - 3.5) < 0.1) ).sim(10000)
+
+plt.figure()
+y_given_Xeq3p5.plot()
+plt.show()
+```
+
+The true conditional distribution of $Y$ given $X=3.5$ is Uniform(1.75, 2.5).
+We see that the approximate distribution is a little rough at the boundaries (near 1.75 and 2.5), because of the "close to 3.5" approximation.
+But we would not be able to simulate the conditional distribution given $X=3.5$ without more sophisticated methods.
+
+
+## Solution to @exr-sensitivity-dartboard-bvn
+
+
+```{python}
+
+sigma = 1
+
+X, Y = RV(Normal(0, sigma) ** 2)
+
+R = sqrt(X ** 2 + Y ** 2)
+
+plt.figure()
+(X & Y).sim(1000).plot()
+plt.show()
+```
+
+
+```{python}
+plt.figure()
+R.sim(10000).plot()
+plt.show()
+```
+
+```{python}
+def dartboard_sim(sigma):
+  X, Y = RV(Normal(0, sigma) ** 2)
+  
+  R = sqrt(X ** 2 + Y ** 2)
+  
+  r = R.sim(10000)
+  
+  return r.count_lt(1) / r.count(), r.count_gt(12) / r.count(), r.mean()
+```
+
+
+```{python}
+
+sigmas = np.arange(0.1, 5.1, 0.1)
+
+results = np.array([dartboard_sim(sigma) for sigma in sigmas])
+
+plt.figure()
+plt.plot(sigmas, results[:, 0])
+plt.xlabel('sigma')
+plt.ylabel('Approximate P(X  < 1)')
+plt.show()
+```
+
+```{python}
+plt.figure()
+plt.plot(sigmas, results[:, 1])
+plt.xlabel('sigma')
+plt.ylabel('Approximate P(X  > 12)')
+plt.show()
+```
+
+```{python}
+plt.figure()
+plt.plot(sigmas, results[:, 2])
+plt.xlabel('sigma')
+plt.ylabel('Approximate E(X)')
+plt.show()
+```
