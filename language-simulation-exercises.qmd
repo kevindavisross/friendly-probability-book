@@ -1,0 +1,787 @@
+# Chapter 3 Exercise Solutions
+
+{{< include _r_setup.qmd >}}
+
+{{< include _python_setup.qmd >}}
+
+::: {.content-hidden}
+$$
+{{< include _macros.tex >}}
+$$
+:::
+
+
+## Solution to @exr-tactile-birthday
+
+Label 365 cards with the numbers 1 through 365.
+Shuffle the cards and deal $n$ with replacement.
+If the $n$ cards dealt all have different numbers, then $B$ does not occur; otherwise $B$ occurs.
+
+
+
+## Solution to @exr-tactile-geometric
+
+Create a spinner with two sectors, one sector labeled "make" which accounts for 40% of the area, and the other 60% labeled "miss".
+Spinner the spinner until it lands on "make" and then stop; let $X$ be the total number of spins.
+
+
+## Solution to @exr-tactile-collector
+
+
+Create a spinner with three equal sectors, labeled 1, 2, 3.
+Spin the spinner 3 times.
+Let $X$ be the number of distinct numbers the spinner lands on; for example if the spinner lands on 3 then 1 then 3, then $X$ is 2.
+Let $Y$ be the number of spins that land on 1.
+
+## Solution to @exr-tactile-dartboard
+
+1.  A Uniform(0, 12) spinner is basically a clock.
+It goes from 0 to 12 in equally spaced increments.
+See @fig-spinner-uniform-0-12.
+1.  To simulate $X$, flip the coin to determine if the point is in the "east" or "west" and then spin the Uniform(0, 12) spinner to determine how far from the center in the east or west direction.
+Let the result of the spin be $U_1$.
+If the coin lands on heads (east) set $X=U_1$; if the coin lands on tails (west) set $X=-U_1$.
+To simulate $Y$, spin the spinner again to get $U_2$, and flip the coin again.
+If the result of the flip is heads (north) then set $Y = U_2$; if the result of the flip is tails (south) then set $Y=-U_2$.
+Compute the distance from $(X, Y)$ to (0, 0) as $R=\sqrt{X^2+Y^2}$.
+If $R>12$ the dart would land off the board, so just discard the repetition and try again.
+1.  @exr-probspace-dartboard-b shows that $R$ is not uniformly distributed between 0 and 12.
+In particular, $R$ is more likely to be between 11 and 12 than it is to be between 0 and 1.
+Therefore a Uniform(0, 12) spinner would not be appropriate.
+
+
+```{r}
+#| label: fig-spinner-uniform-0-12
+#| echo: false
+#| fig-cap: "A continuous *Uniform(0, 12)* spinner. Only selected rounded values are displayed, but in the idealized model the spinner is infinitely precise so that any real number between 0 and 12 is a possible outcome."
+
+n = 12
+
+xp <- data.frame(
+  x = (0:(n-1))/n,
+  p = rep(1/n, n)
+  )
+
+cdf = c(0, cumsum(xp$p))
+
+plotp = (cdf[-1] + cdf[-length(cdf)]) / 2
+  
+spinner1 <- ggplot(xp, aes(x="", y=p, fill=x))+
+  geom_bar(width = 1, stat = "identity", color="black", fill="white") + 
+  coord_polar("y", start=0) +
+  theme_void() +
+  # plot the possible values on the outside
+  scale_y_continuous(breaks = xp$x, minor_breaks = (0:99)/100, labels=c("12|0", 12 * xp$x[-1])) +
+  theme(axis.text.x=element_text(size=14, face="bold")) +
+      annotate(geom="segment", y=(0:99)/100, yend = (0:99)/100,
+             x=1.48, xend= 1.52)
+
+spinner1
+
+
+```
+
+
+## Solution to @exr-tactile-dartboard-b
+
+```{r}
+#| echo: false
+#| label: fig-dartboard-distance
+#| fig-cap: Spinner representing the distribution of $R$ in @exr-tactile-dartboard-b
+
+xr = 1:12
+xl = 0:11
+
+p = (xr / 12) ^ 2 - (xl / 12) ^ 2
+
+xp <- data.frame(xr, p)
+
+cdf = c(0, cumsum(xp$p))
+
+
+
+plotp = (cdf[-1] + cdf[-length(cdf)]) / 2
+  
+spinner2 <- ggplot(xp, aes(x="", y=p, fill=xr))+
+  geom_bar(width = 1, stat = "identity", color="black", fill="white", linetype=1) + 
+  coord_polar("y", start=0) +
+  # coord_curvedpolar("y", start = 0) +
+  theme_void() +
+  # plot the possible values on the outside
+  scale_y_continuous(breaks = cdf[-c(length(cdf))], labels=c("12|0  ", 1:11)) +
+  theme(axis.text.x=element_text(angle = 0, size=12, face = "bold"))  +
+    geom_text(aes(y = plotp,
+                label = percent(p, accuracy = 0.1)), size=4, color=c(rep(NA, 3), rep("black", 9)))
+
+spinner2
+
+
+```
+
+## Solution to @exr-computer-simulation-collector
+
+
+```{python}
+P = BoxModel([1, 2, 3], size = 3)
+
+def count_distinct(u):
+    return len(set(u))
+
+X = RV(P, count_distinct)
+
+Y = RV(P, count_eq(1))
+
+(RV(P) & X & Y).sim(10)
+
+```
+
+
+## Solution to @exr-computer-simulation-collector-b
+
+
+```{python}
+P = BoxModel([1, 2, 3], size = 3, probs = [0.1, 0.3, 0.6])
+
+def count_distinct(u):
+    return len(set(u))
+
+X = RV(P, count_distinct)
+
+Y = RV(P, count_eq(1))
+
+(RV(P) & X & Y).sim(10)
+
+```
+
+
+## Solution to @exr-computer-simulation-birthday
+
+The code below defines a random variable $X$ that counts the number of distinct birthdays in the group of $n$.
+Event $B$ occurs if $X<n$.
+
+
+```{python}
+n = 30
+
+P = BoxModel(list(range(365)), size = n)
+
+def count_distinct(u):
+  return len(set(u))
+
+X = RV(P, count_distinct)
+
+B = (X < n)
+
+B.sim(10)
+```
+
+
+## Solution to @exr-computer-simulation-geometric
+
+
+```{python}
+
+p_success = 0.4
+
+# define a function that takes as an input a sequence of 0s and 1s (omega)
+# and returns when the first 1 occurs
+def count_until_first_success(omega):
+    for i, w in enumerate(omega):
+        if w == 1:
+            return i + 1 # the +1 is for zero-based indexing
+
+# Either of the following probability spaces works        
+# P = Bernoulli(p_success) ** inf
+P = BoxModel([1, 0], probs = [p_success, 1 - p_success], size = inf)
+
+X = RV(P, count_until_first_success)
+
+(RV(P) & X).sim(10)
+
+```
+
+
+
+## Solution to @exr-computer-simulation-dartboard
+
+In the code below
+
+-   `Uniform(0, 12) ** 2` corresponds to the two spins
+-   `BoxModel([-1, 1], size = 2)` corresponds to the two coin flips
+-   `Uniform(0, 12) ** 2 * BoxModel([-1, 1], size = 2)` simulates a pair which we unpack and define as `RV`s `U, F`, but `U` is itself a pair and so is `F`.
+-   `U[0]` is the first spin and `F[0]` is the first flip.
+
+
+
+```{python}
+
+U, F = RV(Uniform(0, 12) ** 2 * BoxModel([-1, 1], size = 2))
+
+X = U[0] * F[0]
+
+Y = U[1] * F[1]
+
+R = sqrt(X ** 2 + Y ** 2)
+
+(U & F & X & Y & R).sim(10)
+```
+
+
+
+Currently the $(X, Y)$ pairs are uniformly distributed in the box with sides [-12, 12].
+We'll see how to discard points off the board later.
+
+```{python}
+plt.figure()
+(X & Y).sim(1000).plot()
+plt.show()
+```
+
+## Solution to @exr-computer-simulation-continuous-dice
+
+
+```{python}
+P = Uniform(1, 4) ** 2
+
+X = RV(P, sum)
+Y = RV(P, max)
+
+(RV(P) & X & Y).sim(10)
+```
+
+
+```{python}
+plt.figure()
+(X & Y).sim(1000).plot()
+plt.show()
+```
+
+
+## Solution to @exr-approximate-probability-collector
+
+**Part 1**
+
+See previous solutions which discuss how to simulate $(X, Y)$ pairs.
+
+Simulate many $(X, Y)$ pairs, say 10000.
+
+a.  To approximate $\IP(X = 2)$: Divide the number of repetitions with $X = 2$ by the total number of repetitions
+a.  To approximate $\IP(Y = 1)$: Divide the number of repetitions with $Y = 1$ by the total number of repetitions
+a.  To approximate $\IP(X = 2, Y = 1)$: Divide the number of repetitions with $X = 2$ and $Y=1$ by the total number of repetitions
+
+
+**Part 2**
+
+```{python}
+P = BoxModel([1, 2, 3], size = 3)
+
+def count_distinct(u):
+    return len(set(u))
+
+X = RV(P, count_distinct)
+
+Y = RV(P, count_eq(1))
+
+x_and_y = (X & Y).sim(10000)
+
+x = x_and_y[0]
+
+y = x_and_y[1]
+```
+
+
+```{python}
+x.count_eq(2) / x.count()
+```
+
+
+
+```{python}
+y.count_eq(1) / x.count()
+```
+
+
+```{python}
+((x == 2) * (y == 1)).sum() / x.count()
+```
+
+**Part 3**
+
+```{python}
+x.tabulate(normalize = True)
+```
+
+```{python}
+plt.figure()
+x.plot()
+plt.show()
+```
+
+```{python}
+y.tabulate(normalize = True)
+```
+
+```{python}
+plt.figure()
+y.plot()
+plt.show()
+```
+
+```{python}
+x_and_y.tabulate(normalize = True)
+```
+
+```{python}
+plt.figure()
+x_and_y.plot('tile')
+plt.show()
+```
+
+## Solution to @exr-approximate-probability-collector-b
+
+**Part 1**
+
+See previous solutions which discuss how to simulate $(X, Y)$ pairs.
+
+Simulate many $(X, Y)$ pairs, say 10000.
+
+a.  To approximate $\IP(X = 2)$: Divide the number of repetitions with $X = 2$ by the total number of repetitions
+a.  To approximate $\IP(Y = 1)$: Divide the number of repetitions with $Y = 1$ by the total number of repetitions
+a.  To approximate $\IP(X = 2, Y = 1)$: Divide the number of repetitions with $X = 2$ and $Y=1$ by the total number of repetitions
+
+
+**Part 2**
+
+```{python}
+P = BoxModel([1, 2, 3], size = 3, probs = [0.1, 0.3, 0.6])
+
+def count_distinct(u):
+    return len(set(u))
+
+X = RV(P, count_distinct)
+
+Y = RV(P, count_eq(1))
+
+x_and_y = (X & Y).sim(10000)
+
+x = x_and_y[0]
+
+y = x_and_y[1]
+```
+
+
+```{python}
+x.count_eq(2) / x.count()
+```
+
+
+
+```{python}
+y.count_eq(1) / x.count()
+```
+
+
+```{python}
+((x == 2) * (y == 1)).sum() / x.count()
+```
+
+**Part 3**
+
+```{python}
+x.tabulate(normalize = True)
+```
+
+```{python}
+plt.figure()
+x.plot()
+plt.show()
+```
+
+```{python}
+y.tabulate(normalize = True)
+```
+
+```{python}
+plt.figure()
+y.plot()
+plt.show()
+```
+
+```{python}
+x_and_y.tabulate(normalize = True)
+```
+
+```{python}
+plt.figure()
+x_and_y.plot('tile')
+plt.show()
+```
+
+
+## Solution to @exr-approximate-probability-geometric
+
+**Part 1**
+
+See previous solutions for description of how to simulate values of $X$.
+
+Simulate many values of $X$ and summarize the simulate values and their relative frequencies to approximate the distribution of $X$.
+
+To approximate $\IP(X  > 3)$: divide the number of repetitions with $X>3$ by the total number of repetitions.
+
+**Part 2**
+
+```{python}
+
+p_success = 0.4
+
+# define a function that takes as an input a sequence of 0s and 1s (omega)
+# and returns when the first 1 occurs
+def count_until_first_success(omega):
+    for i, w in enumerate(omega):
+        if w == 1:
+            return i + 1 # the +1 is for zero-based indexing
+
+# Either of the following probability spaces works        
+# P = Bernoulli(p_success) ** inf
+P = BoxModel([1, 0], probs = [p_success, 1 - p_success], size = inf)
+
+X = RV(P, count_until_first_success)
+
+x = X.sim(10000)
+
+x
+```
+
+
+```{python}
+x.tabulate(normalize = True)
+```
+
+
+
+```{python}
+plt.figure()
+x.plot()
+plt.show()
+```
+
+
+
+```{python}
+x.count_gt(3) / x.count()
+```
+
+## Solution to @exr-approximate-probability-continuous-dice
+
+**Part 1**
+
+See previous solutions for how to simulate $(X, Y)$ pairs.
+
+Simulate many $(X, Y)$ pairs, say 10000.
+To approximate:
+
+a.  $\IP(X < 3.5)$: divide number of repetitions with $X<3.5$ by the total number of repetitions
+a.  $\IP(Y > 2.7)$: divide number of repetitions with $Y>2.7$ by the total number of repetitions
+a.  $\IP(X < 3.5, Y > 2.7)$: divide number of repetitions with $X<3.5$ and $Y>2.7$ by the total number of repetitions
+
+**Part 2**
+
+We usually summarize simulated values of continuous random variables with histogram.
+
+```{python}
+P = Uniform(1, 4) ** 2
+
+X = RV(P, sum)
+Y = RV(P, max)
+
+x_and_y = (X & Y).sim(10000)
+
+x = x_and_y[0]
+
+y = x_and_y[1]
+
+```
+
+
+```{python}
+plt.figure()
+x.plot()
+plt.show()
+```
+
+
+```{python}
+plt.figure()
+y.plot()
+plt.show()
+```
+
+
+```{python}
+plt.figure()
+x_and_y.plot()
+plt.show()
+```
+
+```{python}
+plt.figure()
+x_and_y.plot('hist')
+plt.show()
+```
+
+
+
+## Solution to @exr-approximate-moe-birthday
+
+
+Simulate 10000 repetitions and find the relative frequency of repetitions on which at least 2 people share a birthday.
+The margin of error is $1/sqrt{10000} = 0.01$
+
+
+```{python}
+n = 30
+
+P = BoxModel(list(range(365)), size = n)
+
+def count_distinct(u):
+  return len(set(u))
+
+X = RV(P, count_distinct)
+
+B = (X < n)
+
+p_hat = B.sim(10000).count_eq(True) / 10000
+```
+
+
+We estimate (with 95% confidence) that the probability that at least two people in a group of 30 share the same birthday is `{python} round(p_hat, 3)` with a margin of error of 0.01.
+In other words, we estimate (with 95% confidence) that the probability that at least two people in a group of 30 share the same birthday is between `{python} round(p_hat - 0.01, 2)` and `{python} round(p_hat + 0.01, 2)`.
+
+
+
+## Solution to @exr-approximate-moe-collector
+
+The margin of error for any single probability would be $1/\sqrt{10000} = 0.01$, but since we are estimate many probabilities simultaneously we would use a margin of error of $2\times 0.01$.
+For example, if the simulated relative frequency of $X = 2$ is 0.662, then we approximate $\IP(X = 2)$ to be 0.662 with a margin of error of 0.02; in other words, we estimate that $\IP(X = 2)$ is between 0.642 and 0.682.
+
+## Solution to @exr-simulation-ev-class-size
+
+1.  $X$ takes the value 210 with probability 1/5 and 35 with probability 4/5.
+1.  $\text{E}(X) = 210(1/5) + 35(4/5)=70$ is the average number of students per class from the instructors' perspective. If we randomly select an instructor, record the number of students in the instructor's class, and repeat, the long run average number of students will be 70.
+1.  $\text{P}(X = \text{E}(X)) = \text{P}(X = 70) = 0$. No instructor has a class whose size is equal to the average class size (from the instructor's perspective).
+1.  $Y$ takes the value 210 with probability 210/350 and 35 with probability 140/350.
+1.  $\text{E}(Y) = 210(210/350) + 35(140/350)=140$ is the average number of students per class from the students' perspective. If we randomly select a student, record the number of students in the selected student's class, and repeat, the long run average number of students will be 140.
+1.  $\text{P}(Y = \text{E}(Y)) = \text{P}(Y = 140) = 0$. No student is in a class whose size is equal to the average class size (from the students' perspective).
+1.  Colleges usually report average class size from the instructor/class perspective, which in this case would be 70 students. From the students' perspective, the average class size is not even close to 70! In fact, it's twice that size. Some students (140 of them, which is 40% of the total of 350 students) have the benefit of a small class size of 35. But most students (210 of them, which is 60% of the students) are stuck in a large class of 210 students. In other words, most students would be pretty seriously misled if they chose this college based on the advertised average class size of 35 students per class. From the students' perspective, it seems that 140 is the more relevant average to report. However, neither average really adequately represents what is happening here: there is wide variability in class sizes between large and small.
+
+
+## Solution to @exr-simulation-ev-collector
+
+See previous for solutions for how to simulate $(X, Y)$ pairs
+
+**Part 1**
+
+Simulate many $(X, Y)$ pairs, say 10000
+
+a.  To approximate $\E(X)$: average the simulated $X$ values (sum the 10000 simulated $X$ values and divide by 10000)
+a.  To approximate $\E(Y)$: average the simulated $Y$ values (sum the 10000 simulated $Y$ values and divide by 10000)
+a.  To approximate $\E(X^2)$: average the simulated $X^2$ values (square each simulated $X$ value then sum the 10000 $X^2$ values and divide by 10000)
+a.  To approximate $\E(XY)$: average the simulated $XY$ values (for each $(X, Y)$ pair compute the product $XY$ then sum the 10000 $XY$ values and divide by 10000)
+
+**Part 2**
+
+
+```{python}
+P = BoxModel([1, 2, 3], size = 3)
+
+def count_distinct(u):
+    return len(set(u))
+
+X = RV(P, count_distinct)
+
+Y = RV(P, count_eq(1))
+
+x_and_y = (X & Y).sim(10000)
+
+x = x_and_y[0]
+
+y = x_and_y[1]
+```
+
+```{python}
+x.mean()
+```
+
+```{python}
+y.mean()
+```
+
+```{python}
+(x ** 2).mean()
+```
+
+```{python}
+(x * y).mean()
+```
+
+
+## Solution to @exr-simulation-ev-continuous-dice
+
+
+See previous for solutions for how to simulate $(X, Y)$ pairs
+
+**Part 1**
+
+Simulate many $(X, Y)$ pairs, say 10000
+
+a.  To approximate $\E(X)$: average the simulated $X$ values (sum the 10000 simulated $X$ values and divide by 10000)
+a.  To approximate $\E(Y)$: average the simulated $Y$ values (sum the 10000 simulated $Y$ values and divide by 10000)
+a.  To approximate $\E(X^2)$: average the simulated $X^2$ values (square each simulated $X$ value then sum the 10000 $X^2$ values and divide by 10000)
+a.  To approximate $\E(XY)$: average the simulated $XY$ values (for each $(X, Y)$ pair compute the product $XY$ then sum the 10000 $XY$ values and divide by 10000)
+
+**Part 2**
+
+
+```{python}
+P = Uniform(1, 4) ** 2
+
+X = RV(P, sum)
+
+Y = RV(P, max)
+
+x_and_y = (X & Y).sim(10000)
+
+x = x_and_y[0]
+
+y = x_and_y[1]
+```
+
+```{python}
+x.mean()
+```
+
+```{python}
+y.mean()
+```
+
+```{python}
+(x ** 2).mean()
+```
+
+```{python}
+(x * y).mean()
+```
+
+
+## Solution to @exr-simulation-variance-collector
+
+See previous parts for how to simulate $X$ values.
+
+**Part 1**
+
+To approximate $\Var(X)$:
+
+a.  Simulate many $X$ values and compute the average of the simulated values
+a.  Square each simulated $X$ value and compute the average of the squared values
+a.  Subrtract the square of the average from part a) from the average of the squares in part b).
+
+
+**Part 2**
+
+
+```{python}
+P = BoxModel([1, 2, 3], size = 3)
+
+def count_distinct(u):
+    return len(set(u))
+
+X = RV(P, count_distinct)
+
+x = X.sim(10000)
+```
+
+```{python}
+(x ** 2).mean() - (x.mean()) ** 2
+```
+
+```{python}
+x.var()
+```
+
+```{python}
+x.sd()
+```
+
+
+## Solution to @exr-simulation-variance-continuous-dice
+
+**Part 1**
+
+```{python}
+P = Uniform(1, 4) ** 2
+
+X = RV(P, sum)
+
+Y = RV(P, max)
+
+x_and_y = (X & Y).sim(10000)
+
+x = x_and_y[0]
+
+y = x_and_y[1]
+```
+
+```{python}
+x.plot()
+```
+
+```{python}
+y.plot()
+```
+
+
+**Part 2**
+
+$X$ will have larger standard deviation than $Y$.
+The values of $X$ range from 2 to 8 while the values of $Y$ only range from 1 to 4.
+Also, the values of $Y$ tend to be closer to their mean (around 3.0) than the values of $X$ are to their mean (around 5).
+
+The values of $X$ can be anywhere from 0 to 3 units away from the mean of 5, but more values are closer than farther; we might estimate the SD to be less than 1.5.
+(Remember, the squaring then averaging then taking the square root makes it hard to guess the actual number)
+
+We would estimate the SD of $Y$ to be less, maybe a little less than 1, since a large percentage of values are between 2 and 4 (hence less than 1 unit away from the mean).
+
+**Part 3**
+
+To approximate $\Var(X)$:
+
+a.  Simulate many $X$ values and compute the average of the simulated values
+a.  Square each simulated $X$ value and compute the average of the squared values
+a.  Subrtract the square of the average from part a) from the average of the squares in part b).
+
+Take the square of the variance to approximate the standard deviation.
+
+Similarly for $Y$.
+
+**Part 4**
+
+```{python}
+x.var(), x.sd()
+```
+
+```{python}
+y.var(), y.sd()
+```
+
+
+
+## Solution to @exr-simulation-covariance-collector
+
+TBA
+
+
+## Solution to @exr-simulation-covariance-1
+
+TBA
+
+

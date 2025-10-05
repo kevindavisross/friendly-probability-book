@@ -22,5 +22,11 @@
   },
   "appendix.qmd": {
     "appendix.html": "b5d45be9"
+  },
+  "language-simulation.qmd": {
+    "language-simulation.html": "b5880fb8"
+  },
+  "language-simulation-exercises.qmd": {
+    "language-simulation-exercises.html": "c3551bf1"
   }
 }

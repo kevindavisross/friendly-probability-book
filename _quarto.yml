@@ -16,9 +16,7 @@ book:
     # - about-the-author.qmd
     - literacy-probability.qmd
     - language-probability.qmd
-    # should anything from math-probability go in language-probability or separate chapter here?
-    # specifically, where should Bayes rule go?
-    # - language-simulation.qmd
+    - language-simulation.qmd
     # - simulation-marginal-discrete.qmd
     # - simulation-marginal-continuous.qmd
     # chapter on simulation of multiple RVs (joint, conditional, transformations, sums)
@@ -37,6 +35,7 @@ book:
     # - math-common-continuous.qmd
     # - statistics.qmd
     - language-probability-exercises.qmd
+    - language-simulation-exercises.qmd
     - appendix.qmd
     - references.qmd
 

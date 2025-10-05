@@ -13,6 +13,27 @@
 1 + 1
 ```
 
+
+
+<!--
+Add section: Why is the book "friendly"?
+
+words
+
+graphs
+
+simple strategies likes tables, percentages, averages
+
+simulation
+
+Main characters:
+
+-   You!
+-   We/us, the author/narrator, we're just here to guide you through the journey
+-   Donny
+-   Examples
+-->
+
 ## Why study probability *and simulation*? {.unnumbered}
 
 Why study probability?
@@ -116,6 +137,7 @@ import matplotlib.pyplot as plt
 Colab or Jupyter notebooks provide a natural interface for Symbulate.
 The code in this book matches as closely as possible the commands that would be entered into cells in a notebook.
 However, certain commands that appear throughout the book are needed only to properly produce the output in this book, and not if working directly in notebooks (e.g., some `print` statements, instances of `plt.figure()` or `plt.show()`)
+
 
 
 ## About this book {.unnumbered}

@@ -1,5 +1,10 @@
 # The Language of Probability {#sec-language-probability}
 
+<!-- 
+-   End of dice probability models: add back to two dice, include table for 16 outcomes with column for probability both with fair die and with the first weighted die, mention we'll discuss independence later
+-   Independence section: refer back to the tables created in previous note and include example for how to compute the probability of each outcome, and add a few event probabilities for sum and max. Actually, for fair dice this should already be in intro to distribution section, so in independence section basically redo that for weighted die.
+-->
+
 {{< include _r_setup.qmd >}}
 
 {{< include _python_setup.qmd >}}
@@ -3323,12 +3328,14 @@ For any event^[*Proof.* Since $\Omega = A \cup A^c$ and $A$ and $A^c$ are disjoi
 
 The complement rule follows from the fact that an event either happens or it doesn't.
 We'll see that it is sometimes more convenient to compute directly the probability that an event does not happen and then use the complement rule.
+
+::: {.callout-warning appearance="default"}
 Subtracting a computed probability from 1 seems like a small computational step, but it's an important one.
 If you're taking a test, a 0.9 probability of getting a question correct is much different than a  0.1 probability.
 Unfortunately, the complement rule step is often overlooked when doing probability calculations.
 It's a good idea to ask yourself if the probability you are computing should be greater than or less than 0.5.
 If your computed value seems to be on the wrong side of 0.5, check your calculations to see if you have forgotten (or misapplied) the complement rule.
-
+:::
 
 
 
@@ -4003,11 +4010,6 @@ In the context of multiple random variables, the distribution of any one of the 
 @tbl-dice-sum-dist-table and @fig-dice-sum-dist-plot22 represent the marginal distribution of the sum and larger of two rolls of a fair four-sided die.
 @tbl-dice-max-dist-table and @fig-dice-max-dist-plot22 represent the marginal distribution of the larger of two rolls of a fair four-sided die.
 
-In @exm-dice-probspace, we can obtain the marginal distributions from the joint distribution by summing rows and columns: think of adding a total column (for $X$) and a total row (for $Y$) in the "margins" of the table.
-It is possible to obtain marginal distributions from a joint distribution.
-However, in general you cannot recover the joint distribution from the marginal distributions alone.
-Just because you know the row and column totals doesn't mean you know all the values of the interior cells in the joint distribution table.
-
 :::: {.callout-note appearance="simple"}
 ::: {#exm-dice-change-dist}
 Continuing @exm-dice-probspace, suppose that instead of a fair die, the weighted die in @exm-die-weighted is rolled twice.
@@ -4060,6 +4062,77 @@ We can observe the distribution of weights even if we don't observe the actual f
 
 @exm-dice-probspace involved two discrete random variables.
 We will introduce distributions of continuous random variables later.
+
+
+### Marginal distributions do not determine the joint distribution
+
+In @exm-dice-probspace, we can obtain the marginal distributions from the joint distribution by summing rows and columns: think of adding a total column (for $X$) and a total row (for $Y$) in the "margins" of the table.
+It is always possible to obtain marginal distributions of the random variables in a collection from their joint distribution.
+However, in general the marginal distributions alone are not enough to determine the joint distribution.
+
+
+
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-dice-joint-independent}
+Suppose $X$ and $Y$ are random variables whose joint distribution is represented by @tbl-dice-joint-independent.
+
+1.  Find the marginal distribution of $X$.
+1.  Find the marginal distribution of $Y$.
+1.  Are the marginal distributions of $X$ and $Y$ in this example the same as those in @exm-dice-probspace?
+1.  Is the joint distribution of $X$ and $Y$ the same as the one in @exm-dice-probspace?
+
+:::
+::::
+
+:::: {.callout-tip collapse=true}
+::: {#sol-dice-joint-independent}
+1.  The possible values of $X$ are 2, 3, 4, 5, 6, 7, 8.
+Add a total column to the joint distribution table to find the probabilities of each possible $x$ value, which are, respectively, 16/256, 32/356, 42/256, 64/256, 42/256, 32/356, 16/256, or 1/16, 2/16, 3/16, 4/16, 3/16, 2/16, 1/16. 
+1.  The possible values of $Y$ are 1, 2, 3, 4.
+Add a total row to the joint distribution table to find the probabilities of each possible $y$ value, which are, respectively, 16/256, 48/356, 80/256, 112/256, or 1/16, 3/16, 5/16, 7/16. 
+1.  Yes, the marginal distributions of $X$ and $Y$ are the same as in @exm-dice-probspace, represented by @tbl-dice-sum-dist-table and @tbl-dice-max-dist-table.
+1.  No, this is a different joint distribution than the one in @tbl-dice-joint-dist-twoway.
+For example, in @tbl-dice-joint-dist-twoway some of the $(X, Y)$ pairs aren't even possible, but the joint distribution in @tbl-dice-joint-independent assigns positive probability to all $(X, Y)$ pairs.
+:::
+::::
+
+
+|            |       |        |        |        |
+|------------|------:|-------:|-------:|-------:|
+| $x$ \\ $y$ |     1 |      2 |      3 |      4 |
+| 2          | 1/256 |  3/256 |  5/256 |  7/256 |
+| 3          | 2/256 |  6/256 | 10/256 | 14/256 |
+| 4          | 3/256 |  9/256 | 15/256 | 21/256 |
+| 5          | 4/256 | 12/256 | 20/256 | 28/256 |
+| 6          | 3/256 |  9/256 | 15/256 | 21/256 |
+| 7          | 2/256 |  6/256 | 10/256 | 14/256 |
+| 8          | 1/256 |  3/256 |  5/256 |  7/256 |
+
+: The joint distribution for @exm-dice-joint-independent {#tbl-dice-joint-independent}
+
+
+
+
+@tbl-dice-joint-dist-twoway and @tbl-dice-joint-independent provide an illustration of two different joint distributons with the same marginal distributions.
+When representing the joint distribution of two discrete random variables in a table, just because you know the row and column totals doesn't mean you know all the values of the interior cells.
+
+A joint distribution represents all of the probabilistic behavior of a collection of random variables.
+It is always possible to obtain marginal distributions of the random variables in a collection from their joint distribution.
+
+However, in general you cannot determine the joint distribution based on the marginal distributions alone.
+Marginal distributions only reflect how each random variable behaves in isolation.
+The joint distribution goes further and fully represents relationships between the random variables.
+Just because you know how each random variable behaves individually, you don't necessarily know how they behave in relationship with each other.
+
+::: {.callout-warning appearance="default"}
+In general, marginal distributions alone are not enough to determine a joint distribution. 
+:::
+
+The exception to this warning is when random variables are *independent*, which we'll discuss later.
+But you shouldn't simply assume random variables are independent without sufficient justification.
+
+
 
 
 ### Interpretations of distributions
@@ -6403,7 +6476,7 @@ In these situations $\IP(B|A) = \IP(B|A^c) = \IP(B)$.
 ::: {#exm-venn-independent}
 
 Continuing @exm-venn-conditional.
-In which of the three scenarios represented in @fig-venn-conditional are events $A$ and $B$ independent?
+In which of the three scenarios represented in @fig-venn-conditional-plot are events $A$ and $B$ independent?
 Try your intuition first, and then determine which scenarios represent independence by computing and comparing appropriate probabilities.
 :::
 ::::
@@ -6498,9 +6571,9 @@ You can specify the model by identifying how many cards each person's name is wr
 For each model, find the probabilities of $A$, $B$, and $A\cap B$, and verify whether or not events $A$ and $B$ are independent according to the model.
 
 
-1. Specify a probability model according to which the events $A$ and $B$ are independent.
-1. Specify a different probability model according to which the events $A$ and $B$ are independent.
-1. Specify a probability model according to which the events $A$ and $B$ are not independent.
+1.  Specify a probability model according to which the events $A$ and $B$ are independent.
+1.  Specify a different probability model according to which the events $A$ and $B$ are independent.
+1.  Specify a probability model according to which the events $A$ and $B$ are not independent.
 
 :::
 ::::
@@ -6511,10 +6584,10 @@ For each model, find the probabilities of $A$, $B$, and $A\cap B$, and verify wh
 
 Note that $A \cap B$ is the event that Alicia is selected.
 
-1. Write each person's name on exactly one card, so the 4 outcomes are equally likely.
+1.  Write each person's name on exactly one card, so the 4 outcomes are equally likely.
 Let $\IP$ represent this probability measure.
 Then $\IP(A \cap B) = 1/4 = (2/4)(2/4)=\IP(A)\IP(B)$, so $A$ and $B$ are independent.  
-1. The previous part involves a situation where $(1/2)(1/2)=1/4=(2/4)(2/4)$.
+1.  The previous part involves a situation where $(1/2)(1/2)=1/4=(2/4)(2/4)$.
 We try to construct a situation where $(1/3)(1/3)=1/9=(3/9)(3/9)$.
 Suppose there are 9 cards, with Alicia on 1, Ariana and Beyonce on 2 each, and Billie on 4.
 
@@ -6527,13 +6600,13 @@ Suppose there are 9 cards, with Alicia on 1, Ariana and Beyonce on 2 each, and B
     Then $\IQ(A \cap B) = 1/9 = (3/9)(3/9)=\IQ(A)\IQ(B)$, so events $A$ and $B$ are independent.
     Elaborating,
     
-    - There are 3 cards that satisfy $A$ and 6 that don't so $A$ is 3/6 = 1/2 as likely to occur than not.
-    - If $B$ occurs, then it's either Alicia (satisfies $A$, 1 card) or Beyonce (does not satisfy $A$, 2 cards), so given that $B$ occurs then $A$ is 1/2 times as likely to occur than not.
-    - If $B$ does not occur, then it's either Ariana (satifies $A$, 2 cards) or Billie (does not satisfy $A$, 4 cards), so given that $B$ does not occur then $A$ is 2/4 = 1/2 times as likely to occur than not.
+    -   There are 3 cards that satisfy $A$ and 6 that don't so $A$ is 3/6 = 1/2 as likely to occur than not.
+    -   If $B$ occurs, then it's either Alicia (satisfies $A$, 1 card) or Beyonce (does not satisfy $A$, 2 cards), so given that $B$ occurs then $A$ is 1/2 times as likely to occur than not.
+    -   If $B$ does not occur, then it's either Ariana (satifies $A$, 2 cards) or Billie (does not satisfy $A$, 4 cards), so given that $B$ does not occur then $A$ is 2/4 = 1/2 times as likely to occur than not.
     
     Knowing whether or not $B$ occurs doesn't change the chance of $A$ occurring, so $A$ and $B$ are independent according to this probability model.
 
-1. Independence requires probabilities to overlap in just the right way.
+1.  Independence requires probabilities to overlap in just the right way.
 Aside from equally likely situations, if we blindly write down numbers that sum to 1 we will probably not luck into a probability measure where the events are independent.
 For example,
 
@@ -6546,9 +6619,9 @@ For example,
     Then $\tilde{\IQ}(A \cap B) = 0.1 \neq (0.3)(0.4)=\tilde{\IQ}(A)\tilde{\IQ}(B)$, so events $A$ and $B$ are not independent.
     Elaborating,
     
-    - There are 3 cards that satisfy $A$ and 7 that don't so $A$ is 3/7 as likely to occur than not.
-    - If $B$ occurs, then it's either Alicia (satisfies $A$, 1 card) or Beyonce (does not satisfy $A$, 3 cards), so given that $B$ occurs then $A$ is 1/3 times as likely to occur than not.
-    - If $B$ does not occur, then it's either Ariana (satifies $A$, 2 cards) or Billie (does not satisfy $A$, 4 cards), so given that $B$ does not occur then $A$ is 2/4 = 1/2 times as likely to occur than not.
+    -   There are 3 cards that satisfy $A$ and 7 that don't so $A$ is 3/7 as likely to occur than not.
+    -   If $B$ occurs, then it's either Alicia (satisfies $A$, 1 card) or Beyonce (does not satisfy $A$, 3 cards), so given that $B$ occurs then $A$ is 1/3 times as likely to occur than not.
+    -   If $B$ does not occur, then it's either Ariana (satifies $A$, 2 cards) or Billie (does not satisfy $A$, 4 cards), so given that $B$ does not occur then $A$ is 2/4 = 1/2 times as likely to occur than not.
     
     Knowing whether or not $B$ occurs changes the chance of $A$ occurring, so $A$ and $B$ are not independent according to this probability model.
 
@@ -6582,15 +6655,15 @@ However, if you flip a coin twenty times and it lands on heads each time, this m
 ::: {#exm-coin-multiple-events-independent}
 Flip a fair coin twice. Let
 
-- $A$ be the event that the first flip lands on heads
-- $B$ be the event that the second flip lands on heads,
-- $C$ be the event that both flips land on the same side.
+-   $A$ be the event that the first flip lands on heads
+-   $B$ be the event that the second flip lands on heads,
+-   $C$ be the event that both flips land on the same side.
   
 
-1. Are the two events $A$ and $B$ independent?
-1. Are the two events $A$ and $C$ independent?
-1. Are the two events $B$ and $C$ independent?
-1. Are the three events $A$, $B$, and $C$ independent?
+1.  Are the two events $A$ and $B$ independent?
+1.  Are the two events $A$ and $C$ independent?
+1.  Are the two events $B$ and $C$ independent?
+1.  Are the three events $A$, $B$, and $C$ independent?
 
 :::
 ::::
@@ -6603,14 +6676,14 @@ Flip a fair coin twice. Let
 
 There are four equally likely outcomes $\{HH, HT, TH, TT\}$.
 
-- $A = \{HH, HT\}$, so $\IP(A) = 2/4$
-- $B = \{HH, TH\}$, so $\IP(B) = 2/4$
-- $C = \{HH, TT\}$, so $\IP(C) = 2/4$
+-   $A = \{HH, HT\}$, so $\IP(A) = 2/4$
+-   $B = \{HH, TH\}$, so $\IP(B) = 2/4$
+-   $C = \{HH, TT\}$, so $\IP(C) = 2/4$
 
-1. Yes, events $A$ and $B$ are independent. $A\cap B=\{HH\}$, $\IP(A\cap B)=1/4$, and $\IP(A\cap B)=\IP(A)\IP(B)$.
-1. Yes, events $A$ and $C$ are independent. $A\cap C=\{HH\}$, $\IP(A\cap C)=1/4$, and $\IP(A\cap C)=\IP(A)\IP(C)$.
-1. Yes, events $B$ and $C$ are independent. $B\cap C=\{HH\}$, $\IP(B\cap C)=1/4$, and $\IP(B\cap C)=\IP(B)\IP(C)$.
-1. No, even though each pair of events is independent, the collection of the three events is not.  If $A$ and $B$ occur then we know event $C$ occurs.  That is, $\IP(C|A \cap B)=1$ but $\IP(C) = 1/2$.
+1.  Yes, events $A$ and $B$ are independent. $A\cap B=\{HH\}$, $\IP(A\cap B)=1/4$, and $\IP(A\cap B)=\IP(A)\IP(B)$.
+1.  Yes, events $A$ and $C$ are independent. $A\cap C=\{HH\}$, $\IP(A\cap C)=1/4$, and $\IP(A\cap C)=\IP(A)\IP(C)$.
+1.  Yes, events $B$ and $C$ are independent. $B\cap C=\{HH\}$, $\IP(B\cap C)=1/4$, and $\IP(B\cap C)=\IP(B)\IP(C)$.
+1.  No, even though each pair of events is independent, the collection of the three events is not.  If $A$ and $B$ occur then we know event $C$ occurs.  That is, $\IP(C|A \cap B)=1$ but $\IP(C) = 1/2$.
 
 :::
 ::::
@@ -6618,9 +6691,9 @@ There are four equally likely outcomes $\{HH, HT, TH, TT\}$.
 
 Events $A_1, A_2, A_3, \ldots$ are **independent** if:
 
-- any pair of events $A_i, A_j, (i \neq j)$ satisfies $\IP(A_i\cap A_j)=\IP(A_i)\IP(A_j)$,
-- and any triple of events $A_i, A_j, A_k$ (distinct $i,j,k$) satisfies $\IP(A_i\cap A_j\cap A_k)=\IP(A_i)\IP(A_j)\IP(A_k)$,
-- and any quadruple of events $A_i, A_j, A_k, A_\ell$ (distinct $i,j,k,\ell$) satisfies $\IP(A_i\cap A_j\cap A_k \cap A_\ell)=\IP(A_i)\IP(A_j)\IP(A_k)\IP(A_\ell)$,
+-   any pair of events $A_i, A_j, (i \neq j)$ satisfies $\IP(A_i\cap A_j)=\IP(A_i)\IP(A_j)$,
+-   and any triple of events $A_i, A_j, A_k$ (distinct $i,j,k$) satisfies $\IP(A_i\cap A_j\cap A_k)=\IP(A_i)\IP(A_j)\IP(A_k)$,
+-   and any quadruple of events $A_i, A_j, A_k, A_\ell$ (distinct $i,j,k,\ell$) satisfies $\IP(A_i\cap A_j\cap A_k \cap A_\ell)=\IP(A_i)\IP(A_j)\IP(A_k)\IP(A_\ell)$,
 - and so on.
 
 Intuitively, a collection of events is independent if knowing whether or not any combination of the events in the collection occur does not change the probability of any other event in the collection.
@@ -6652,10 +6725,10 @@ Continuing @exm-dice-conditional.
 Let $U_1$ be the result of the first roll.
 
 
-1. Are the events $\{U_1 = 1\}$ and $\{X = 5\}$ independent?
-1. Do you think the random variables $U_1$ and $X$ are independent?
+1.  Are the events $\{U_1 = 1\}$ and $\{X = 5\}$ independent?
+1.  Do you think the random variables $U_1$ and $X$ are independent?
 Support your answer by computing and comparing appropriate probabilities.
-1. Suggest a random variable in this context---not $X$ or $Y$---that is independent of $U_1$.
+1.  Suggest a random variable in this context---not $X$ or $Y$---that is independent of $U_1$.
 
 :::
 ::::
@@ -6665,13 +6738,13 @@ Support your answer by computing and comparing appropriate probabilities.
 
 
 
-1. Yes the events $\{U_1 = 1\}$ and $\{X = 5\}$.
+1.  Yes the events $\{U_1 = 1\}$ and $\{X = 5\}$.
 See the solution to part 3 of @exm-dice-independent).
-1. Intuitively, $U_1$ and $X$ are not independent.
+1.  Intuitively, $U_1$ and $X$ are not independent.
 But remember that independence is a statement about probabilities, so we need to compare appropriate probabilities.
 For example, $\IP(X = 8 | U_1 = 1) = 0$ but $\IP(X = 8) = 1/16$.
 Knowing that $U_1=1$ changes the distribution of $X$.
-1. If $U_2$ is the result of the second roll, then intuitively $U_1$ and $U_2$ are independent.
+1.  If $U_2$ is the result of the second roll, then intuitively $U_1$ and $U_2$ are independent.
 $U_2$ is equally likely to be 1, 2, 3, or 4, regardless of the value of $U_1$.
 
 :::
@@ -6679,7 +6752,57 @@ $U_2$ is equally likely to be 1, 2, 3, or 4, regardless of the value of $U_1$.
 
 Two random variables are independent if any event involving one of the random variables is independent of any event involving the other.
 Roughly, two random variables are independent if knowing the value of one does not change the distribution of the other.
-See @fig-independent-rv-mosaic) for mosaic plots illustrating two independent discrete random variables (not in the dice context); notice that the conditional distribution of $X$ is the same for each value of $Y$, and vice versa.
+
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-dice-joint-independent-conditional}
+Suppose $X$ and $Y$ are random variables whose joint distribution is represented by @tbl-dice-joint-independent.
+Recall that we found the marginal distributions in @exm-dice-joint-independent.
+
+1.  How is $\IP(X = 2, Y=1)$ related to $\IP(X = 2)$ and $\IP(Y=1)$?
+What does this imply?
+1.  How is the joint distribution of $X$ and $Y$ related to the marginal distributions of $X$ and $Y$?
+1.  Compute the conditional distribution of $Y$ given $X=2$.
+How does it compare to the marginal distribution of $Y$?
+1.  Compute the conditional distribution of $Y$ given $X=x$ for each possible $x$.
+What do you notice?
+1.  Compute the conditional distribution of $X$ given $Y=1$.
+How does it compare to the marginal distribution of $X$?
+1.  Compute the conditional distribution of $X$ given $Y=y$ for each possible $y$.
+What do you notice?
+1.  Are the random variables $X$ and $Y$ independent?
+
+:::
+::::
+
+:::: {.callout-tip collapse=true}
+::: {#sol-dice-joint-independent-conditional}
+1.  The joint probability is the product of the marginal probabilities, $\IP(X = 2, Y=1)= 1/256 = (1/16)(1/16) = \IP(X = 2) \IP(Y=1)$, so the events $\{X=2\}$ and $\{Y=1\}$ are independent. 
+1.  For each possible value $x$ of $X$ and $y$ of $Y$, $\IP(X = x, Y=y)= \IP(X = x) \IP(Y=y)$.
+In short, the joint distribution of $X$ and $Y$ is the product of their marginal distributions.
+1.  Slice and renormalize: the possible values of $Y$ are 1, 2, 3, 4 with respective probabilities 1/6, 3/16, 5/16, 7/16.
+The conditional distribution of $Y$ given $X=2$ is the same as the marginal distribution of $Y$.
+1.  Along each possible $x$ slice, the possible values of $Y$ are 1, 2, 3, 4 with respective probabilities 1/6, 3/16, 5/16, 7/16.
+For every possible value $x$ of $X$, the conditional distribution of $Y$ given $X=x$ is the same as the marginal distribution of $Y$.
+1.  Slice and renormalize: the possible values of $X$ are 2, 3, 4, 5, 6, 7, 8 with respective probabilities 1/16, 2/16, 3/16, 4/16, 3/16, 2/16, 1/16.
+The conditional distribution of $X$ given $Y=1$ is the same as the marginal distribution of $X$.
+1.  Along each possible $y$ slice, the possible values of $X$ are 2, 3, 4, 5, 6, 7, 8 with respective probabilities 1/16, 2/16, 3/16, 4/16, 3/16, 2/16, 1/16.
+For every possible value $y$ of $Y$, the conditional distribution of $X$ given $Y=y$ is the same as the marginal distribution of $X$.
+1.  Yes, the random variables $X$ and $Y$ independent.
+For every possible value $x$ of $X$ and $y$ of $Y$ the events $\{X=x\}$ and $\{Y=y\}$ are independent.
+Knowing the value of one variable does not change the distribution of the other.
+:::
+::::
+
+
+Roughly, two random variables $X$ and $Y$ are independent if and only if:
+
+-   Their joint distribution is the product of their marginal distributions
+-   The conditional distribution of $X$ given the value of $Y$ is equal to the marginal distribution of $X$.
+-   The conditional distribution of $Y$ given the value of $X$ is equal to the marginal distribution of $Y$.
+
+@fig-independent-rv-mosaic displays mosaic plots of the distributions of the two independent discrete random variables of @exm-dice-joint-independent-conditional.
+Notice that the conditional distribution of $X$ is the same for each value of $Y$, and vice versa.
 
 
 
@@ -6692,9 +6815,11 @@ See @fig-independent-rv-mosaic) for mosaic plots illustrating two independent di
 #|   - "Conditioning on values of $Y$; color represents values of $X$"
 #| layout-ncol: 2
 
-knitr::include_graphics(c("_graphics/independent-mosaic1.png", "_graphics/independent-mosaic2.png"))
+knitr::include_graphics(c("_graphics/mosaic-dice-sum-max-independent-given-x.png", "_graphics/mosaic-dice-sum-max-independent-given-y.png"))
 
 ```
+
+
 
 
 
