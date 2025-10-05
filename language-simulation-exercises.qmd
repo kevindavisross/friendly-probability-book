@@ -785,3 +785,127 @@ TBA
 TBA
 
 
+## Solution to @exr-simulation-condition-collector
+
+Approximate the conditional distribution of $Y$ given $X=1$:
+
+-   Simulate $(X, Y)$ pair
+-   If $X\neq1$ discard the repetition, otherwise keep
+-   Repeat until 10000 repetitions with $X=1$ are obtained
+-   Summarize the simulated values of $Y$ from these repetitions to approximate the conditional distribution of $Y$ given $X = 1$
+-   To approximate $\IP(Y = 0 | X=1)$ count the number of repetitions with $Y=0$ and divide by 10000 (remember, all of the repetitions have $X = 1$)
+
+Approximate the conditional distribution of $X$ given $Y=0$ similarly, with a different simulation of 10000 $(X, Y)$ pairs that satisfy $Y=0$.
+
+```{python}
+P = BoxModel([1, 2, 3], size = 3)
+
+def count_distinct(u):
+    return len(set(u))
+
+X = RV(P, count_distinct)
+
+Y = RV(P, count_eq(1))
+```
+
+
+```{python}
+y_given_Xeq1 = ( Y | (X == 1) ).sim(10000)
+```
+
+```{python}
+y_given_Xeq1.tabulate()
+```
+
+```{python}
+y_given_Xeq1.tabulate(normalize=True)
+```
+
+```{python}
+plt.figure()
+y_given_Xeq1.plot()
+plt.show()
+```
+
+
+```{python}
+x_given_Yeq0 = ( X | (Y == 0) ).sim(10000)
+```
+
+```{python}
+x_given_Yeq0.tabulate()
+```
+
+```{python}
+x_given_Yeq0.tabulate(normalize=True)
+```
+
+```{python}
+plt.figure()
+x_given_Yeq0.plot()
+plt.show()
+```
+
+
+
+## Solution to @simulation-condition-dartboard
+
+
+In the code below
+
+-   `Uniform(0, 12) ** 2` corresponds to the two spins
+-   `BoxModel([-1, 1], size = 2)` corresponds to the two coin flips
+-   `Uniform(0, 12) ** 2 * BoxModel([-1, 1], size = 2)` simulates a pair which we unpack and define as `RV`s `U, F`, but `U` is itself a pair and so is `F`.
+-   `U[0]` is the first spin and `F[0]` is the first flip.
+
+
+
+```{python}
+
+U, F = RV(Uniform(0, 12) ** 2 * BoxModel([-1, 1], size = 2))
+
+X = U[0] * F[0]
+
+Y = U[1] * F[1]
+
+R = sqrt(X ** 2 + Y ** 2)
+
+( (U & F & X & Y & R) | (R < 12) ).sim(10)
+```
+
+
+```{python}
+plt.figure()
+( (X & Y) | (R < 12) ).sim(1000).plot()
+plt.show()
+```
+
+
+```{python}
+r = ( R | (R < 12) ).sim(10000)
+
+plt.figure()
+r.plot()
+plt.show()
+```
+
+```{python}
+r.count()
+```
+
+```{python}
+r.count_lt(1) / r.count()
+```
+
+```{python}
+r.count_gt(11) / r.count()
+```
+
+```{python}
+r.mean()
+```
+
+```{python}
+r.sd()
+```
+

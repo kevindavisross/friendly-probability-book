@@ -1,0 +1,197 @@
+---
+title: "Untitled"
+format: html
+---
+
+Section here about how all things can change with conditioning: EV, SD, correlation
+
+Conditioning on the value of a random variable $X$ in general changes the distribution of another random variable $Y$.  If a distribution changes, its summary characteristics like expected value and variance can change too.
+
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-dice-ce}
+Roll a fair four-sided die twice.  Let $X$ be the sum of the two rolls, and let $Y$ be the larger of the two rolls (or the common value if a tie). We found the joint and marginal distributions of $X$ and $Y$ in Example \@ref(exm:dice-probspace), displayed in the table below.
+
+
+| $p_{X, Y}(x, y)$ |      |      |      |      |            |
+|------------------|-----:|-----:|-----:|-----:|-----------:|
+| $x$ \\ $y$       |    1 |    2 |    3 |    4 | $p_{X}(x)$ |
+| 2                | 1/16 |    0 |    0 |    0 |       1/16 |
+| 3                |    0 | 2/16 |    0 |    0 |       2/16 |
+| 4                |    0 | 1/16 | 2/16 |    0 |       3/16 |
+| 5                |    0 |    0 | 2/16 | 2/16 |       4/16 |
+| 6                |    0 |    0 | 1/16 | 2/16 |       3/16 |
+| 7                |    0 |    0 |    0 | 2/16 |       2/16 |
+| 8                |    0 |    0 |    0 | 1/16 |       1/16 |
+| $p_Y(y)$         | 1/16 | 3/16 | 5/16 | 7/16 |            |
+
+
+1.  Find $\E(Y)$. How could you find a simulation-based approximation?
+1.  Find $\E(Y|X=6)$.  How could you find a simulation-based approximation?
+1.  Find $\E(Y|X=5)$.  How could you find a simulation-based approximation?
+1.  Find $\E(Y|X=x)$ for each possible value of $x$ of $X$.
+1.  Find $\E(X|Y = 4)$. How could you find a simulation-based approximation?
+1.  Find $\E(X|Y = y)$ for each possible value $y$ of $Y$.
+
+:::
+::::
+
+
+
+:::: {.callout-tip collapse=true}
+::: {#sol-dice-ce}
+
+
+1.  $\E(Y) = 1(1/16) + 2(3/16) + 3(5/16) + 4(7/16) = 3.125$.  Approximate this long run average value by simulating many values of $Y$ and computing the average.
+1.  The conditional pmf of $Y$ given $X=6$ places probability 2/3 on the value 4 and 1/3 on the value 3.  Compute the expected value using this conditional distribution: $\E(Y|X=6) = 3(1/3) + 4(2/3) = 3.67$.  This conditional long run average value could be approximated by simulating many $(X, Y)$ pairs from the joint distribution, discarding the pairs for which $X\neq 6$, and computing the average value of the $Y$ values for the remaining pairs.
+1.  The conditional pmf of $Y$ given $X=5$ places probability 1/2 on the value 4 and 1/2 on the value 3.  Compute the expected value using this conditional distribution: $\E(Y|X=5) = 3(1/2) + 4(1/2) = 3.5$.  This conditional long run average value could be approximated by simulating many $(X, Y)$ pairs from the joint distribution, discarding the pairs for which $X\neq 5$, and computing the average value of the $Y$ values for the remaining pairs.
+1.  Proceed as in the previous two parts. Find $\E(Y|X=x)$ for each possible value of $x$ of $X$.
+
+    | $x$ |            $\E(Y|X=x)$ |
+    |----:|-----------------------:|
+    |   2 |               1(1) = 1 |
+    |   3 |               2(1) = 2 |
+    |   4 |  2(1/3) + 3(2/3) = 8/3 |
+    |   5 |  3(1/2) + 4(1/2) = 3.5 |
+    |   6 | 3(1/3) + 4(2/3) = 11/3 |
+    |   7 |               4(1) = 4 |
+    |   8 |               4(1) = 4 |
+  
+1.  The conditional pmf of $X$ given $Y=4$ places probability 2/7 on each of the values 5, 6, 7, and 1/7 on the value 8.  Compute the expected value using this conditional distribution: $\E(X|Y=4) = 5(2/7) + 6(2/7) +7(2/7) + 8(1/7)= 6.29$.  This conditional long run average value could be approximated by simulating many $(X, Y)$ pairs from the joint distribution, discarding the pairs for which $Y\neq 4$, and computing the average value of the $X$ values for the remaining pairs.
+1.  Proceed as in the previous part.
+
+    | $y$ |                             $\E(X|Y=y)$ |
+    |----:|----------------------------------------:|
+    |   1 |                                2(1) = 2 |
+    |   2 |                  3(2/3) + 4(1/3) = 10/3 |
+    |   3 |          4(2/5) + 5(2/5) + 6(1/5) = 4.8 |
+    |   4 | 5(2/7) + 6(2/7) +7(2/7) + 8(1/7) = 44/7 |
+
+:::
+::::
+
+
+```{python}
+
+U1, U2 = RV(DiscreteUniform(1, 4) ** 2)
+
+X = U1 + U2
+
+Y = (U1 & U2).apply(max)
+
+y_given_Xeq6 = (Y | (X == 6) ).sim(3000)
+
+y_given_Xeq6
+
+```
+
+
+```{python}
+
+y_given_Xeq6.tabulate()
+
+```
+
+```{python}
+
+y_given_Xeq6.mean()
+
+```
+
+
+
+::: {.definition #ce}
+
+The **conditional expected value** (a.k.a. *conditional expectation* a.k.a. *conditional mean*), of a random variable $Y$ given the event $\{X=x\}$, defined on a probability space with measure $\IP$, is a *number* denoted $\E(Y|X=x)$ representing the probability-weighted average value of $Y$, where the weights are determined by the conditional distribution of $Y$ given $X=x$.
+
+\begin{align*}
+	& \text{Discrete $X, Y$ with conditional pmf $p_{Y|X}$:} & \E(Y|X=x) & = \sum_y y p_{Y|X}(y|x)\\
+	& \text{Continuous $X, Y$ with conditional pdf $f_{Y|X}$:} & \E(Y|X=x) & =\int_{-\infty}^\infty y f_{Y|X}(y|x) dy
+\end{align*}
+
+:::
+
+
+Remember, when conditioning on $X=x$, $x$ is treated as a fixed constant. The conditional expected value  $\E(Y | X=x)$ is  a *number* representing the mean of the conditional distribution of $Y$ given $X=x$. The conditional expected value $\E(Y | X=x)$ is the long run average value of $Y$ over only those outcomes for which $X=x$.
+To approximate $\E(Y|X = x)$, simulate many $(X, Y)$ pairs, discard the pairs for which $X\neq x$, and average the $Y$ values for the pairs that remain. 
+
+
+
+
+
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-uniform-sum-max-ce}
+
+Recall Example \@ref(exm:uniform-sum-max-conditional). Consider the probability space corresponding to two spins of the Uniform(1, 4) spinner and let $X$ be the sum of the two spins and $Y$ the larger to the two spins (or the common value if a tie).
+
+1.  Find $\E(X | Y = 3)$.
+1.  Find $\E(X | Y = 4)$.
+1.  Find $\E(X | Y = y)$ for each value $y$ of $Y$.
+1.  Find $\E(Y | X = 3.5)$.
+1.  Find $\E(Y | X = 6)$.
+1.  Find $\E(Y | X = x)$ for each value $x$ of $X$.
+
+:::
+::::
+
+:::: {.callout-tip collapse=true}
+::: {#sol-uniform-sum-max-ce}
+
+1.  Recall Figure \@ref(fig:uniform-sum-max-conditional-plot).  All the conditional distributions (slices) are Uniform, but over different ranges of possible values. Remember, the mean of any Uniform distribution is the midpoint of the possible range of values. The conditional distribution of $X$ given $Y=3$ is the Uniform(4, 6) distribution, which has mean 5.  Therefore, $\E(X | Y = 3)=5$.  As an integral, since $f_{X|Y}(x|3) = 1/2, 4<x<6$,
+$$
+\E(X | Y = 3) = \int_4^6  x (1/2)dx = \frac{x^2}{4}\Bigg|_{x=4}^{x=6} = \frac{6^2}{4} - \frac{4^2}{4} = 5.
+$$
+1.  The conditional distribution of $X$ given $Y=4$ is the Uniform(5, 8) distribution, which has mean 6.5.  Therefore, $\E(X | Y = 4)=6.5$.
+1.  For a given $y$, the conditional distribution of $X$ given $Y=y$ is the Uniform($y+1$, $2y$) distribution, which has mean $\frac{y+1+2y}{2}=1.5y + 0.5$.  Therefore, $\E(X | Y = y)=1.5y + 0.5$. As an integral, since $f_{X|Y}(x|y) = \frac{1}{y-1}, y+1 < x< 2y$,
+$$
+\E(X | Y = y) = \int_{y+1}^{2y}  x \left(\frac{1}{y-1}\right)dx = \frac{x^2}{2(y-1)}\Bigg|_{x=y+1}^{x=2y} = \frac{(2y)^2}{2(y-1)} - \frac{(y+1)^2}{2(y-1)} = 1.5y + 0.5.
+$$
+In the above, $y$ is treated like a fixed constant, and we are averaging over values of $X$ by taking a $dx$ integral. For a given value of $y$ like $y=3$, $1.5y + 0.5$ is a number like $1.5(3)+0.5=5$.
+1.  The conditional distribution of $Y$ given $X=3.5$ is the Uniform(1.75, 2.5) distribution, which has mean 2.125.  Therefore, $\E(Y | X = 3.5)=2.125$.  As an integral, since $f_{Y|X}(y|3.5) = 1/0.75, 1.75<y<2.5$,
+$$
+\E(Y | X = 3.5) = \int_{1.75}^{2.5}  y (1/0.75)dy = \frac{y^2}{1.5}\Bigg|_{y=1.75}^{y=2.5} = \frac{2.5^2}{1.5} - \frac{1.75^2}{1.5} = 2.125.
+$$
+1.  The conditional distribution of $Y$ given $X=6$ is the Uniform(3, 4) distribution, which has mean 3.5.  Therefore, $\E(Y | X = 6)=3.5$.
+1.  There are two general cases.  If $2<x<5$ then the conditional distribution of $Y$ given $X=x$ is Uniform($0.5x$, $x-1$) so $\E(Y|X = x) = \frac{0.5x + x - 1}{2} = 0.75x - 0.5$. If $5<x<8$ then the conditional distribution of $Y$ given $X=x$ is Uniform($0.5x$, 4) so $\E(Y|X = x) = \frac{0.5x + 4}{2} = 0.25x +2$.  The two cases can be put together as
+$$
+\E(Y | X = x) = 0.25x + 0.5\min(4, x-1).  
+$$
+In the above, $x$ is treated like a fixed constant, and we are averaging over values of $Y$ by taking a $dy$ integral. For a given value of $x$ like $x=3.5$, $0.25x + 0.5\min(4, x-1)$ is a number like $0.25(3.5) + 0.5\min(4, 3.5-1)=2.125$.
+    
+:::
+::::
+
+
+Remember that the probability that a continuous random variable is equal to a particular value is 0; that is, for continuous $X$, $\IP(X=x)=0$. When we condition on $\{X=x\}$ we are really conditioning on $\{|X-x|<\ep\}$ and seeing what happens in the idealized limit when $\ep\to0$.
+
+When simulating, *never* condition on $\{X=x\}$ for a continuous random variable $X$; rather, condition on $\{|X-x|<\ep\}$ where $\ep$ represents some suitable degree of precision (e.g. $\ep=0.005$ if rounding to two decimal places).
+
+To approximate $\E(Y|X = x)$ for continuous random variables, simulate many $(X, Y)$ pairs, discard the pairs for which $X$ *is not close to* $x$, and average the $Y$ values for the pairs that remain. 
+
+```{python}
+
+U1, U2 = RV(Uniform(1, 4) ** 2)
+
+X = U1 + U2
+
+Y = (U1 & U2).apply(max)
+
+x_given_Yeq3 = (X | (abs(Y - 3) < 0.05) ).sim(1000)
+
+x_given_Yeq3
+
+```
+
+
+
+```{python}
+
+x_given_Yeq3.plot()
+plt.show()
+
+x_given_Yeq3.mean()
+
+```
+
+
