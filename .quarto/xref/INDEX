@@ -28,5 +28,23 @@
   },
   "language-simulation-exercises.qmd": {
     "language-simulation-exercises.html": "c3551bf1"
+  },
+  "simulation-marginal-discrete.qmd": {
+    "simulation-marginal-discrete.html": "4bb39645"
+  },
+  "simulation-marginal-continuous.qmd": {
+    "simulation-marginal-continuous.html": "56765f03"
+  },
+  "simulation-joint.qmd": {
+    "simulation-joint.html": "37da298f"
+  },
+  "math-probability.qmd": {
+    "math-probability.html": "7f77b337"
+  },
+  "statistics.qmd": {
+    "statistics.html": "d585efb2"
+  },
+  "math-probability-exercises.qmd": {
+    "math-probability-exercises.html": "97005b70"
   }
 }

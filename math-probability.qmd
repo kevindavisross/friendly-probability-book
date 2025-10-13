@@ -1,0 +1,624 @@
+# Mathematics of Probability {#sec-math-probability}
+
+
+{{< include _r_setup.qmd >}}
+
+{{< include _python_setup.qmd >}}
+
+::: {.content-hidden}
+$$
+{{< include _macros.tex >}}
+$$
+:::
+
+## Equally likely outcomes {#sec-equally-likely}
+
+In this section we'll look more closely at how to compute probabilities  when the outcomes in the sample space are equally likely.
+But a warning before proceeding: in most situations sample space outcomes are *not* equally likely! 
+And even in case where the outcomes are equally, values of corresponding random variables are usually not.
+So beware that the results for probabilities in this section only apply in a limited number of special cases.
+However, some of the rules for counting outcomes will be useful even when outcomes are not equally likely.
+
+
+For a sample space $\Omega$ with finitely many possible outcomes, assuming  **equally likely outcomes** corresponds to a probability measure $\IP$ which satisfies
+
+$$
+\IP(A) = \frac{|A|}{|\Omega|} = \frac{\text{number of outcomes in $A$}}{\text{number of outcomes in $\Omega$}} \qquad{\text{when outcomes are equally likely}}
+$$
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-coin-probspace}
+
+Flip a coin 4 times and record the results in sequence.
+For example, HTHH indicates T on the second flip and H on the others.
+Let $X$ be the number of H in the four flips.
+Assume that the coin is fair and the flips are independent.
+
+
+1.  Find the probability of the outcome HTHH.
+1.  Find the probability of the outcome HHHH.
+1.  Make a table of all the possible outcomes; there should be 16.
+Is it reasonable to assume the outcomes are equally likely?
+Explain.
+1.  Identify the possible values of $X$.
+Are the values of $X$ equally likely?
+1.  Compute and interpret $\IP(X = 4)$.
+1.  Compute and interpret $\IP(X=3)$.
+1.  Find the distribution of $X$.
+1.  Suppose the coin were biased in favor of landing on H.
+Would the sample space change? Would the definition of $X$ and its possible values change? Would the 16 outcomes be equally likely? Would the distribution of $X$ change?
+
+:::
+::::
+
+:::: {.callout-tip collapse=true}
+::: {#sol-coin-probspace}
+
+1.  Since the coin is fair, the probability of H on any single flip is 0.5, same as the probability of T.
+Since the flips are independent, we can find the probability of the sequence by multiplying the probability of H/T for each flip. The probability of HTHH is (0.5)(0.5)(0.5)(0.5) = 0.0625 = 1/16.
+1.  Similar to the previous part, the probability of H is 1/16.
+1.  See @tbl-coin-transform-tab2.
+Assuming that the flips are independent and the coin is fair is equivalent to assuming that the probability of any single outcome is 1/16. So yes, it is reasonable to assume equally likely outcomes given these assumptions.
+1.  $X$ can take values 0, 1, 2, 3, 4. (Don't forget 0.)
+Even though the 16 possible sequences are equally likely, the values of $X$ are not.
+For example, there are more outcomes that result in $X=3$ than $X=4$.
+1. $\IP(X = 4) = 1/16$ since there are 4 H in 4 flips if and only every flip is H, $\{X = 4\} = \{HHHH\}$.
+Over many sets of 4 fair coin flips, about 6.25% of sets will result in 4 H.
+If you flip a coin 4 times, it is 15 times more likely to obtain fewer than 4 H than to obtain 4 H.
+1.  $\IP(X = 3) = 4/16$ since there are 4 outcomes (out of 16 equally likely outcomes) with 3 H in 4 flips, $\{X = 3\} = \{HHHT, HHTH, HTHH, THHH\}$.
+Over many sets of 4 fair coin flips, about 25% of sets will result in exactly 3 H.
+If you flip a coin 4 times, it is 3 times more likely to obtain something other than 3 H than to obtain 3 H.
+1.  The distribution can be represented in a table with the possible values $x$ of $X$, and $\IP(X = x)$ for each possible $x$.
+Since outcomes are equally, $\IP(X = x)$ is the number of outcomes that satisfy the event $\{X=x\}$ divided by 16, the total number of possible outcomes.
+See @tbl-coin-four-heads and @fig-coin-four-heads.
+1.  If the coin were biased in favor of landing on H, the sample space wouldn't change; there would still be 16 possible flip sequences. The definition of $X$ and its possible values also would not change.
+However, the 16 outcomes would no longer be equally likely.
+For example, the probability of HHHH would be greater than that of TTTT
+The distribution of $X$ would also change; for example, $\IP(X = 4)$ would be greater than 1/16 and $\IP(X = 0)$ would be less than 1/16.
+
+:::
+::::
+
+
+
+
+```{r}
+#| label: tbl-coin-transform-tab2
+#| echo: false
+#| tbl-cap: "Table representing the outcomes of 4 flips of a coin, and $X$, the number of H."
+
+n = 3
+# u1 = sort(rep(c("H", "T"), 4))
+# u2 = rep(sort(rep(c("H", "T"), 2)), 2)
+# u3 = rep(c("H", "T"), 4)
+# u = paste(u1, u2, u3, sep = "")
+u = c("HHHH", "HHHT", "HHTH", "HTHH", "THHH", "HHTT", "HTHT", "HTTH", "THHT", "THTH", "TTHH", "HTTT", "THTT", "TTHT", "TTTH",  "TTTT")
+
+x = c(4, rep(3, 4), rep(2, 6), rep(1, 4), 0)
+
+
+kbl(
+  data.frame(u, x),
+  col.names = c("Outcome", "X"),
+  booktabs = TRUE,
+) |>
+  kable_styling(fixed_thead = TRUE)
+
+```
+
+
+
+```{r}
+#| label: tbl-coin-four-heads
+#| echo: false
+#| tbl-cap: "The marginal distribution of $X$, the number of H in 4 flips of a fair coin."
+
+y = 0:4
+p = c(1, 4, 6, 4, 1) / 16
+knitr::kable(
+  data.frame(y, p),
+  col.names = c("x", "P(X=x)"),
+  booktabs = TRUE,
+  digits = 4
+)
+```  
+
+
+
+```{r}
+#| label: fig-coin-four-heads
+#| echo: false
+#| fig-cap: "The marginal distribution of $X$, the number of H in 4 flips of a fair coin."
+
+ggplot(data.frame(y, p),
+       aes(x = y,
+           xend = y,
+           y = 0,
+           yend = p)) +
+  geom_segment(linewidth = 1.2, col = "skyblue") +
+  # scale_color_manual(values = c("#56B4E9", "#E69F00", "#999999")) +
+  scale_x_continuous(breaks = 0:4) +
+  scale_y_continuous(expand = c(0, 0)) +
+  theme_classic() +
+  theme(legend.position = "none") +
+  labs(x = "x",
+       y = "P(X = x)")
+
+```
+
+Remember that events often involve random variables.
+Even if the sample space outcomes are equally likely, the possible values of related random variables are usually not.
+
+
+### Some counting rules {#counting}
+
+Computing probabilities in the equally likely case reduces to just counting outcomes. 
+In previous sections we often counted outcomes by enumerating them in a list. 
+Of course, listing all the outcomes is unfeasible unless the sample space is very small. 
+In this section we will see some formulas for counting in a few common situations.
+
+
+All of the counting rules we'll see are based on the multiplication principle for counting in @lem-multiplication-principle. 
+Review @#sec-language-counting-outcomes before proceeding.
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-ceo1}
+Suppose the board of directors of a corporation has identified 5 candidates --- Ariana, Beyonce, Cardi, Drake, Elvis --- for three executive positions: chief executive officer (CEO), chief financial officer (CFO), and chief operating officer (COO). 
+In the interest of fairness, the board assigns 3 of the 5 candidates to the positions completely at random. 
+No individual can hold more than one of the positions.
+
+When calculating probabilities below, consider the sample space of all possible executive teams.
+
+
+1.  How many executive teams are possible?
+1.  What is the probability that Ariana is CEO, Beyonce is CFO, and Cardi is COO?  
+1.  What is the probability that Ariana is CEO, Cardi is CFO, and Beyonce is COO?  
+1.  What is the probability that Ariana is CEO and Beyonce is CFO?
+1.  What is the probability that Ariana is CEO?
+1.  What is the probability that Ariana is one of the executives?
+
+:::
+::::
+
+
+:::: {.callout-tip collapse=true}
+::: {#sol-ceo1}
+
+1.  There are 5 choices for CEO, then 4 choices for CFO, then 3 choices for COO.  So there are $5\times 4 \times 3 = 60$ possible teams. 
+The sample space consists of 60 possible outcomes.
+The order in which we make the choices doesn't matter. 
+We could have picked the CFO first then COO then CEO, still resulting in $5\times 4\times3$ possible outcomes. 
+What is important is that there are 3 distinct stages. Choosing Ariana as CEO is not the same as choosing Ariana as CFO.
+1.  If the selections are made uniformly at random, each of the 60 possible teams is equally likely. 
+So the probability of any particular team, like this one, is 1/60.
+1.  The probability of any particular team is 1/60. 
+But note that Ariana as CEO, Beyonce as CFO, and Cardi as COO is a different outcome than Ariana as CEO, Cardi as CFO, and Beyonce as COO
+1.  To construct a team with Ariana as CEO and Beyonce as CFO, there is one possible choice for CEO (Ariana), one possible choice for CFO (Beyonce) and three possible choices for COO, resulting in $1\times 1\times 3$ teams that have Ariana as CEO and Beyonce as CFO. Since the outcomes are equally likely, the probability is 3/60.
+1.  To construct a team with Ariana as CEO, there is one possible choice for CEO (Ariana), four possible choicea for CFO, and three possible choices for COO, resulting in $1\times 4\times 3=12$ teams that have Ariana as CEO. 
+Since the outcomes are equally likely, the probability is 12/60=1/5. 
+This makes sense because any of the five people is equally likely to be CEO.
+1.  The probability that Ariana is CEO is 12/60, similarly for CFO and COO. 
+Since Ariana can't hold more than one position, these events are disjoint, so the probability that Ariana is CEO or CFO or COO is $3(12/60) = 3/5$.
+
+:::
+::::
+
+
+
+
+| CEO | CFO | COO |
+|-----|-----|-----|
+| A   | B   | C   |
+| A   | C   | B   |
+| B   | A   | C   |
+| B   | C   | A   |
+| C   | A   | B   |
+| C   | B   | A   |
+| A   | B   | D   |
+| A   | B   | E   |
+| A   | C   | D   |
+| A   | C   | E   |
+
+: Ten of the 60 possible executive teams in @exm-ceo1 {#tbl-ceo-ordered}
+
+In the previous example, the "stage" at which the person was chosen was important: there was a CEO stage, a CFO stage, and a COO stage. 
+Choosing Ariana at the CEO stage, Beyonce at the CFO stage, and Cardi at the COO stage was a different outcome than choosing Ariana at the CEO stage, Cardi at the CFO stage, and Beyonce at the COO stage. 
+When what happens at each stage matters, an outcome is often called an "ordered" arrangement. 
+Again, "order" is perhaps a misnomer; it's not that there's a "first" and "second" and "third" stage, but rather that  there are three distinct stages --- CEO, CFO, COO.
+
+
+The multiplication principle applies directly to situations which involve "ordered" or stage-wise counting, like the executive example. 
+We employed the multiplication principle to find that there are $5\times 4\times 3=60$ possible executive teams. 
+The following formula generalizes this result.
+
+
+**Number of ordered arrangements.** The number of *ordered arrangements* of $k$ items, selected *without* replacement from a set of $n$ distinct items is
+$$
+n(n-1)(n-2)\cdots(n-k+1) = \frac{n!}{(n-k)!}
+$$
+
+Recall the **factorial** notation: $m!=m(m-1)(m-2)\cdots (3)(2)(1)$. 
+For example, $5!=5\times4\times3\times2\times1=120$.  By definition, 0!=1.
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-ceo2}
+Your boss is forming a committee of 3 people for a new project team, and 5 people --- Ariana, Beyonce, Cardi, Drake, Elvis--- have volunteered to be on the committee. 
+In the interest of fairness, 3 of the 5 people will be selected uniformly at random to form the committee.
+
+1.  How is this situation different from the executive team example?
+1.  How many possible committees consist of Ariana, Beyonce, Cardi? 
+How many executive teams consisted of Ariana, Beyonce, Cardi? 
+1.  How many different possible committees of 3 people can be formed from the 5 volunteers?
+
+:::
+::::
+
+:::: {.callout-tip collapse=true}
+::: {#sol-ceo2}
+
+1.  There were distinct stages in the executive team example; selecting Ariana as CEO, Beyonce as CFO, and Cardi as COO was counted as a different outcome than selecting Ariana as CEO, Cardi as CFO, and Beyonce as COO. 
+But when forming the committee we only need to know which three people were selected, not which stage or "order" they were selected in.
+1.  There is only one committee that consists of Ariana, Beyonce, Cardi. 
+But there were 6 executive teams that consisted of Ariana, Beyonce, Cardi. 
+See @tbl-ceo-permutations.
+To have a team with these three people, there are 3 choices for who is CEO, then 2 choices for COO, then 1 choice for COO, for a total of $3\times2\times1=6$ possible teams consisting of Ariana, Beyonce, Cardi. 
+1.  There were 60 possible "ordered" outcomes, but counting in an "ordered" way overcounts the number of committees by a factor of 6. 
+Counting in an "ordered" way would count 6 teams consisting of Ariana, Beyonce, Cardi, but we only want to count the possible committee once. 
+Therefore, the total number of committees is 60/6 = 10.
+See @tbl-ceo-combinations.
+
+:::
+::::
+
+
+
+
+
+
+| CEO | CFO | COO |
+|-----|-----|-----|
+| A   | B   | C   |
+| A   | C   | B   |
+| B   | A   | C   |
+| B   | C   | A   |
+| C   | A   | B   |
+| C   | B   | A   |
+
+: Six different executive teams in @exm-ceo1 but only one committee in @exm-ceo2 {#tbl-ceo-permutations}
+
+
+The following is the relationship between "ordered" and "unordered" counting.
+
+$$
+{\scriptsize
+\left(\text{number of ordered selections of $k$ from $n$}\right) = \left(\text{number of unordered selections of $k$ from $n$}\right) \times\left(\text{number of ways of arranging the $k$ items in order}\right).
+}
+$$
+
+We have seen how to compute the number of "ordered" arrangements. 
+How many ways are there of arranging $k$ items in order? 
+
+
+**Number of permutations.**  The number of ways of arranging $k$ items in order is
+$$
+k\times (k-1)\times (k-2)\times\cdots\times 3\times 2\times1 = k!
+$$
+This can be seen as an application of the multiplication rule, or as a special case of the number of "ordered" arrangements rule with $n=k$. 
+*Permutation* is  another word for an ordering of $k$ items.
+
+
+
+
+We now have what we need to count the number of unordered arrangements. 
+We know that the number of ordered arrangements is $n!/(n-k)!$ and that the number of ways of arranging the $k$ items is $k!$, and so using the relationship noted above, we must have that the number of unordered arrangements is $(n!/(n-k)!)/k!$. 
+More precisely,
+
+
+**Number of combinations.**  The number of ways to choose $k$ items without replacement from a group of $n$ distinct items where *order does not
+			matter*, denoted $\binom{n}{k}$, is
+
+$$
+\binom{n}{k} = \frac{n(n-1)(n-2)\cdots(n-k+1)}{k!} = \frac{n!}{k!(n-k)!}
+$$
+
+The quantity on the right is just a compact way of representing the quantity in the middle. 
+But since factorials can be very large, it's best to use the quantity in the middle to compute. 
+In Python: `math.comb(n, k)`; in R: `choose(n, k)`. 
+
+
+
+An unordered selection of $k$ items from a group of $n$ is sometimes called a *combination*, so $\binom{n}{k}$ is sometimes called the number of combinations. 
+The symbol $\binom{n}{k}$ is by definition equal to the quantity in the middle above. 
+It is read as "$n$ choose $k$" and is referred to as a **binomial coefficient**.  For example, there are "5 choose 3" committees in the previous example
+
+$$
+\binom{5}{3} = \frac{5!}{3!(5-3)!} = \frac{(5)(4)(3)}{3!} = \frac{60}{6} = 10.
+$$
+
+```{python}
+
+math.comb(5, 3)
+```
+
+
+
+| One person | Another person | One more person |
+|------------|----------------|-----------------|
+| A          | B              | C               |
+| A          | B              | D               |
+| A          | B              | E               |
+| A          | C              | D               |
+| A          | C              | E               |
+| A          | D              | E               |
+| B          | C              | D               |
+| B          | C              | E               |
+| B          | D              | E               |
+| C          | D              | E               |
+
+
+: All possible committees in @exm-ceo2 {#tbl-ceo-combinations}
+
+
+
+
+
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-ceo3}
+
+Your boss is forming a committee of 3 people for a new project team, and 5 people --- Ariana, Beyonce, Cardi, Drake, Elvis--- have volunteered to be on the committee.  In the interest of fairness, 3 of the 5 people will be selected uniformly at random to form the committee.
+
+1.  Find the probability that the committee consists of Ariana, Beyonce, and Cardi.
+1.  Find the probability that Ariana and Beyonce are on the committee.
+1.  Find the probability that Ariana is on the committee.
+
+:::
+::::
+
+:::: {.callout-tip collapse=true}
+::: {#sol-ceo3}
+
+1.  If the selections are made uniformly at random each of the  $\binom{5}{3} = 10$ possible committees is equally likely. 
+So the probability of any particular committee, like this one, is 1/10.
+1.  Split the five people into two groups: group 1 with Ariana and Beyonce and group 2 with the other three. 
+In order to have a committee with Ariana and Beyonce, we need to choose 2 people from group 1 and 1 person from group 2. 
+There is only way to choose the 2 people from group 1, and there are three possibilities for the person selected from group 2. 
+Each of these three people can be partnered with Ariana and Beyonce to form the committee. 
+Therefore, the probability is 3/10.  Written another way
+$$
+\frac{\binom{2}{2}\binom{3}{1}}{\binom{5}{3}} = \frac{(1)(3)}{10} 
+$$
+1.  Intuitively, this should be 3/5, the same as the probability that Ariana was an executive. 
+Split the five people into two groups: group 1 with Ariana and group 2 with the other four. 
+In order to have a committee with Ariana, we need to choose Ariana from group 1 and 2 people from group 2. 
+There is only way to choose the Ariana from group 1, and there are $\binom{4}{2}=6$ possibilities for the two people selected from group 2. 
+Each of these pairs can be partnered with Ariana to form a committee with Ariana on it.  Therefore, the probability is 6/10.  Written another way
+$$
+\frac{\binom{1}{1}\binom{4}{2}}{\binom{5}{3}} = \frac{(1)(6)}{10} 
+$$
+
+:::
+::::
+
+
+The strategy of *partitioning* is often useful in problems involving "unordered" sampling without replacement. 
+Notice that in each of the problems in @exm-ceo3 the denominator had one binomial coefficient, corresponding to the total number of selections. 
+Then the totals were partitioned into some number of groups, determined by the event of interest. 
+The numerator of the probability will have one binomial coefficient for each group; the sums of the "tops" of the binomial coefficients in the numerator will equal the top of the binomial coefficient in the denominator, and the 
+the sums of the "bottoms" of the binomial coefficients in the numerator will equal the bottom of the binomial coefficient in the denominator.
+
+
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-counting-lottery2}
+
+In the Powerball lottery, a player picks five different whole numbers between 1 and 69, and another whole number between 1 and 26 that is called the Powerball. 
+In the drawing, the 5 numbers are drawn without replacement from a "hopper" with balls labeled 1 through 69, but the Powerball is drawn from a separate hopper with balls labeled 1 through 26. The player wins the jackpot if both the first 5 numbers match those drawn, in any order, and the Powerball is a match.
+
+How many different possible winning draws are there?
+
+:::
+::::
+
+
+
+
+
+
+
+:::: {.callout-tip collapse=true}
+::: {#sol-counting-lottery2}
+
+There are $\binom{69}{5}$ ways of choosing the 5 numbers from the 69, and each of these can be paired with one of the 26 possible Powerballs. 
+Therefore, there are $\binom{69}{5}(26) = 292,201,338$ possible winning numbers.
+
+:::
+::::
+
+<!-- When asked about the probability of a general event, it is often helpful to first consider the probability of a specific outcome that satisfies the event.  -->
+
+
+<!-- A group of 40 students is going to be randomly sorted^[Usually, you just put people's names into a hat, but sometimes you put the actual people into the hat.] into four  classes of 10 students each.  Three of the students --- say, Harry, Ron, Hermione  --- are close friends.  -->
+
+
+<!-- What is the probability that the three friends will all be in the class? -->
+
+<!-- What is the probability that exactly two of the friends will be in the same class? -->
+
+<!-- What is the probability that all three friends will be in different classes? -->
+
+<!-- What is the probability that Ron and Hermione will be the in the same class, but Harry will be in a different class? -->
+
+
+<!-- How many different possible ways are there of assigning the 40 students into four classes of 10 each? -->
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-binomial-coef}
+
+To get some intuition behind binomial coefficients, answer the following without using any formulas or doing any calculations.
+
+1.  What is $\binom{n}{n}$?
+1.  What is $\binom{n}{0}$?
+1.  What is $\binom{n}{1}$?
+1.  What is the relationship between $\binom{n}{k}$ and $\binom{n}{n-k}$?
+1.  Explain why
+$$
+\binom{m+n}{k} = \sum_{j=0}^k \binom{m}{j} \binom{n}{k-j}
+$$
+Hint: Suppose you are choosing a committee of size $k$ from a group consisting of $m$ faculty and $n$ students.
+1.  Explain why
+$$
+2^n = \sum_{k=0}^n\binom{n}{k} 
+$$
+Hint: Suppose you are forming a subset from $n$ items. 
+:::
+::::
+
+:::: {.callout-tip collapse=true}
+::: {#sol-binomial-coef}
+
+1.  $\binom{n}{n}=1$. 
+There is only one way to select all $n$ items.
+1.  $\binom{n}{0}=1$. 
+There is only one way to select none of the $n$ items.
+1.  $\binom{n}{1}=n$. 
+If you are just selecting 1 of $n$ items, then are $n$ ways to do it, one for each of the $n$ items.
+1.  $\binom{n}{k}=\binom{n}{n-k}$. 
+Suppose you are selecting a committee of size $k$ from $n$ peoeple. 
+The number of ways to choose $k$ of the $n$ people to include on the committee is equivalent to the number of ways to choose $n-k$ of the $n$ people to exclude from the committee.
+1.  Suppose you are choosing a committee of size $k$ from a group consisting of $m$ faculty and $n$ students. 
+The left side $\binom{m+n}{k}$ is the number of possible committees. 
+There can be anywhere from 0 to $k$ faculty on the committee. 
+If there are $j$ faculty there must be $k-j$ students, so $\binom{m}{j} \binom{n}{k-j}$ is the number of ways to select a committee with exactly $j$ faculty. 
+The right side sums the number of committees of each faculty/student breakdown to find the number of committees overall. 
+1.  Suppose you are forming a subset from $n$ items. 
+There are $2^n$ possible subsets, including the empty set. 
+This follows from the multiplication principle since each of the $n$ items can either be included or excluded in the subset. 
+(Label the items 1 to $n$; at the "include item 1 in the subset?" stage there are two possible choices, etc, so the total number of choices is $2^n$.) $\binom{n}{k}$ is the number of subsets of size $k$; sum the numbers of subsets of each size to get the overall number of subsets.
+
+:::
+::::
+
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-coin-probspace-counting}
+Continuing Example @exm-coin-probspace.
+
+
+1.  Use counting rules to find a formula for $\IP(X = 3)$.
+1.  Use counting rules to find a formula for $\IP(X = 2)$.
+1.  Use counting rules to find a formula for $\IP(X = x)$ for each possible value of $x$.
+1.  Now suppose the coin is flipped $n$ times. Continue to assume the coin is fair and the flips are independent. Let $X$ count the number of H in $n$ flips.
+Use counting rules to find a formula for $\IP(X = x)$ for each possible value of $x$.
+
+:::
+::::
+
+
+:::: {.callout-tip collapse=true}
+::: {#sol-coin-probspace-counting-sol}
+
+1.  We need to count the number of outcomes with exactly 3 H. 
+There are 4 "spots" in the sequence, and we need to choose 3 of them to put the H's in, so there are $\binom{4}{3} = 4$ ways to do so. 
+So $\IP(X = 3) = \binom{4}{3}/2^4 = 4/16$.
+1.  We need to count the number of outcomes with exactly 2 H. 
+There are 4 "spots" in the sequence, and we need to choose 2 of them to put the H's in, so there are $\binom{4}{2} = 6$ ways to do so. 
+So $\IP(X = 2) = \binom{4}{2}/2^4 = 6/16$.
+1.  There are $2^4$ equally likely outcomes. 
+For $X=x$ to be true, we need exactly $x$ H. 
+There are 4 "spots" in the sequence, and we need to choose $x$ of them to put the H's in, so there are $\binom{4}{x}$ ways to do so.
+$$
+\IP(X = x) = \frac{\binom{4}{x}}{2^4}, \qquad x = 0, 1, 2, 3, 4
+$$
+1.  There are $n$ flips, each with two possibilities, so there are $2^n$ equally likely coin flip sequences. 
+The possible values of $X$ are $0, 1, 2, \ldots, n$. 
+For $X=x$ to be true, there are $n$ spots in the sequence and we need to choose $x$ of them to put the $x$ H in, so there are $\binom{n}{x}$ ways to do so.
+That is, $\binom{n}{x}$ is the number of outcomes with exactly $x$ H (out of the $2^n$ equally likely outcomes).
+$$
+\IP(X = x) = \frac{\binom{n}{x}}{2^n}, \qquad x = 0, 1, 2, \ldots, n
+$$
+
+
+:::
+::::
+
+
+
+
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-counting-card-partition}
+
+A standard deck of 52 cards contains 4 suits (hearts, diamonds, spades, clubs)  each consisting of 13 different face values (2 through 10, jack, queen, king, ace).  The deck is well shuffled and a hand of 5 cards is dealt.
+
+1.  How many possible hands are there?
+1.  What is the probability the hand contains 4 aces?
+1.  What is the probability the hand contains 3 aces and 2 kings?
+1.  What is the probability the hand is a full house (3 cards of one face value and 2 of another)?
+<!-- A standard deck of 52 cards is well shuffled.  What is the probability that the four aces are all next to each other? -->
+:::
+::::
+
+:::: {.callout-tip collapse=true}
+::: {#sol-counting-card-partition}
+
+1.  The order of the deal does not matter; just which 5 cards are in the hand. 
+So we will use the combinations rule. 
+There are 52 cards of which we choose 5 so there are
+$$
+\binom{52}{5} = \frac{52!}{5!\times47!} = \frac{52\times51\times50\times49\times48}{5\times4\times3\times2\times1} = 2,598,960
+$$
+or about 2.6 million possible 5 card hands.
+1.  Partition the 52 cards into two groups: one with 4 aces and one with the 48 other cards.  We need to select all 4 from the ace group and 1 from the other group to complete the 5 card hand.  The probability of 4 aces is
+$$
+\frac{\binom{4}{4}\times\binom{48}{1}}{\binom{52}{5}}=\frac{1\times 48}{\binom{52}{5}} \approx 0.0000185
+$$
+or about 2 in 100,000 deals.
+1.  Partition into three groups: the 4 aces, the 4 kings, and the 44 other cards.  The probability is
+$$
+\frac{\binom{4}{3}\times\binom{4}{2}\times\binom{44}{0}}{\binom{52}{5}}
+= \frac{4\times6\times 1}{\binom{52}{5}}\approx0.00000924.
+$$
+1.  The previous problem gives an example of one kind of full house, 3 aces and 2 kings. 
+Any kind of full house will have the same probability, so we just need to figure out how many kinds of full house there are. 
+There are 13 possible choices for the 3-of-a-kind and then 12 possible choices for the pair. 
+So there are $13\times12=156$ different kinds of full house. 
+Note that this is "stage-wise" counting. 
+A full house with 3 aces and 2 kings is different than one with 2 aces and 3 kings. 
+"Order" matters and this is why it is $13\times12$ instead of $13\times12/2$ or $\binom{13}{2}$.  So the probability of a full house is
+$$
+13\times12\times\frac{\binom{4}{3}\times\binom{4}{2}\times\binom{44}{0}}{\binom{52}{5}}\approx0.00144,
+$$
+or about 1 in one thousand.
+
+:::
+::::
+
+
+
+
+
+<!-- A group of 40 students is going to be randomly assigned into four  classes of 10 each.  Three of the students --- say, Harry, Ron, Hermione  --- are close friends.  -->
+
+<!-- 1. What is the probability that the three friends will all be in the same class? -->
+<!-- 1. What is the probability that exactly two of the friends will be in the same class? -->
+<!-- 1. What is the probability that all three friends will be in different classes? -->
+<!-- 1. What is the probability that Ron and Hermione will be the in the same class, but Harry will be in a different class? -->
+<!-- 1. How many different possible ways are there of assigning the 40 students into four classes of 10 each? -->
+
+
+### Exercises
+
+::: {#exr-card-counting}
+
+A standard deck of 52 cards contains 13 cards (2-10, jack, queen, king, ace) in each of 4 suits (diamonds, hearts, clubs, spades).
+Shuffle the deck and deal a hand of 5 cards without replacement.
+
+1.  Compute and interpret the probability that the hand contains exactly 2 aces.
+1.  Compute and interpret the probability that the hand contains exactly 2 hearts.
+1.  Compute and interpret the probability that the hand contains the ace of hearts, exactly one more ace, and exactly one more heart.
+1.  Compute and interpret the probability that the hand contains at least one card from each of the four suits.
+1.  Compute and interpret the probability that the hand contains a "four-of-a-kind": four cards of the same face value (e.g. all 4 aces), plus one additional card.
+1.  Now shuffle the deck and deal cards one at a time until a heart is dealt and then stop. 
+What is the probability that you deal more than 4 cards?
+:::

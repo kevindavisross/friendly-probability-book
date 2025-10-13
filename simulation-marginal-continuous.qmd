@@ -1,0 +1,14 @@
+# Marginal Distributions of Discrete Random Variables {#sec-simulation-marginal-discrete}
+
+
+{{< include _r_setup.qmd >}}
+
+{{< include _python_setup.qmd >}}
+
+::: {.content-hidden}
+$$
+{{< include _macros.tex >}}
+$$
+:::
+
+TBA

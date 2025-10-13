@@ -1,0 +1,44 @@
+# Chapter 7 Exercise Solutions
+
+{{< include _r_setup.qmd >}}
+
+{{< include _python_setup.qmd >}}
+
+::: {.content-hidden}
+$$
+{{< include _macros.tex >}}
+$$
+:::
+
+## Solution to @exr-card-counting
+
+1.  Partition into aces and others. 
+Over many 5 card hands, about `{r} 100 * round(choose(4, 2) * choose(48, 3) / choose(52, 5), 4)`% contain exactly 2 aces.
+$$
+\frac{\binom{4}{2}\binom{48}{3}}{\binom{52}{5}} 
+$$
+1.  Partition into hearts and others. 
+Over many 5 card hands, about `{r} 100 * round(choose(13, 2) * choose(39, 3) / choose(52, 5), 4)`% contain exactly 2 hearts.
+$$
+\frac{\binom{13}{2}\binom{39}{3}}{\binom{52}{5}} 
+$$
+1.  Partition into ace of hearts, the 3 other aces, the 12 other hearts, and the 36 other cards. 
+Over many 5 card hands, about `{r} 100 * round(choose(3, 1) * choose(12, 1) * choose(36, 2) / choose(52, 5), 4)`% contain the ace of hearts, exactly one more ace, and exactly one more heart.
+$$
+\frac{\binom{1}{1}\binom{3}{1}\binom{12}{1}\binom{36}{2}}{\binom{52}{5}} 
+$$
+1.  You need to choose 2 cards from 1 face, and one from the others. 
+There are 4 possibilities for the face value that gets 2 cards. 
+Over many 5 card hands, about `{r} 100 * round(4 * choose(13, 2) * 13 ^ 3 / choose(52, 5), 4)`% contains at least one card from each of the four suits.
+$$
+4\frac{\binom{13}{2}\binom{13}{1}\binom{13}{1}\binom{13}{1}}{\binom{52}{5}} 
+$$ 
+1.  There are 13 choices for the face value of the four-of-a-kind, and 48 choices for the other card. 
+Over many 5 card hands, about `{r} 100 * round(13 * 48 / choose(52, 5), 4)`% contain a four-of-a-kind.
+$$
+\frac{(13)(48)}{\binom{52}{5}} 
+$$ 
+1.  You deal more than 4 cards only if the first 4 cards are not hearts: `{r} round(choose(39, 4) / choose(52, 4), 5)`
+$$
+\left(\frac{39}{52}\right)\left(\frac{38}{51}\right)\left(\frac{37}{50}\right)\left(\frac{36}{49}\right)
+$$

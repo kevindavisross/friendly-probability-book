@@ -451,7 +451,7 @@ In particular, considering the sample space can help distinguish between "the pa
 
 
 
-### Counting outcomes
+### Counting outcomes {#sec-language-counting-outcomes}
 
 When there are finitely many possibilities, we can ask: how many possible outcomes are there?
 In @exm-dice-outcome and @exm-matching-outcome we counted outcomes by enumerating them in a list.

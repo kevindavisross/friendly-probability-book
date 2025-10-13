@@ -17,8 +17,11 @@ book:
     - literacy-probability.qmd
     - language-probability.qmd
     - language-simulation.qmd
-    # - simulation-marginal-discrete.qmd
-    # - simulation-marginal-continuous.qmd
+    - simulation-marginal-discrete.qmd
+    - simulation-marginal-continuous.qmd
+    - simulation-joint.qmd
+    - math-probability.qmd
+    - statistics.qmd
     # chapter on simulation of multiple RVs (joint, conditional, transformations, sums)
     # - maybe two chapters (one joint, one transformations)
     # chapter on simulation expected value? Or is everything already in earlier chapters? Maybe it's like "a closer look at averages"?
@@ -36,6 +39,7 @@ book:
     # - statistics.qmd
     - language-probability-exercises.qmd
     - language-simulation-exercises.qmd
+    - math-probability-exercises.qmd
     - appendix.qmd
     - references.qmd
 
