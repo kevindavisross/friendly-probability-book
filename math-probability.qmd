@@ -11,6 +11,10 @@ $$
 $$
 :::
 
+We have already encountered many important concepts in probability.
+In this chapter, we'll explore further the mathematics of probability.
+
+
 ## Equally likely outcomes {#sec-equally-likely}
 
 In this section we'll look more closely at how to compute probabilities  when the outcomes in the sample space are equally likely.
@@ -622,3 +626,265 @@ Shuffle the deck and deal a hand of 5 cards without replacement.
 1.  Now shuffle the deck and deal cards one at a time until a heart is dealt and then stop. 
 What is the probability that you deal more than 4 cards?
 :::
+
+## Binomial distributions
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-binomial-stock}
+Consider an extremely simplified model for the daily closing price of a certain stock.
+Every day the price either goes up or goes down, and the movements are independent from day-to-day.
+Assume that the probability that the stock price goes up on any single day is 0.25.
+Let $X$ be the *number* of days in which the price goes up in the next 5 days.
+
+
+1.  Compute and interpret $\IP(X=5)$.
+1.  Compute the probability that the price goes down today and then up on the following four days.
+1.  Why is $\IP(X=4)$ different from the probability in the previous part?
+1.  How many outcomes (5 day sequences) satisfy the event $\{X=4\}$?
+Compute and interpret $\IP(X=4)$. 
+1.  Compute the probability that the price goes up on the next three days and then down on the following two days.
+1.  Why is $\IP(X=3)$ different from the probability in the previous part?
+1.  How many outcomes (5 day sequences) satisfy the event $\{X=3\}$?
+Compute and interpret $\IP(X=3)$. 
+1.  Suggest a general formula for the probability mass function of $X$.
+
+
+:::
+::::
+
+:::: {.callout-tip collapse=true}
+::: {#sol-binomial-stock}
+
+1.  Days are independent so we can multiply probabilities
+$$
+\IP(X = 5) = (0.25)(0.25)(0.25)(0.25)(0.25) = (0.25)^5 = \binom{5}{5}(0.25)^5(1-0.25)^{5 -5} = 0.00098
+$$
+In about 0.098\% of 5-day periods the price goes up all 5 days.
+1.  Days are independent so we can multiply probabilities
+$$
+(0.25)(0.25)(0.25)(1-0.25)(1-0.25) = (0.25)^3(1-0.25)^{5-3} = 0.0088
+$$
+1.  SSSFF is only one outcome with $X=3$.  There are $\binom{5}{3}=10$ total outcomes for which $X = 3$, each with probability $(0.25)^3(1-0.25)^2$, so 
+$$
+\IP(X = 3) = 10(0.25)^3(1-0.25)^2 = \binom{5}{3}(0.25)^3(1-0.25)^{5-3} = 0.088
+$$
+In about 8.8\% of 5-day periods the price goes up on exactly 3 of the 5 days.
+1.  The pmf is
+$$
+p(x) = 
+\begin{cases}
+	\binom{5}{x} 0.25^x (1-0.25)^{5-x}, & x=0, 1, 2, 3, 4, 5\\
+	0, & \text{otherwise}
+\end{cases}
+$$
+1.  See Example \@ref(exm:binomial-capture) and the discussion following it.
+1.  If price goes up on 25\% of days we would expect $5(0.25) = 1.25$ up movements in 5 days, on average in the long run.
+This is what we get if we compute the expected value the "long way" based on the distribution table.
+1.  These are different random variables. The number of tagged butterflies is different than the number of up price movements.
+1.  Yes, they have the same distribution. While the contexts are different and the variables are measuring different things, probabilistically the situations are equivalent.
+In each situation:
+    -   There are S/F trials (tagged/not, up/not)
+    -   Trials are independent (sampling with replacement, by assumption)
+    -   Probability of success of 0.25 on each trial (13/52, assumed 0.25)
+    -   5 trials (5 butterflies,  5 days)
+    -   $X$ counts the number of successes (number of tagged butterflies, number of up movements)
+Therefore, in each problem the random variable $X$ has a Binomial(5, 0.25) distribution.
+
+:::
+::::
+
+
+::: {#def-binomial-pmf}
+## Binomial pmf
+
+A discrete random variable $X$ has a **Binomial distribution** with parameters
+$n$, a nonnegative integer, and $p\in[0, 1]$ if and only if its probability mass function is
+\begin{align*}
+p_{X}(x) & = \binom{n}{x} p^x (1-p)^{n-x}, & x=0, 1, 2, \ldots, n
+\end{align*}
+
+If $X$ has a Binomial($n$, $p$) distribution
+\begin{align*}
+\E(X) & = np\\
+\Var(X) & = np(1-p)
+\end{align*}
+
+:::
+
+
+## Negative Binomial distributions
+
+
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-nb-bball-math}
+Maya is a basketball player who makes 86% of her free throw attempts.  Suppose that she attempts free throws until she makes 5 and then stops.  Let $X$ be the total number of free throws she attempts.  Assume shot attempts are independent.
+
+
+1.  Does $X$ have a Binomial distribution?  Why or why not?
+1.  What are the possible values of $X$? Is $X$ discrete or continuous?
+1.  Compute $\IP(X=5)$
+1.  Compute $\IP(X=6)$
+1.  Compute $\IP(X=7)$
+1.  Compute $\IP(Y=8)$
+1.  Find the probability mass function of $X$.
+1.  What seems like a reasonable general formula for $\E(X)$?  Interpret $\E(X)$ for this example.
+1.  Would the variance be larger or smaller if attempted free throws until she made 10 instead of 5?
+
+:::
+::::
+
+:::: {.callout-tip collapse=true}
+::: {#sol-nb-bball-math}
+1.  $X$ does not have a Binomial distribution since the number of *trials* is not fixed.  The number of *successes* is fixed to be 5, but the number of trials is random.
+1.  $X$ can take values 5, 6, 7, $\ldots$.  Even though it is unlikely that $X$ is very large, there is no fixed upper bound.  Even though $X$ can take infinitely values, $X$ is a discrete random variables because it takes *countably* many possible values.
+1.  In order for $X$ to be 5, Maya must make her first 5 attempts. Since the attempts are independent $\IP(X=5)=(0.86)^5=0.47$.  If Maya does this every practice, then in about 47% of practices she will make her first five free throw attempts.
+1.  In order for $X$ to be 6, Maya must miss exactly one of her first 5 attempts and then make her 6th. (If she didn't miss any of her first 5 attempts then she would be done in 5 attempts.) Consider the case where she misses her first attempt and then makes the next 5; this has probability $(1-0.86)(0.86)^5$.  Any particular sequence with exactly 1 miss among the first 5 attempts and a make on the 6th attempt has this same probability.  There are 5 "spots" for where the 1 miss can go, so there are $\binom{5}{1} = 5$ possible sequences.  Therefore
+    $$
+    \IP(X=6) = \binom{5}{1}(0.86)^5(1-0.86)^1 = 0.329
+    $$
+    Equivalently, the 4 successes, excluding the final success, must occur in the first 5 attempts, so there are $\binom{5}{4}$ possible sequences.  Note that $\binom{5}{1} = 5 = \binom{5}{4}$.  So we can also write
+    $$
+    \IP(X=6) = \binom{5}{4}(0.86)^5(1-0.86)^1 = 0.329
+    $$
+1.  In order for $X$ to be 7, Maya must miss exactly two of her first 6 attempts and then make her 7th. Any particular sequence of this form has probability $(0.86)^5(1-0.86)^2$ and there are $\binom{6}{2}=\binom{6}{4}$ possible sequences.  Therefore
+    \begin{align*}
+    \IP(X=7) & = \binom{6}{2}(0.86)^5(1-0.86)^2 = 0.138\\
+    & = \binom{6}{4}(0.86)^5(1-0.86)^2
+    \end{align*}
+1.  In order for $X$ to be 8, Maya must miss exactly three of her first 7 attempts and then make her 8th. Any particular sequence of this form has probability $(0.86)^5(1-0.86)^3$ and there are $\binom{7}{3}=\binom{7}{4}$ possible sequences.  Therefore
+    \begin{align*}
+    \IP(X=8) & = \binom{7}{3}(0.86)^5(1-0.86)^3 = 0.045\\
+    & = \binom{7}{4}(0.86)^5(1-0.86)^3
+    \end{align*}
+1.  In order for $X$ to take value $x$, the last trial must be success and the first $x-1$ trials must consist of $5-1=4$ successes and $x-5$ failures. There are $\binom{x-1}{5-1}$ ways to have $4$ successes among the first $x-1$ trials.  (This is the same as saying there are $\binom{x-1}{x-5}$ ways to have $x-5$ failures among the first $x-1$ trials.)
+    \begin{align*}
+    p_X(x) = \IP(X=x) & = \binom{x-1}{5-1}(0.86)^5(1-0.86)^{x-5}, \qquad x = 5, 6, 7, \ldots\\
+    & = \binom{x-1}{x-5}(0.86)^5(1-0.86)^{x-5}, \qquad x = 5, 6, 7, \ldots
+    \end{align*}
+1.  On average it takes $1/0.86 = 1.163$ attempts to make a free throw, so it seems reasonable that it would take on average $5(1/0.86)=5.81$ attempts to make 5 free throws.  If Maya does this at every practice, it takes her on average 5.8 attempts to make 5 free throws.
+1.  The variance would be larger with 10 attempts.
+
+:::
+::::
+
+```{python}
+
+r = 5
+def count_until_rth_success(omega):
+    trials_so_far = []
+    for i, w in enumerate(omega):
+        trials_so_far.append(w)
+        if sum(trials_so_far) == r:
+            return i + 1 
+        
+P = Bernoulli(0.86) ** inf
+
+X = RV(P, count_until_rth_success)
+x = X.sim(10000)
+
+x.plot()
+
+NegativeBinomial(r = 5, p = 0.86).plot()
+plt.show()
+
+```
+
+
+```{python}
+
+x.count_eq(7) / 10000, NegativeBinomial(r = 5, p = 0.86).pmf(7)
+
+```
+
+```{python}
+
+x.mean(), NegativeBinomial(r = 5, p = 0.86).mean()
+
+```
+
+```{python}
+
+x.var(), NegativeBinomial(r = 5, p = 0.86).var()
+
+```
+
+
+
+Suppose you perform a sequence of Bernoulli($p$) trials until $r$ successes occur and then stop.  Let $X$ be the total number of *trials* performed, including the trials on which the successes occur.  Then $X$ has a NegativeBinomial($r$,$p$) distribution. In this situation, exactly $x$ trials are performed if and only if
+
+-   there are exactly $r-1$ successes among the first $x-1$ trials, and 
+-   the $x$th (last) trial results in success.
+
+There are $\binom{x-1}{r-1}$ possible sequences that satisfy the above, and each of these sequences --- with $r$ successes and $x-r$ failures --- has probability $p^r(1-p)^{x-r}$.
+
+
+::: {#def-nb-pmf}
+
+A discrete random variable $X$ has a **Negative Binomial distribution** with parameters $r$, a positive integer, and  $p\in[0, 1]$ if its probability mass function is
+\begin{align*}
+p_{X}(x) & = \binom{x-1}{r-1}p^r(1-p)^{x-r}, & x=r, r+1, r+2, \ldots
+\end{align*}
+If $X$ has a NegativeBinomial($r$, $p$) distribution
+\begin{align*}
+\E(X) & = \frac{r}{p}\\
+\Var(X) & = \frac{r(1-p)}{p^2}
+\end{align*}
+
+:::
+
+
+Suppose you perform a sequence of Bernoulli($p$) trials until $r$ successes occur and then stop.  Let $X$ be the total number of *trials* performed, including the trials on which the successes occur.  Then $X$ has a NegativeBinomial($r$,$p$) distribution. In this situation, exactly $x$ trials are performed if and only if
+
+-   there are exactly $r-1$ successes among the first $x-1$ trials, and 
+-   the $x$th (last) trial results in success.
+
+There are $\binom{x-1}{r-1}$ possible sequences that satisfy the above, and each of these sequences --- with $r$ successes and $x-r$ failures --- has probability $p^r(1-p)^{x-r}$.
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-nb-geom}
+What is another name for a NegativeBinomial(1,$p$) distribution?
+
+:::
+::::
+
+:::: {.callout-tip collapse=true}
+::: {#sol-nb-geom}
+A NegativeBinomial(1,$p$) distribution is a Geometric($p$) distribution.
+
+:::
+::::
+
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-nb-geom-sum}
+Suppose $X_1, \ldots, X_r$ are independent each with a Geometric($p$) distribution.  What is the distribution of $X_1+\cdots + X_r$?  Find the expected value and variance of this distribution.
+
+:::
+::::
+
+:::: {.callout-tip collapse=true}
+::: {#sol-nb-geom-sum}
+
+Consider a long sequence of Bernoulli($p$) trials.  
+Let $X_1$ count the number of trials until the 1st success occurs.  
+Starting immediately after the first success occurs, let $X_2$ count the number of *additional* trials until the 2nd success occurs, so that $X_1+X_2$ is the total number of trials until the first 2 successes occur.  
+Since $X_1$ and $X_2$ are independent, then the two sets of trials are independent.  
+That is, $X_1+X_2$ counts the number of trials until 2 successes occur in Bernoulli($p$) trials, so $X_1+X_2$ has a Negative Binomial(2, $p$) distribution.  
+Continuining in this way we see that if $X_1, \ldots, X_r$ are independent each with a Geometric($p$) distribution then $(X_1+\cdots+X_r)$ has a NegativeBinomial($r$,$p$) distribution.
+
+If $X$ has a NegativeBinomial($r$,$p$) distribution then it has the same distributional properties as  $(X_1+\cdots+X_r)$  where $X_1, \ldots, X_r$ are independent each with a Geometric($p$) distribution.  
+Therefore we can compute the mean of a Negative Binomial distribution by computing
+$$
+\E(X_1+\cdots+X_r)  =\E(X_1)+\cdots+\E(X_r) = \frac{1}{p} + \cdots + \frac{1}{p} = \frac{r}{p}
+$$
+We can use a similar technique to compute the variance of a Negative Binomial distribution, because the $X_i$s are independent.
+$$
+\Var(X_1+\cdots+X_r)  \stackrel{\text{(independent)}}{=}\Var(X_1)+\cdots+\Var(X_r) = \frac{1-p}{p^2} + \cdots + \frac{1-p}{p^2} = \frac{r(1-p)}{p^2}
+$$
+`
+
+:::
+::::
+
+

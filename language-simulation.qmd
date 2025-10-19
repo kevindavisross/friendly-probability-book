@@ -7275,7 +7275,7 @@ Combine Symbulate and Python code to perform a sensivity analysis of how the fol
 :::
 
 
-## Simulating from distributions
+## Simulating from distributions {#sec-simulate-from-distribution}
 
 The distribution of a random variable specifies the long run pattern of variation  of values of the random variable over many repetitions of the underlying random phenomenon, or the relative degree of likelihood of possible values.
 The distribution of a random variable $X$ can be approximated by

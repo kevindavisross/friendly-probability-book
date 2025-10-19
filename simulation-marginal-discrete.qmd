@@ -11,4 +11,2841 @@ $$
 $$
 :::
 
-TBA
+
+
+
+<!-- MOTIVATION: THE MATH CHAPTERS SHOULD BE AFTERTHOUGHT
+SO ALL IMPORTANT PROPERTIES SHOULD BE INTRODUCED IN SIMULATION CHAPTERS
+DEFINE DISTRIBUTION AS STORY (BINOMIAL, GAMMA, ETC) OR PATTERN (POISSON, NORMAL, ETC)
+PROVIDE FORMULAS FOR EXPECTED VALUE AND VARIANCE WITH JUSTIFICATION VIA SIMULATION, STORY OR PROPERTY (E.G. LINEARITY)
+DO NOT INCLUDE FORMULAS FOR PMF/PDF/CDF (MAYBE PUT IN FOOTNOTE) UNTIL MATH CHAPTERS (UNLESS SIMPLE LIKE UNIFORM OR GEOMETRIC)
+
+
+Add expected value material here? What needs to go here that isn't in language of sim chapter and won't be in math of EV chapter? General EV section somewhere to introduce idea, via dice/Binomial/Geometric? Include EV/Var formulas for named distributions in each section? Motivate EV/Var formulas through stories and plots (change parameters, how does EV/Var change?)
+
+Comment somewhere about no "the Binomial distribution" etc, family of distributions.
+
+- this is where all the spinner stuff is
+- same dist = same spinner
+- how would you simulate
+- include independence - only need 1 spinner for each case
+
+
+
+- Need to add more questions we we just use simulation to answer
+- Add more general text about describing distributions: shape, center, variability, range of values, probabilities. Include tables of percentiles for a few examples. Describe in context of the problem what the distribution tells us.
+- For joint distributions, add more joint probabilities P(X < x, Y < y) for different (x, y) pairs -->
+
+
+
+
+
+
+
+Random variables measure numerical quantities of interest associated with a random phenomenon.
+Random variables can potentially take many different values, usually with some values or intervals of values more probable than others.
+Even when outcomes of a random phenomenon are equally likely, values of related random variables are usually not.
+The **(probability) distribution** of a collection of random variables identifies the possible values that the random variables can take and a way of determining their relative likelihoods.
+We will see several ways to describe distributions, some of which depend on the number and types (discrete or continuous) of the random variables under investigation.
+
+Commonly encountered random variables can be classified as discrete or continuous (or a mixture of the two[^distribution-1]).
+
+[^distribution-1]: There is another type of weird random variable which has a "singular" distribution, like the [Cantor distribution](https://en.wikipedia.org/wiki/Cantor_distribution), but we're counting these random variables as not commonly encountered.
+
+-   A **discrete** random variable can take on only countably many isolated points on a number line.
+These are often counting type variables.
+Note that "countably many" includes the case of countably infinite, such as $\{0, 1, 2, \ldots\}$.
+-   A **continuous** random variable can take any value within some uncountable interval, such as $[0, 1]$, $[0,\infty)$, or $(-\infty, \infty)$.
+These are often measurement type variables.
+
+We will see a few ways of specifying a distribution, including
+
+-   A well labeled *plot*
+-   A *table* of possible values and corresponding probabilities for discrete random variables.
+This could be a two-way table for the joint distribution of two discrete random variables (or multi-way table)
+-   A *probability mass function* for discrete random variables which maps possible values $x$ --- or $(x, y)$ pairs, etc --- to their respective probability.
+-   A *probability density function* for continuous random variables which maps possible values $x$ --- or $(x, y)$ pairs, etc --- to their respective probability "density".
+-   A *cumulative distribution function*, which provides all the percentiles (a.k.a. quantiles) of the distribution
+-   By *name, including values of relevant parameters*, e.g., "Uniform(0, 60)", "Normal(30, 10)", "Poisson(1)", "BivariateNormal(30, 30, 10, 10, 0.7)".
+We will see that some probabilistic situations are so common that the corresponding distributions have special names.
+Each named distribution has corresponding *parameters*, e.g., 0 and 60 are the parameters of the Uniform(0, 60) distribution.
+Always be sure to specify values of relevant parameters, e.g., "Normal(30, 10) distribution" rather than just "Normal distribution".
+Be careful: different named distributions have different identifying parameters.
+For example, the parameters 0 and 60 mean something different for the Uniform(0, 60) distribution than for the Normal(0, 60) distribution.
+
+
+
+Distributions of random variables can be thought of as collections of probabilities of events involving the random variables.
+As for probabilities, we can interpret probability distributions of random variables as:
+
+- *long run relative frequency distributions*: what pattern of values would emerge if we repeated the random process many times and observed many values of the random variables?  
+- *subjective probability distributions*: which potential values of these uncertain numerical quantities are relatively more plausible than others?
+
+Regardless of the interpretation, we can use simulation to investigate distributions of random variables: simulate many values of the random variables and summarize them in various ways to describe the pattern of variability.
+We will often represent distributions as spinners (or a collection of spinners) which when spun many times achieve the appropriate long run pattern of values of the random variables.
+
+Most interesting problems involve two or more random variables defined on the same probability space.
+In these situations, we can consider how the variables vary together and study relationships between them.
+A **joint distribution** describes the full pattern of variability of a collection of random variables.
+In the context of multiple random variables, the distribution of any one of the random variables alone is called a **marginal distribution**.
+
+In this chapter we'll investigate marginal distributions of discrete random variables.
+We have already been introduced to distributions of discrete random variables; see @sec-dist-intro and @sec-language-simulation-relative-frequency.
+Now we'll explore in more detail.
+
+## An introductory example {#sec-marginal-dist-intro}
+
+
+
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-binomial-capture}
+Capture-recapture sampling is a technique often used to estimate the size of a population.
+Suppose you want to estimate $N$, the number of [monarch butterflies in Pismo Beach](https://www.parks.ca.gov/?page_id=30273).
+(Assume that $N$ is a fixed but unknown number; the population size doesn't change over a short time.)
+You first capture a sample of $N_1$ butterflies, selected randomly, and tag them and release them.
+Later you capture a second sample of $n$ butterflies, selected randomly *with replacement*.
+(We'll compare to the case of sampling without replacement later.)
+Let $X$ be the number of butterflies in the second sample that have tags (because they were also caught in the first sample).
+(Assume that the tagging has no effect on behavior, so that selection in the first sample is independent of selection in the second sample.)
+
+In practice, $N$ is unknown and the point of capture-recapture sampling is to estimate $N$.
+But let's start with a simpler, but unrealistic, example where there are $N=52$ butterflies, $N_1 = 13$ are tagged and $N_0=52-13 = 39$ are not, and $n=5$ is the size of the second sample.
+
+
+1.  What are the possible values of $X$?
+1.  Describe how you could use a tactile simulation to simulate a single value of $X$.
+1.  Describe in words how you could use simulation to approximate $\IP(X=0)$.
+1.  Describe in words how you could use simulation to approximate the distribution of $X$.
+1.  Write and run Symbulate code to approximate $\IP(X=0)$ and the distribution of $X$.
+1.  Construct a table, plot, and spinner representing the approximate distribution of $X$.
+1.  The theoretical value of $\IP(X = 0)$ is 0.237.
+(We will see how to compute this later.)
+Compare to your simulated value.
+Is the theoretical value within the margin of error of the simulated value?
+1.  Interpret in context $\IP(X = 0) = 0.237$ as a long run relative frequency.
+1.  Describe in words the distribution of $X$.
+What are some relevant features?
+
+:::
+::::
+
+:::: {.callout-tip collapse=true}
+::: {#sol-binomial-capture}
+
+1.  $X$ is the number of tagged butterflies in the sample of 5, so the largest $X$ can be is 5 and the smallest $X$ can be is 0.
+(Don't forget 0.)
+The possible values of $X$ are 0, 1, 2, 3, 4, 5.
+1.  We could use a deck of 52 cards, with 13 labeled "tagged" (say the clubs) and the others not.
+Shuffle the deck and draw 5 cards *with replacement*, and let $X$ be the number of cards out of the 5 drawn that say "tagged".
+1.  Repeat the steps in part 2 many times to simulate many values of $X$, say 10000.
+Count the number of repetitions that result in $X=0$ and divide by the total number of repetitions (10000); this relative frequency approximates $\IP(X = 0)$.
+1.  Simulate many values of $X$ (say 10000) and find the simulated relative frequency of each possible value: $0, 1, 2, 3, 4, 5$.
+1.  See Symbulate code below.
+1.  Compare to @tbl-binomial-capture and @fig-binomial-capture.
+These represent the theoretical distribution of $X$, but your simulation-based approximation should be similar (see our Symbulate output below).
+1.  For 10000 repetitions, the margin of error is roughly $1/\sqrt{10000} = 0.01$ (or 0.02 following the recommendation in @sec-moe-multiple).
+Simulation results vary, but for most simulations adding and subtracting 0.01 to the simulated relative frequency of 0 will result in an interval that contains 0.237.
+1.  In this scenario, 23.7% of possible *samples* of 5 butterflies contain 0 tagged butterflies.
+1.  We could interpret the distribution is terms of relative frequencies as in the previous example: 39.6% of possible samples contain exactly 1 tagged butterfly, only about 1.6% of possible samples contain at least 4 tagged butterflies, etc.
+We can also interpret the distribution in terms of relative degrees of likelihood.
+The possible values, in order from most to least likely, are 1, 2, 0, 3, 4, 5.
+    - The most likely value is 1, which is about 1.5 times more likely than 2.
+    - 2 is a little more likely (about 1.1 times) than 0.
+    - 0 is about 2.7 times more likely than 3
+    - 3 is about 6 times more likely than 4
+    - 4 is about 15 times more likely than 5
+    
+:::
+::::
+
+The following Symbulate code implements the simulation in @exm-binomial-capture.
+We define a box model with 13 tickets labeled 1 ("tagged") and 39 labeled 0 ("not tagged"), and select 5 with replacement.
+
+
+```{python}
+P = BoxModel({1: 13, 0: 39}, size = 5, replace = True)
+
+P.sim(10)
+```
+
+Since the tickets are labeled 1/0 we can count the number of 1s ("tagged") in a sample by summing.
+
+
+```{python}
+X = RV(P, sum)
+
+(RV(P) & X).sim(10)
+```
+
+
+
+Now we simulate many values of $X$.
+
+```{python}
+x = X.sim(10000)
+
+x
+```
+
+Approximate $\IP(X = 0)$ with the relative frequency of 0; compare to the theoretical value 0.237.
+
+```{python}
+x.count_eq(0) / x.count()
+```
+
+
+We can display the approximate distribution of $X$ in a table or plot (`x.plot()`).
+Calling `Binomial(5, 0.25).plot()` overlays the theoretical distribution of $X$, called the "Binomial(5, 0.25)" distribution (which we'll discuss soon).
+
+```{python}
+x.tabulate(normalize = True)
+```
+
+
+
+```{python}
+#| warning: false
+
+plt.figure();
+x.plot() # approximate distribution based on simulated values
+Binomial(5, 0.25).plot(); # theoretical distribution
+plt.show()
+```
+
+The marginal distribution of a discrete random variable $X$ is often displayed in a table (like @tbl-binomial-capture) or plot (like @fig-binomial-capture-1) displaying the probability of the event $\{X=x\}$ for each possible value $x$.
+We can represent a marginal distribution of a discrete random variable with a spinner (like @fig-binomial-capture-2) which returns possible values of the random variable with the appropriate probabilities.
+
+
+```{r}
+#| label: tbl-binomial-capture
+#| echo: false
+#| tbl-cap: "Table representing the the Binomial(5, 0.25) distribution, the theoretical distribution of $X$ in @exm-binomial-capture."
+
+n = 5
+p = 0.25
+
+x = 0:n
+px = dbinom(x, n, p)
+
+data.frame(x, px) |>
+  kbl(col.names = c("x", "P(X = x)"),
+      digits = 4) |>
+  kable_styling()
+```
+
+```{r}
+#| label: fig-binomial-capture
+#| echo: false
+#| fig-cap: "Plot and spinner representing the the Binomial(5, 0.25) distribution, the theoretical distribution of $X$ in @exm-binomial-capture."
+#| fig-subcap: 
+#|   - "Impulse plot"
+#|   - "Spinner; the values 4 and 5 have been grouped together and their total probability of 1.6% is not displayed."
+#| layout-ncol: 2
+
+# impulse plot
+
+ggplot(data.frame(x, px),
+       aes(x = x,
+           xend = x,
+           y = 0,
+           yend = px)) +
+  geom_segment(linewidth = 1.2, col = "skyblue") +
+  scale_x_continuous(breaks = 0:5) +
+  scale_y_continuous(expand = c(0, 0)) +
+  theme_classic() +
+  theme(legend.position = "none") +
+  labs(x = "x",
+       y = "P(X = x)")
+
+# spinner
+
+x = c(0:3, "4-5")
+p = c(dbinom(0:3, 5, 0.25), 1-pbinom(3, 5, 0.25))
+
+
+xp <- data.frame(x, p)
+
+cdf = c(0, cumsum(xp$p))
+
+plotp = (cdf[-1] + cdf[-length(cdf)]) / 2
+
+spinner <- ggplot(xp, aes(x="", y=p, fill=x))+
+  geom_bar(width = 1, stat = "identity",
+           color = "black", fill = "white") + 
+  coord_polar("y", start = 0) +
+  theme_void() +
+  scale_y_continuous(breaks = plotp, labels = xp$x) +
+  theme(axis.text.x=element_text(size = 12, face = "bold")) +
+  geom_text(aes(y = plotp,
+                label = percent(p)), size = 4,
+            color=c(rep("black", 4), rep(NA, 1)))
+
+spinner
+```
+
+
+## Bernoulli trials and the Binomial situation
+
+Some probabilistic situations are so common that the corresponding distributions have special names.
+@exm-binomial-capture involves the "Binomial situation", and the random variable $X$ in @exm-binomial-capture has a "Binomial distribution with parameters $n = 5$ and $p=0.25$".
+
+We can describe the general Binomial situation in terms of a box model.
+
+-   Imagine a box containing tickets where each ticket is labeled either 1 or 0.
+-   Let $p$ be the proportion of tickets in the box labeled 1.
+-   Randomly select $n$ tickets from the box *with replacement*.
+-   Let $X$ be the number of tickets in the sample that are labeled 1.
+    - Since the tickets are labeled 1/0, the random variable $X$ which counts the number of successes is equal to the sum of the 1/0 values on the tickets in the sample.
+-   Then we say that $X$ a Binomial distribution with parameters $n$ and $p$.
+
+
+Binomial distributions are commonly used when sampling from a population.
+
+-   Each individual in a population called be categorized as "success" (1) or not (0, "failure").
+    - "Success" is a generic term for whatever you're interested in counting
+    - "Success" is not necessarily good; for example if you're counting the number of people who have died from a given cause then "success" equals death.
+-   $p$ is the population proportion of success
+-   A random sample of size $n$ is selected from the population (technically with replacement, but we will revisit later)
+-   $X$ is the number of successes in the sample
+-   Then we say that $X$ a Binomial distribution with parameters $n$ and $p$.
+
+
+
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-binomial-capture-situation}
+Explain how @exm-binomial-capture involves the Binomial situation, and identify the values of $n$ and $p$.
+
+:::
+::::
+
+:::: {.callout-tip collapse=true}
+::: {#sol-binomial-capture-situation}
+
+-   There is a population of 52 butterflies and each butterfly is either tagged (success) or not (failure)
+-   The proportion of tagged butterflies in the population is $p=13/52 = 0.25$.
+Each time a butterfly is randomly selected, the marginal probability that the butterfly is tagged is $p=0.25$.
+-   A random sample of $n=5$ butterflies is selected.
+Since the selections are made with replacement they are independent.
+    - Every time a new butterfly is selected, with replacement the population proportion is 13/52=0.25 regardless of the results of the other selections.
+    - In this case it is enough to just specify the population proportion $0.25$ without knowing the population size
+-   $X$ counts the number of tagged butterflies in the sample, so $X$ has a Binomial(5, 0.25) distribution.
+
+:::
+::::
+
+
+
+Binomial situations can also be described in terms of "Bernoulli trials".
+
+::: {#def-bernoulli-trials}
+In a sequence of **Bernoulli($p$) trials**
+
+-   There are only two possible outcomes, "success" (1) or not (0, "failure"), on each trial.
+-   The unconditional/marginal probability of success is the same on every trial, and equal to $p$.
+-   The trials are independent.
+
+:::
+
+::: {#def-binomial-story}
+Consider a *fixed number*, $n$, of Bernoulli($p$) trials and let $X$ count the number of successes.
+The distribution of $X$ is defined to be the **Binomial($n, p$) distribution**.
+:::
+
+A Binomial distribution is specified by two parameters:
+
+-   $n$ (an integer): the fixed number of Bernoulli trials, or the sample size
+-   $p$ (in $[0, 1]$): the fixed marginal probability of success on each Bernoulli trial, or the population proportion of success
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-binomial-plot-sketch}
+Without doing any calculation or simulation, sketch a plot representing each of the following distributions, like @fig-binomial-capture-1 for the Binomial(5, 0.25) distribution.
+Explain your reasoning.
+
+
+1.  Binomial(5, 0.75)
+1.  Binomial(5, 0.5)
+1.  Binomial(5, 0.1)
+1.  The distribution of $Y = 5-X$ for $X$ in @exm-binomial-capture.
+Hint: what does $Y$ represent in the butterfly context?
+
+:::
+::::
+
+:::: {.callout-tip collapse=true}
+::: {#sol-binomial-plot-sketch}
+
+1.  The Binomial(5, 0.25) situation corresponds to a probability of success of 0.25 and of failure of 0.75, while the Binomial(5, 0.75) situation corresponds to a probability of success of 0.75 and of failure of 0.25.
+So going from Binomial(5, 0.25) to Binomial(5, 0.75) is just like switching the roles of success and failure.
+For example, seeing 0 successes in a Binomial(5, 0.25) situation is as likely as seeing 0 failures, and hence 5 successes, in a Binomial(5, 0.75) situation.
+To obtain a Binomial(5, 0.75) distribution, imagine "rotating" the Binomial(5, 0.25) distribution around $n/2 = 2.5$; see @fig-binomial-plot-sketch-3.
+1.  In the Binomial(5, 0.5) situation, on each trial the probability of success is the same as failure, so we might expect the shape to be symmetric around $n/2 = 2.5$, with the probabilities decreasing as $x$ moves away from $n/2$.
+See @fig-binomial-plot-sketch-2.
+1.  In the Binomial(5, 0.1) situation we only expect to see success in 1 in every 10 trials on average, so in only 5 trials we would most likely see 0 successes.
+So the probability is highest for $x=0$ and then decreases as $x$ increases.
+See @fig-binomial-plot-sketch-4
+1.  The reasoning is similar to part 1.
+If $X$ counts the number of tagged butterflies in the sample of 5, then $Y=5-X$ counts the number of untagged butterflies.
+So $Y$ also fits the Binomial situation, but untagged represents "success" (what $Y$ counts) so the probability of success is 0.75.
+Therefore $Y$ has a Binomial(5, 0.75) distribution as in part 1.
+
+:::
+::::
+
+```{r}
+#| label: fig-binomial-plot-sketch
+#| echo: false
+#| fig-cap: "Binomial($n$, $p$) distributions with $n=5$"
+#| fig-subcap: 
+#|   - "$p = 0.25$"
+#|   - "$p = 0.5$"
+#|   - "$p = 0.75$"
+#|   - "$p = 0.1$"
+#| layout-ncol: 2
+#| layout-nrow: 2
+
+
+x = 0:5
+
+px = dbinom(x, 5, 0.25)
+ggplot(data.frame(x, px),
+       aes(x = x,
+           xend = x,
+           y = 0,
+           yend = px)) +
+  geom_segment(linewidth = 1.2, col = "skyblue") +
+  scale_x_continuous(breaks = 0:5) +
+  scale_y_continuous(expand = c(0, 0), limits = c(0, 0.6)) +
+  theme_classic() +
+  theme(legend.position = "none") +
+  labs(x = "x",
+       y = "P(X = x)")
+  
+
+px = dbinom(x, 5, 0.5)
+ggplot(data.frame(x, px),
+       aes(x = x,
+           xend = x,
+           y = 0,
+           yend = px)) +
+  geom_segment(linewidth = 1.2, col = "skyblue") +
+  scale_x_continuous(breaks = 0:5) +
+  scale_y_continuous(expand = c(0, 0), limits = c(0, 0.6)) +
+  theme_classic() +
+  theme(legend.position = "none") +
+  labs(x = "x",
+       y = "P(X = x)")
+
+
+px = dbinom(x, 5, 0.75)
+ggplot(data.frame(x, px),
+       aes(x = x,
+           xend = x,
+           y = 0,
+           yend = px)) +
+  geom_segment(linewidth = 1.2, col = "skyblue") +
+  scale_x_continuous(breaks = 0:5) +
+  scale_y_continuous(expand = c(0, 0), limits = c(0, 0.6)) +
+  theme_classic() +
+  theme(legend.position = "none") +
+  labs(x = "x",
+       y = "P(X = x)")
+
+
+px = dbinom(x, 5, 0.1)
+ggplot(data.frame(x, px),
+       aes(x = x,
+           xend = x,
+           y = 0,
+           yend = px)) +
+  geom_segment(linewidth = 1.2, col = "skyblue") +
+  scale_x_continuous(breaks = 0:5) +
+  scale_y_continuous(expand = c(0, 0), limits = c(0, 0.6)) +
+  theme_classic() +
+  theme(legend.position = "none") +
+  labs(x = "x",
+       y = "P(X = x)")
+```
+
+
+The exact shape of a Binomial distribution depends on $n$ and $p$.
+@fig-binom-plots-n and @fig-binom-plots-p display just a few examples of how changing $n$ or $p$ affects the shape of a Binomial distribution.
+
+
+```{python}
+#| label: fig-binom-plots-n
+#| echo: false
+#| warning: false
+#| fig-cap: "Binomial($n$, 0.4) distributions for (from left to right) $n = 5, 10, 15, 20$."
+
+p = 0.4
+
+ns = [5, 10, 15, 20]
+
+plt.figure()
+
+for n in ns:
+  Binomial(n, p).plot();
+
+# plt.legend(ns, title = "n")
+
+plt.show()
+
+```
+
+
+
+```{python}
+#| label: fig-binom-plots-p
+#| echo: false
+#| warning: false
+#| fig-cap: "Binomial(10, $p$) distributions for (from left to right) $p = 0.1, 0.3, 0.5, 0.7, 0.9$."
+
+n = 10
+
+ps = [0.1, 0.3, 0.5, 0.7, 0.9]
+
+plt.figure()
+
+for p in ps:
+  Binomial(n, p).plot();
+
+# plt.legend(ps, title = "p", loc = "upper center");
+plt.xlim(-0.2, n + 0.2);
+
+plt.show()
+```
+
+
+
+
+
+
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-binomial-situation}
+In each of the following situations determine whether or not $X$ has a Binomial distribution.
+If so, specify $n$ and $p$.
+If not, explain why not.
+
+
+1.  Roll a die 20 times; $X$ is the number of times the die lands on an even number.
+1.  Roll a die 20 times; $X$ is the number of times the die lands on 6.
+1.  Roll a die until it lands on 6; $X$ is the total number of rolls.
+1.  Roll a die until it lands on 6 three times; $X$ is the total number of rolls.
+1.  Roll a die 20 times; $X$ is the sum of the numbers rolled.
+1.  Shuffle a standard deck of 52 cards (13 hearts, 39 other cards) and deal 5 *without replacement*; $X$ is the number of hearts dealt.
+(Hint: be careful about why.)
+1.  Roll a fair six-sided die 10 times and a fair four-sided die 10 times; $X$ is the number of 3s rolled (out of 20). 
+
+:::
+::::
+
+:::: {.callout-tip collapse=true}
+::: {#sol-binomial-situation}
+
+1.  Yes, Binomial(20, 0.5).
+Success = even.
+1.  Yes, Binomial(20, 1/6).
+Success = 6.
+The probability of success has to be the same on each trial.
+However, the probability of success does not have to be the same as the probability of failure.
+1.  Not Binomial; not a fixed number of trials.
+These are Bernoulli trials, but the random variable is not counting the number of successes in a fixed number of trials.
+1.  Not Binomial; not a fixed number of trials.
+These are Bernoulli trials, but the random variable is not counting the number of successes in a fixed number of trials.
+1.  Not Binomial; each trial has more outcomes than just success or failure, and the random variable is summing the values rather than counting successes.
+1.  Not Binomial, but be careful about the reason: the trials are not independent.
+The conditional probability that the second card is a heart given that the first card is a heart is 12/51, which is not equal to the conditional probability that the second card is a heart given that the first card is not a heart, 13/51.
+The trials are not independent.
+However, *the unconditional probability of success is the same on each trial*, $p=13/52$.
+Recall @exm-harry-second and the related discussion.
+1.  Not Binomial.
+Here the trials are independent, but the probability of success is not the same on each trial; it's 1/6 for the six-sided die trials but 1/4 for the four sided-die trials. 
+(We can write $X = Y + Z$ where $X$, the number of times the six-sided die lands on 3, has a Binomial(10, 1/6) distribution, and $Y$, the number of times the four-sided die lands on 3, has a Binomial(10, 1/4) distribution and $Y$ and $Z$ are independent.
+But $X$ itself does not have a Binomial distribution.)
+
+:::
+::::
+
+
+Do not confuse the following two distinct assumptions of Bernoulli trials.
+
+-   The probability of success is the same on each trial --- this concerns the *unconditional/marginal* probability of each individual trial.
+    -   When sampling from a population, the probability of success will be the same on each trial regardless of whether the sampling is with or without replacement as long as all trials are sampled from the same population.
+- The trials are independent --- this concerns *joint or conditional* probabilities for the collection of trials.
+    -   When sampling from a population, the trials will technically only be independent if the sampling is with replacement.
+    -   But when sampling without replacement, if the population size is much larger than the sample size then the trials will be nearly independent.
+
+
+We will study Binomial distributions in much more detail as we go, including how to compute probabilities.
+For now, be sure to know how to identify the Binomial situation.
+
+## Probability mass functions
+
+
+The marginal distribution of a discrete random variable $X$ is often represented in a table or plot containing the probability of the event $\{X=x\}$ for each possible value $x$.
+In some cases the distribution has a "formulaic" shape and $\IP(X=x)$ can be written explicitly as a function of $x$.
+
+
+Recall @sec-dist-intro and consider again $X$, the sum of two rolls of a fair four-sided die.
+See @fig-dice-sum-dist-plot2-pmf; the probabilities of the possible values $x$ follow a clear triangular pattern as a function of $x$.
+
+
+::: {.callout-warning}
+The dotted lines in @fig-dice-sum-dist-plot2-pmf emphasize the triangular pattern of $\IP(X = X)$ as a function of $x = 2, 3, 4, 5, 6, 7, 8$, but remember that $\IP(X =x) = 0$ for other values of $x$.
+:::
+
+
+```{r}
+#| label: fig-dice-sum-dist-plot2-pmf
+#| echo: false
+#| fig-cap: "The marginal distribution of $X$, the sum of two rolls of a fair four-sided die. The black dots represent the marginal probability mass function of $X$."
+
+y = 2:8
+p = c(1, 2, 3, 4, 3, 2, 1) / 16
+
+ggplot(data.frame(y, p),
+       aes(x = y,
+           y = p)) +
+  geom_point(col = "black", shape = 1, size = 4) +
+  geom_line(linetype = "dotted") +
+  geom_segment(aes(x = y,
+                   xend = y,
+                   y = 0,
+                   yend = p), 
+               linewidth = 1.2, col = "skyblue") +
+  # scale_color_manual(values = c("#56B4E9", "#E69F00", "#999999")) +
+  scale_x_continuous(breaks = 2:8) +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.01), 
+                                           add = c(0, 0.01)),
+                     limits = c(0, 0.25)) +
+  theme_classic() +
+  theme(legend.position = "none") +
+  labs(x = "x",
+       y = "P(X = x)")
+
+```
+
+For each possible value $x$ of the random variable $X$, $\IP(X=x)$ can be obtained from the formula
+
+$$
+p(x) =
+\begin{cases}
+\frac{4-|x-5|}{16}, & x = 2, 3, 4, 5, 6, 7, 8,\\
+0, & \text{otherwise.}
+\end{cases}
+$$
+
+That is, $\IP(X = x) = p(x)$ for all $x$.
+For example, $\IP(X = 2) = 1/16 = p(2)$; $\IP(X=5)=4/16=p(5)$; $\IP(X=7.5)=0=p(7.5)$.
+To specify the distribution of $X$ we could provide @tbl-dice-rv-sol-table, or we could just provide the function $p(x)$. 
+Notice that part of the specification of $p(x)$ involves the possible values of $x$; $p(x)$ is only nonzero for $x=2,3, \ldots, 8$.
+Think of $p(x)$ as a compact way of representing @tbl-dice-rv-sol-table; given $p(x)$ we could plug in the possible $x$ values and construct @tbl-dice-rv-sol-table.
+The function $p(x)$ is called the **probability mass function** of the discrete random variable $X$.
+
+
+::: {#def-pmf}
+
+The **probability mass[^pmf-definition] function (pmf)** of a *discrete* RV $X$, defined on a probability space with probability measure $\IP$, is a function $p_X:\mathbb{R}\mapsto[0,1]$ which specifies each possible value of the RV and the probability that the RV takes that particular value: $p_X(x)=\IP(X=x)$ for all $x$.
+
+:::
+
+[^pmf-definition]: We use "mass" "pmf" for discrete distributions and reserve "density" and "pdf" for continuous probability density functions.  The terms "pdf" and "density" are sometimes used in both discrete and continuous situations even though the objects the terms represent differ between the two situations (probability versus density).  In particular, in R the `d` commands (`dbinom`, `dnorm`, etc) are used for both discrete and continuous distributions. In Symbulate, you can use `.pmf()` for discrete distributions.
+
+The axioms of probability imply that a valid pmf must satisfy \begin{align*}
+p_X(x) & \ge 0 \quad \text{for all $x$}\\
+p_X(x) & >0 \quad \text{for at most countably many $x$ (the possible values, i.e., support)}\\
+\sum_x p_X(x) & = 1
+\end{align*}
+
+The countable set of possible values of a discrete random variable $X$, $\{x: \IP(X=x)>0\}$, is called its **support**.
+
+The pmf of a discrete random variable provides the probability of "equal to" events: $\IP(X = x)$.
+Probabilities for other general events, e.g., $\IP(X \le x)$ can be obtained by summing the pmf over the range of values of interest.
+
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-pmf-dice-max}
+
+Let $Y$ be the larger of two rolls of a fair four-sided die.  Find the probability mass function of $Y$.
+
+:::
+::::
+
+:::: {.callout-tip collapse=true}
+::: {#sol-pmf-dice-max}
+
+
+Recall @tbl-dice-max-dist-table and @fig-dice-max-dist-plot22.
+As a function of $y=1, 2, 3, 4$, $\IP(Y=y)$ is linear with slope 2/16 passing through the point (1, 1/16); see @fig-dice-max-dist-pmf.
+The pmf of $Y$ is
+
+$$
+p_Y(y) =
+\begin{cases}
+\frac{2y-1}{16}, & y = 1, 2, 3, 4, \\
+0, & \text{otherwise.}
+\end{cases}
+$$
+
+For any $y$, $\IP(Y=y) = p_Y(y)$.
+For example, $\IP(Y=2) = 3/16 = p_Y(2)$ and $\IP(Y = 3.3) = 0 = p_Y(3.3)$.
+
+:::
+::::
+
+
+```{r}
+#| label: fig-dice-max-dist-pmf
+#| echo: false
+#| fig-cap: "The marginal distribution of $Y$, the larger (or common value if a tie) of two rolls of a fair four-sided die. The black dots represent the marginal probability mass function of $Y$. The dotted lines emphasize the linear pattern, but the actual probability is 0 between possible values."
+
+y = 1:4
+p = (2 * y - 1) / 16
+
+ggplot(data.frame(y, p),
+       aes(x = y,
+           y = p)) +
+  geom_point(col = "black", shape = 1, size = 4) +
+  geom_line(linetype = "dotted") +
+  geom_segment(aes(x = y,
+                   xend = y,
+                   y = 0,
+                   yend = p), 
+               linewidth = 1.2, col = "orange") +
+  # scale_color_manual(values = c("#56B4E9", "#E69F00", "#999999")) +
+  scale_x_continuous(breaks = 1:4) +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.01), 
+                                           add = c(0, 0.01)),
+                     limits = c(0, 0.5)) +
+  theme_classic() +
+  theme(legend.position = "none") +
+  labs(x = "y",
+       y = "P(Y = y)")
+
+
+```
+
+
+When there are multiple discrete random variables of interest, we usually identify their marginal pmfs with subscripts: $p_X, p_Y, p_Z$, etc.
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-dd-pmf-label}
+
+Donny Dont provides two answers to Example @exm-pmf-dice-max.  Are his answers correct?
+If not, why not?
+
+1. $p_Y(y) = \frac{2y-1}{16}$
+1. $p_Y(x) = \frac{2x-1}{16},\; x = 1, 2, 3, 4$, and $p_Y(x)= 0$ otherwise.
+
+:::
+::::
+
+:::: {.callout-tip collapse=true}
+::: {#sol-dd-pmf-label}
+
+
+1.  Donny's solution is incomplete; he forgot to specify the possible values.
+It's possible that someone who sees Donny's expression would think that $p_Y(2.5)$ is equal to 4/16 instead of 0.
+You don't necessarily always need to write "0 otherwise", but do always clearly identify the possible values.
+1.  Donny's answer is actually correct, though maybe a little confusing.
+The important place to put a $Y$ is the subscript of $p$: $p_Y$ identifies this function as the pmf of the random variable $Y$, the larger of the two rolls, as opposed to any other random variable that might be of interest.
+The argument of $p_Y$ is just a dummy variable that defines the function.
+As an analogy, $g(u)=u^2$ is the same function as $g(x)=x^2$; it doesn't matter which symbol defines the argument.
+It is convenient to represent the argument of the pmf of $Y$ as $y$, and the argument of the pmf of $X$ as $x$, but this is not necessary.
+Donny's answer does provide a way of constructing @tbl-dice-max-dist-table and @fig-dice-max-dist-pmf. 
+
+:::
+::::
+
+In some scenarios we can derive the pmf of a discrete random variable using probability rules.
+
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-geometric-bball}
+Maya is a basketball player who makes 40% of her three point field goal attempts.
+Suppose that she attempts three pointers until she makes one and then stops.
+Let $X$ be the total number of shots she attempts.
+Assume shot attempts are independent.
+
+
+1.  Can Maya's attempts be considered Bernoulli trials?
+1.  Explain why $X$ does not have a Binomial distribution.
+1.  What are the possible values that $X$ can take? 
+Is $X$ discrete or continuous?
+1.  Compute and interpret $\IP(X=1)$.
+1.  Compute and interpret $\IP(X=2)$.
+1.  Compute and interpret $\IP(X=3)$.
+1.  Compute and interpret $\IP(X=4)$.
+1.  Find the probability mass function of $X$.
+1.  Construct a table, plot, and spinner representing the distribution of $X$.
+1.  Compute $\IP(X>5)$.
+Can you think of a way to do this without summing several terms?
+
+:::
+::::
+
+
+:::: {.callout-tip collapse=true}
+::: {#sol-geometric-bball-sol}
+
+1.  Yes, these are Bernoulli trials: each attempt results in success or failure, the probability of success on any attempt is 0.4, and the attempts are assumed to be independent.
+1.  There are Bernoulli trials but $X$ does not have a Binomial distribution since the number of trials is not fixed.
+1.  $X$ can take values 1, 2, 3, $\ldots$.
+Even though it is unlikely that $X$ is very large, there is no fixed upper bound.
+Even though $X$ can take infinitely many values, $X$ is a discrete random variable because it takes *countably* many possible values.
+1.  In order for $X$ to be 1, Maya must make her first attempt, so $\IP(X = 1) = 0.4$.
+If Maya does this every practice, then in about 40% of practices she will make a three pointer on her first attempt.
+1.  In order for $X$ to be 2, Maya must miss her first attempt and make her second.
+Since the attempts are independent $\IP(X=2)=(1-0.4)(0.4)=0.24$.
+If Maya does this every practice, then in about 24% of practices she will make her first three pointer on her second attempt.
+1.  In order for $X$ to be 3, Maya must miss her first two attempts and make her third. 
+Since the attempts are independent $\IP(X=3)=(1-0.4)(1-0.4)(0.4)=(1-0.4)^2(0.4)=0.144$.
+If Maya does this every practice, then in about 14.4% of practices she will make her first three pointer on her third attempt.
+1.  In order for $X$ to be 4, Maya must miss her first three attempts and make her fourth. 
+Since the attempts are independent $\IP(X=4)=(1-0.4)(1-0.4)(1-0.4)(0.4)=(1-0.4)^3(0.4)=0.0864$.
+If Maya does this every practice, then in about 8.6% of practices she will make her first three pointer on her fourth attempt.
+1.  The previous parts suggest a general pattern.
+In order for $X$ to take value $x$, the first success must occur on attempt $x$, so the first $x-1$ attempts must be failures.
+Therefore, $\IP(X=x)$ as a function of $x$ is given by the pmf
+    $$
+    p_X(x) = (1-0.4)^{x-1}(0.4), \qquad x = 1, 2, 3, \ldots  
+    $$
+1.  See @tbl-geometric-bball and @fig-geometric-bball.
+1.  We could compute $\IP(X > 5)$ as $1 - \IP(X \le 5) = 1 - (\IP(X = 1) + \cdots +\IP(X = 5))$.
+A quicker way is to realize that given the setup Maya requires more than 5 attempts to obtain her first success (that is, $X > 5$) if and only if the first 5 attempts are failures.
+Therefore,
+    $$
+    P(X > 5) = \IP(\text{first 5 attempts are failures}) = (1-0.4)^5  = 0.078
+    $$
+
+:::
+::::
+
+```{r}
+#| label: tbl-geometric-bball
+#| echo: false
+#| tbl-cap: "Table representing the the Geometric(0.4) distribution, the theoretical distribution of $X$ in @exm-geometric-bball."
+
+p = 0.4
+
+x = 1:9
+px = (1 - p) ^ (x - 1) * p
+
+data.frame(x, px) |>
+  kbl(col.names = c("x", "P(X = x)"),
+      digits = 4) |>
+  kable_styling()
+```
+
+```{r}
+#| label: fig-geometric-bball
+#| echo: false
+#| fig-cap: "Plot and spinner representing the the Geometric(0.4) distribution, the theoretical distribution of $X$ in @exm-geometric-bball."
+#| fig-subcap: 
+#|   - "Impulse plot"
+#|   - "Spinner; the values 9+ have been grouped together"
+#| layout-ncol: 2
+
+# impulse plot
+
+ggplot(data.frame(x, px),
+       aes(x = x,
+           xend = x,
+           y = 0,
+           yend = px)) +
+  geom_segment(linewidth = 1.2, col = "skyblue") +
+  scale_x_continuous(breaks = 1:9) +
+  scale_y_continuous(expand = c(0, 0)) +
+  theme_classic() +
+  theme(legend.position = "none") +
+  labs(x = "x",
+       y = "P(X = x)")
+
+# spinner
+
+x = c(1:8, "9+")
+px = c((1 - p) ^ (1:8 - 1) * p, (1 - p) ^ 8)
+
+
+xp <- data.frame(x, px)
+
+cdf = c(0, cumsum(xp$px))
+
+plotp = (cdf[-1] + cdf[-length(cdf)]) / 2
+
+spinner <- ggplot(xp, aes(x="", y=px, fill=x))+
+  geom_bar(width = 1, stat = "identity",
+           color = "black", fill = "white") + 
+  coord_polar("y", start = 0) +
+  theme_void() +
+  scale_y_continuous(breaks = plotp, labels = xp$x) +
+  theme(axis.text.x=element_text(size = 12, face = "bold")) +
+  geom_text(aes(y = plotp,
+                label = percent(px)), size = 2.5,
+            color=c(rep("black", 8), rep(NA, 1)))
+
+spinner
+```
+
+
+
+
+
+
+The following Symbulate code conducts a simulation for @exm-geometric-bball. 
+The value of $X$ depends on a sequence of Bernoulli trials, but the number of trials is not know in advance.
+We can simulate Bernoulli trials of unspecified length in Symbulate using `Bernoulli(p) ** inf`; each trial results in either 1 (success) or 0 (failure).
+(The `inf` implies "infinite", but in reality Symbulate will keep simulating as many Bernoulli trials as needed.)
+Given a sequence of Bernoulli trials (of any length) we define a function `count_until_first_success` that outputs the number of trials until the first success and then use it to define a `RV` `X`.
+
+```{python}
+def count_until_first_success(omega):
+    for i, w in enumerate(omega):
+        if w == 1:
+            return i + 1 # the +1 is for zero-based indexing
+        
+P = Bernoulli(0.4) ** inf
+
+X = RV(P, count_until_first_success)
+```
+
+Now we simulate many values of $X$ and summarize the results; the simulation results are consistent with the theoretical distribution represented by @tbl-geometric-bball and @fig-geometric-bball.
+
+```{python}
+x = X.sim(10000)
+
+x.tabulate(normalize = True)
+```
+
+
+```{python}
+x.plot()
+
+Geometric(0.4).plot() # Overlay the theoretic pmf
+plt.show()
+
+```
+
+Many commonly encountered probability mass functions correspond to named distributions.
+The distribution of $X$ in @exm-geometric-bball is called the "Geometric(0.4)" distribution.
+We'll discuss Geometric distributions in more detail soon.
+
+The probability mass functions of many commonly encountered named distributions are built in to Symbulate and can be called as `Distribution(parameters).pmf(x)`.
+For example, we can use Symbulate to compute $\IP(X = 3) = 0.144$ in  @exm-geometric-bball.
+
+```{python}
+
+Geometric(0.4).pmf(3)
+
+```
+
+
+
+
+## Simulating from a marginal distribution
+
+Recall from @sec-simulate-from-distribution that there are basic methods for simulating a value $x$ of a random variable $X$.
+
+1. **Simulate from the probability space.**
+Simulate an outcome $\omega$ from the underlying probability space and set $x = X(\omega)$.
+1. **Simulate from the distribution.**
+Simulate a value $x$ directly from the distribution of $X$.
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-geometric-bball-sim}
+
+Recall @exm-binomial-capture and the discussion and Symbulate code following it.
+
+1.  Which method did we use to simulate values of $X$?
+1.  Describe how could we simulate values of $X$ using the other method.
+1.  Write the Symbulate code to simulate values of $X$ using the other method and summarize the simulated values.
+Is the simulation consistent with our early simulation?
+:::
+::::
+
+:::: {.callout-tip collapse=true}
+::: {#sol-geometric-bball-sim-sol}
+
+1.  We used the "simulate from the probability space method". 
+We simulated a sequence of five success/failure trials (outcome $\omega$) and counted the number of successes ($X(\omega)$).
+1.  The spinner in @fig-binomial-capture-2 represents the distribution of $X$.
+To simulate a value of $X$ from the distribution, we just spin this spinner once.
+1.  See the Symbulate code below.
+We can "simulate from the distribution" in Symbulate by defining `X = RV(Binomial(5, 0.25))`; read this as "$X$ is a random variable with a Binomial(5, 0.25) distribution".
+This code basically says that values of $X$ will be simulated using the spinner in @fig-binomial-capture-2.
+
+:::
+::::
+
+
+
+```{python}
+X = RV(Binomial(5, 0.25))
+
+X.sim(10)
+```
+
+```{python}
+X.sim(10000).tabulate(normalize = True)
+```
+
+
+
+The "simulate from the distribution" method corresponds to constructing a spinner representing the marginal distribution of $X$ and spinning it once to generate $x$.
+This method does require that the distribution of $X$ is known.
+However, as we will see in many examples, *it is common to specify the distribution of a random variable directly without defining the underlying probability space*.
+
+Many commonly encountered distributions have special names, and in Symbulate we can define a random variable to have a specific named distribution through code of the form `RV(Distribution(parameters))`.
+For an unnamed discrete distribution, specified as a table of possible values and probabilities, `BoxModel` with the `probs` option can be used (when there are finitely many possible values).
+
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-geometric-bball-sim}
+Recall @exm-geometric-bball. 
+Maya is a basketball player who makes 40% of her three point field goal attempts.
+Suppose that she attempts three pointers until she makes one and then stops.
+Let $X$ be the total number of shots she attempts.
+Assume shot attempts are independent.
+
+
+1.  Specify how you could simulate a value of $X$ using the "simulate from the probability space" method.
+1.  Specify how you could simulate a value of $X$ using the "simulate from the distribution" method.
+1.  Explain how you could use simulation to approximate the distribution of $X$.
+1.  Write Symbulate code to approximate the distribution of $X$ using the "simulate from the distribution" method.
+
+:::
+::::
+
+
+:::: {.callout-tip collapse=true}
+::: {#sol-geometric-bball-sim-sol}
+
+1.  Spin a spinner that lands on success with probability 0.4 (and failure otherwise) until it lands on success then stop; $X$ is the number of spins.
+This is the method represented by the Symbulate code after @exm-geometric-bball.
+1.  Construct a spinner representing the probability mass function in part 7 (see @fig-geometric-bball-sim) then spin it once; the resulting value is $X$.
+1.  Simulate many values of $X$ (using either method) then summarize the simulated values: For each possible value, compute the simulated relative frequency, e.g. to approximate $\IP(X = 3)$ count the number of repetitions resulting in an $X$ value of 3 and divide by the total number of repetitions.
+1.  See below.
+The simulation results are consistent with the @exm-geometric-bball and the simulation based on the "simulate from the probability space" method.
+
+:::
+::::
+
+```{python}
+X = RV(Geometric(0.4))
+
+x = X.sim(10000)
+
+x
+```
+
+
+```{python}
+x.tabulate(normalize = True)
+```
+
+
+```{python}
+x.plot()
+
+Geometric(0.4).plot() # Overlay the theoretic pmf
+plt.show()
+
+```
+
+<!-- Add exercise here about don't confuse distribution and RV
+
+Binomial(5, 0.25).count_eq(0) / 10000 versus Binomial(5, 0.25).pmf(0) versus RV(Binomial(5, 0.25)).count_eq(0) /10000 versus RV(Binomial(5, 0.25)).pmf(0) -->
+
+## Binomial Distributions
+
+<!-- p-value calc? power calc? -->
+
+<!-- Only define through story, no pdf -->
+
+<!-- Introduce properties through story proofs: sum of Binomial is Binomial. Or wait until multiple RVs chapter?
+
+Don't need mean/sd yet because that will be in EV chapter??? Or put here?
+
+Provide pmf but without the Binomial coefficient (just "number of ways for x out of n") and then say we'll cover counting later?
+
+p-value example - save for NB section and compare Bin and NB
+
+power and type I error example (give rejection region) -->
+
+
+
+A Binomial($n$, $p$) distribution has a probability mass function that depends on $n$ and $p$ whose form---which we will see later[^footnote-binomial]---is determined by the assumptions of @def-binomial-story.
+The following code shows how we can use Symbulate to compute probabilities involving a random variable $X$ with a Binomial(5, 0.25) distribution as in @exm-binomial-capture.
+
+
+[^footnote-binomial]: If you can't wait, the Binomial($n$, $p$) pmf is
+$$
+p(x) = \binom{n}{x} p^x (1-p)^{n-x}, x=0, 1, 2, \ldots, n
+$$
+where $\binom{n}{x} = \frac{n!}{x!(n-x)!}$.
+For example, if $n=5$ and $p = 0.25$, $p(2) = \binom{5}{2}(0.25)^2(1-0.25)^{5-2} = 0.264$.
+We will derive this pmf later.
+
+
+```{python}
+
+Binomial(n = 5, p = 0.25).pmf(0)
+
+```
+
+We can plug in all possible values of $X$ to compute the Binomial(5, 0.25) pmf.
+
+```{python}
+
+Binomial(n = 5, p = 0.25).pmf([0, 1, 2, 3, 4, 5])
+
+```
+
+The following code achieves the same purpose, but uses list comprehension and displays the results in a table.
+
+```{python}
+
+xs = list(range(5 + 1))
+
+pmf_x = [Binomial(n = 5, p = 0.25).pmf(x) for x in xs]
+
+print(tabulate({'x': xs,
+                'Binomial(5, 0.25) pmf(x)': pmf_x},
+               headers = 'keys', floatfmt=".3f"))
+```
+
+
+
+
+
+
+
+If we know a random variable has a Binomial distribution, then we can use Symbulate as a probability calculator.
+Therefore, the key is to identify the Binomial situation and the relevant parameters.
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-binomial-symbulate-pmf}
+Use Symbulate to compute the following probabilities, then interpret the values in context.
+
+
+1.  Shuffle a standard deck of 52 cards and deal 5 with replacement.
+What is the probability that there are no hearts among the cards dealt?
+1.  Shishito peppers are typically relatively mild, but about 10% are spicy.
+If these peppers are sold in packs of 20, what is the probability that a pack contains at least one spicy pepper?
+1.  About 70% of major league baseball pitchers are right-handed.
+If 13 pitchers are selected at random, what is the probability that at most 8 are right-handed?
+
+:::
+::::
+
+
+:::: {.callout-tip collapse=true}
+::: {#sol-binomial-symbulate-pmf}
+
+
+1.  The context is different, but probabilistically this situation is the same as @exm-binomial-capture.
+If $X$ is the number of hearts among the 5 cards dealt, then $X$ has a Binomial(5, 0.25) distribution, and $\IP(X=0) = 0.237$.
+About 23.7% of five-card-hands, dealt with replacement, will contain no hearts.
+1.  If $X$ is the number of spicy peppers in a twenty-pepper-pack then $X$ has a Binomial(20, 0.1) distribution.
+We want $\IP(X\ge 1)$ which we can compute, using the complement rule, as $1 - \IP(X = 0)$: either at least one pepper in the pack is spicy or none of them are.
+In Symbulate, `1 - Binomial(20, 0.1).pmf(0)` yields 0.878.
+About 88% of 20-pepper-packs of Shishito peppers contain at least one spicy pepper.
+In other words, a pack is about 7 times more likely than not to contain at least one spicy pepper.
+1.  If $X$ is the number of the 13 pitchers that are right-handed, then $X$ has a Binomial(13, 0.70) distribution.
+We want $\IP(X \le 8)$, which we can compute as $\IP(X = 0) + \IP(X = 1) + \cdots \IP(X = 8)$.
+Symbulate code (see below) yields 0.346.
+About 35% of groups of 13 pitchers will have at most 8 right-handed pitchers.
+
+:::
+::::
+
+The pmf directly provides probabilities of "equal to" events, but we can obtain probabilities of other events by summing appropriately, as in the following Symbulate code.
+
+```{python}
+xs = list(range(8 + 1))
+
+Binomial(13, 0.7).pmf(xs).sum()
+```
+
+
+The probability mass function (pmf) returns "equal to" probabilities: $\IP(X = x)$.
+The **cumulative distribution function (cdf)** provides "less than or equal to" probabilities $\IP(X \le x)$.
+We can use the `cdf` method in Symbulate to shortcut summing.
+(We will discuss cumulative distribution functions in much more detail for continuous random variables.)
+
+```{python}
+Binomial(13, 0.7).cdf(8)
+```
+
+@fig-binomial-pmf-shade displays the Binomial(13, 0.7) pmf with $p(x)$ for $x\le 8$ highlighted.
+`Binomial(13, 0.7).cdf(8)` computes the sum of the probabilities represented by the spikes for $x\le 8$.
+
+```{python}
+#| label: fig-binomial-pmf-shade
+#| fig-cap: "Binomial(13, 0.7) pmf, with $p(x)$ for $x \\leq 8$ highlighted"
+
+Binomial(13, 0.7).plot().shade(le = 8)
+```
+
+Note that `cdf(x)` by definition returns $\IP(X \le x)$.
+We can obtain other probabilities by using the complement rule or subtracting.
+For example, `1-Binomial(13, 0.7).cdf(8)` returns $1 - \IP(X\le 8)=\IP(X > 8) = \IP(X \ge 9)$.
+
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-binomial-power}
+Roy, a baseball player, tells his coach: "Throughout my career my probability of getting a hit in an at bat has been 0.250.
+But ever since baseball season ended, I've been practicing really hard and I have definitely improved my hitting".
+The coach needs some convincing and decides to let Roy have 100 at bats to convince him.
+Let $X$ be the number of hits Roy gets in the 100 at bats.
+
+
+You can assume Roy's probability of getting a hit on any single at bat, $p$ is the same for each at bat and that the at bats are independent (and you can ignore baseball context like walks/etc. and assume that there is no funny business in data collection).
+
+1.  What is the distribution of $X$?
+What is the distribution of $X$ *if Roy has not improved*?
+1.  Suppose the coach decides that if Roy gets at least 30 hits he'll be convinced.
+What is the probability that Roy convinces the coach that he has improved even if he has not really improved?
+1.  Suppose that Roy really has improved and his probability of getting a hit in an at bat is 0.300.
+What is the probability that Roy convinces the coach that he has improved?
+1.  Suppose the coach wants the probability in part 2 to be 0.01.
+What should his threshold for convincing---which was 30 in the part 2---be?
+Should the threshold be greater or less than 30?
+1.  Use Symbulate and trial and error to find a threshold which gets the probability in part 2 as close to 0.01 without going over.
+1.  The coach decides to use the threshold from the previous part.
+Suppose that Roy really has improved and his probability of getting a hit in an at bat is 0.300.
+What is the probability that Roy convinces the coach that he has improved?
+How does this compare to part 3?
+1.  Repeat parts 4 and 5 assuming Roy has 400 at bats.
+How do the values change?
+1.  Now Roy actually takes 100 at bats and gets hits in 38 at bats.
+What is the probability that Roy would get at least 38 hits if he really hadn't improved?
+Did he necessarily improve?
+Are you convinced that he improved?
+Explain.
+
+:::
+::::
+
+
+
+:::: {.callout-tip collapse=true}
+::: {#sol-binomial-power}
+1.  This the Binomial situation:
+    -   each at bat is a trial that results in success (hit) or not
+    -   the probability of success is assumed to be the same on each trial, $p$
+    -   the trials are assumed to be independent
+    -   there are a fixed number of trials, 100
+    -   $X$ counts the number of successes in 100 Bernoulli trials
+So $X$ has a Binomial(100, $p$) distribution.
+If Roy has not improved $X$ has a Binomial(100, 0.250) distribution. 
+1.  Let $\IP$ be the probability measure which reflects that $Roy$ has not improved.
+We want $\IP(X \ge 30)=1-\IP(X<30) = 1 - \IP(X \le 29)$, where $X$ has a Binomial(100, 0.250) distribution according to $\IP$.
+In Symbulate: `1 - Binomial(100, 0.25).cdf(29)` which is `{r} round(1 - pbinom(29, 100, 0.25), 4)`.
+See @fig-binomial-power-1
+1.  Let $\IQ$ be the probability measure which reflects that $Roy$ has improved to a 0.300 hitter.
+We want $\IQ(X \ge 30)=1-\IQ(X<30) = 1 - \IQ(X \le 29)$, where $X$ has a Binomial(100, 0.300) distribution according to $\IQ$.
+In Symbulate: `1 - Binomial(100, 0.30).cdf(29)` which is `{r} round(1 - pbinom(29, 100, 0.30), 4)`.
+See @fig-binomial-power-2
+1.  We need to decrease the probability so we want a greater (stricter) threshold than 30.
+1.  We want to find $x$ such that $0.01 \approx \IP(X \ge x)=1-\IP(X<x) = 1 - \IP(X \le x-1)$, where $X$ has a Binomial(100, 0.250) distribution according to $\IP$.
+Try `1 - Binomial(100, 0.25).cdf(x - 1)` for different values of `x` to find $x=36$, which yields $\IP(X \ge 36)= 1 - \IP(X \le 35) = 0.009$.
+If the coach is only convinced if Roy gets hits in at least 36 at bats then the probability of being incorrectly convinced if Roy hasn't improved is 0.009.
+1.  We want $\IQ(X \ge 36)=1-\IQ(X<36) = 1 - \IQ(X \le 35)$, where $X$ has a Binomial(100, 0.300) distribution according to $\IQ$.
+In Symbulate: `1 - Binomial(100, 0.30).cdf(35)` which is `{r} round(1 - pbinom(35, 100, 0.30), 4)`.
+With the stricter threshold, Roy has a smaller probability of convincing the coach that he really has improved.
+1.  Now $X$ has a Binomial(400, 0.25) distribution according to $\IP$.
+Try `1 - Binomial(400, 0.25).cdf(x - 1)` for different values of `x` to find $x=121$, which yields $\IP(X \ge 121)= 1 - \IP(X \le 120) = 0.01$.
+So if the coach is only convinced if Roy get at least 121 hits in 400 at bats then the probability of being incorrectly convinced if Roy hasn't improved is 0.01.
+The probability is the same in part 4, but in part 4 Roy needed to demonstrate success in at least 36/100 = 36% of at bats, but now the threshold is 121/400 = 30.25% of at bats.  
+
+    Now $X$ has a Binomial(400, 0.30) distribution according to $\IQ$. 
+We want $\IQ(X \ge 121)= 1 - \IQ(X \le 120)$, where $X$ has a Binomial(100, 0.300) distribution according to $\IQ$. 
+In Symbulate: `1 - Binomial(400, 0.30).cdf(120)` which is `{r} round(1 - pbinom(120, 400, 0.30), 4)`. 
+By demonstrating good performance over more at bats, Roy has a greater probability of convincing the coach that he really has improved. 
+
+1.  Let $\IP$ be the probability measure which reflects that $Roy$ has not improved.
+We want $\IP(X \ge 38)=1-\IP(X<38) = 1 - \IP(X \le 37)$, where $X$ has a Binomial(100, 0.250) distribution according to $\IP$.
+In Symbulate: `1 - Binomial(100, 0.25).cdf(37)` which is `{r} round(1 - pbinom(37, 100, 0.25), 4)`.
+
+    There are two explanations for Roy's performance.
+Either Roy didn't really improve and he just got really lucky in these 100 at bats, or he actually did improve.
+Since it would be so unlikely (`{r} round(1 - pbinom(37, 100, 0.25), 4)`) for Roy to get hits in at least 38 out of 100 at bats if he really hadn't improved, the fact that he actually did this well gives us evidence that he really has improved.
+Did Roy necessarily improve? No.
+Could he have just gotten lucky?
+Sure.
+But since 38/100 would be so unlikely just by luck if he hadn't improved, the more plausible explanation is that he actually has improved.
+We would say that 38/100 offers pretty convincing evidence that he has improved.
+
+:::
+::::
+
+<!-- 
+[^binomial-power-note]: We have mentioned how $\IP$ is more than just shorthand for the word "probability", but we're not really following our own advice here.
+Technically, there are different probability measures in this problem: one that reflects that Roy has not improved, in which case $X$ has a Binomial(100, 0.250) distribution, and another that reflects that Roy has improved, in which case $X$ has a Binomial(100, 0.300) distribution. -->
+
+
+@exm-binomial-power featured some statistical applications of Binomial distributions, in the context of a "null hypothesis test".
+
+-   The "null hypothesis" is that Roy has not improved
+-   A threshold like "at least 30" is a "rejection region"
+-   The probability of exceeding the threshold if the null hypothesis is true is the probability of "Type I error" (see @fig-binomial-power-1)
+-   The probability of exceeding the threshold if Roy really has improved is the "power", computed if $p=0.300$, but this would generally be a function of $p$ (see @fig-binomial-power-2)
+-   After we observe 38 hits in 100 at bats, the probability of observing a result at least that extreme if the null hypothesis is true is the "p-value".
+The smaller the p-value, the stronger the evidence the observed data provides to reject the null hypothesis and conclude that Roy really has improved.
+
+
+```{python}
+#| label: fig-binomial-power
+#| fig-cap: "Probability of at least 30 hits in 100 at bats in @exm-binomial-power"
+#| fig-subcap: 
+#|   - "If Roy has not improved and $p=0.25$"
+#|   - "If Roy has improved and $p=0.30$"
+#| layout-ncol: 1
+
+plt.figure();
+Binomial(100, 0.25).plot().shade(ge = 30);
+plt.xlim(0, 50);
+plt.show();
+
+plt.figure();
+Binomial(100, 0.30).plot().shade(ge = 30);
+plt.xlim(0, 50);
+plt.show();
+```
+
+We will study further applications to statistics in more detail later.
+
+In the next few examples we'll investigate expected value and variance for Binomial distributions.
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-binomial-ev}
+Recall @exm-binomial-capture, where $X$ had a Binomial(5, 0.25) distribution.
+
+1.  Suggest a "shortcut" formula for $\E(X)$.
+1.  Use the table from the previous part to compute $\E(X)$.
+Did the shortcut formula work?
+1.  Compute $\IP(X = \E(X))$.
+1.  Compute $\IP(X \le \E(X))$.
+Is it 0.5?
+1.  Interpret $\E(X)$ in context.
+1.  Use simulation to approximate $\Var(X)$ and $\SD(X)$.
+:::
+::::
+
+
+:::: {.callout-tip collapse=true}
+::: {#sol-binomial-ev}
+
+1.  If 25% are tagged we would expect $5(0.25) = 1.25$ tagged butterflies in the sample of 5.
+1.  Indeed we do get 1.25 if we compute the expected value the "long way" based on the distribution table.
+$$
+(0)(0.2373) + (1)(0.3955) + (2)(0.2637) + (3)(0.0879) + (4)(0.0146) + (5)(0.0010) 
+$$
+1.  $\IP(X = \E(X)) = \IP(X = 1.25)=0$; 1.25 is not a possible value of $X$.
+1.  $\IP(X \le \E(X)) = \IP(X \le 1.25)=\IP(X = 0) + \IP(X =1) = 0.2373+0.3955 = 0.633$.
+This is not 0.5; the distribution of $X$ is not symmetric so the mean is not necessarily "in the middle".
+1.  Over many samples of 5 butterflies we would expect to see 1.25 tagged butterlies per sample on average.
+1.  See simulation results below; $\Var(X)$ is approximately 0.9375 (we'll see a shortcut formula for this soon) and $\SD(X)$ is approximately $\sqrt{0.9375} =0.9682$.
+:::
+::::
+
+
+```{python}
+X = RV(Binomial(5, 0.25))
+
+x = X.sim(10000)
+
+x.mean(), x.var(), x.sd()
+```
+
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-binomial-var-n}
+@fig-binom-plots-n displays Binomial distributions for a given $p$ (0.4) for a few different values of $n$ (5, 10, 15, 20).
+As $n$ increases does the variance increase, decrease, or stay the same?
+:::
+::::
+
+
+:::: {.callout-tip collapse=true}
+::: {#sol-binomial-var-n}
+For a Binomial($n$, $p$) distribution, variance increases as $n$ increases.
+Since the possible values of a random variable with a Binomial distribution are $0, 1, \ldots, n$, as $n$ increases the range of possible values of the variable increases.
+
+However, in some sense it is unfair to compare values from Binomial distributions with different values of $n$.
+Ten successes has a very different meaning if $n$ is 10 or 20 or 100. 
+Rather than focusing on the absolute number of successes, in Binomial situations we are often concerned with the *proportion* of successes in the sample.
+We will see later that as the sample size $n$ increases, the variance of the sample proportion decreases.
+
+:::
+::::
+
+
+
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-binomial-var-p}
+@fig-binom-plots-p displays Binomial distributions for a given $n$ (10) for a few different values of $n$ (0.1, 0.3, 0.5, 0.7, 0.9).
+
+1.  How does the variance when $p=0.1$ compare to when $p=0.9$?
+What about 0.3 and 0.7?
+1.  For what value of $p$ is the variance the largest?
+1.  Among these values of $p$, for what values of $p$ is the variance the smallest?
+1.  What values of $p$ (not just among those pictured) would lead to the smallest variance?
+:::
+::::
+
+
+:::: {.callout-tip collapse=true}
+::: {#sol-binomial-var-p}
+
+1.  The variance when $p=0.1$ is the same as when $p=0.9$.
+The shapes are mirror images (reflected about 0.5) but the degree of dispersion about the mean is the same.
+Moving from $p=0.1$ to $p=0.9$ is just like interchanging the roles of success and failure.
+Likewise for 0.3 and 0.7.
+1.  The distribution is most disperse, and the variance largest, when $p=0.5$.
+When $p=0.5$ we would expect the most "alterations" between success and failure in the individual trials.
+1.  Variance decreases in a symmetric manner as $p$ moves away from 0.5.
+That is, variance decreases as $p$ gets closer to 0 or 1.
+1.  The extremes $p=0$ and $p=1$ both result in a variance of 0.
+When $p=0$, every trials results in failure so the number of successes out of $n$ trials is always 0 and so the variance is 0.
+Similarly, when $p=1$ every trials results in success so the number of successes out of $n$ trials is always $n$, and so the variance is 0.
+
+:::
+::::
+
+The following result formalizes the observations from the last few exercises.
+
+::: {#lem-binomial-ev-var}
+If $X$ has a Binomial($n$, $p$) distribution then
+
+\begin{align*}
+\E(X) & = np\\
+\Var(X) & = np(1-p)
+\end{align*}
+
+:::
+
+In @exm-binomial-capture, $\Var(X) = 5(0.25)(1-0.25) = 0.9375$, and $\SD(X) = \sqrt{0.9375} = 0.968$.
+
+In Symbulate, the theoretical expected value and variance of a named distribution can be computed as `Distribution(parameters).mean()` and `Distribution(parameters).var()`
+
+```{python}
+Binomial(5, 0.25).mean()
+
+Binomial(5, 0.25).var()
+```
+
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-binomial-sum}
+Xavier bets on red on each of 3 spins of a roulette wheel.
+After the third spin, Xavier leaves and Zander arrives and bets on black on the next two spins.
+Let $X$ be the number of bets that Xavier wins and let $Z$ be the number that Zander wins.
+
+1.  Identify the distribution of $X$ and the distribution of $Z$.
+1.  Are $X$ and $Z$ independent?
+Explain.
+1.  What does $X+Z$ represent in this context?
+Identify the distribution of $X+Z$ without doing any calculations.
+1.  Use simulation to approximate the distribution of $X+Z$ and confirm your answer to the previous part.
+1.  Suppose that Yolanda bets on black on all 5 spins of the wheel.
+Does $X + Y$ have a Binomial distribution?
+Explain. 
+1.  Suppose instead that Zavier bet on the number 7 in his two bets.
+Does $X + Z$ have a Binomial distribution in this case?
+Explain.
+:::
+::::
+
+
+:::: {.callout-tip collapse=true}
+::: {#sol-binomial-sum}
+
+1.  $X$ has a Binomial(3, 18/38) distribution and $Z$ has a Binomial(2, 18/38) distribution.
+1.  Yes, $X$ only depends on the first three spins, and $Z$ only depends on the last two, and the spins are (physically) independent, so $X$ and $Z$ are independent.
+1.  $X+Z$ is the total number of bets won by either of these players.
+The five spins satisfy the Binomial situation. 
+Each trial results in either "win" or not.
+The probability of a win on any bet is 18/38; it doesn't matter if they're betting on black or red because each has the same probability of winning.
+The spins are independent.
+Between the two players there is a fixed number of 5 bets and we are counting the number of wins.
+So $X+Z$ has a Binomial(5, 18/38) distribution.
+1.  See the results below; the simulated values follow closely a Binomial(5, 13/38) distribution.
+1.  $X + Y$ does not have a Binomial distribution, because the trials that determine $X$ are not independent of those that determine $Y$.
+The random variables $X$ and $Y$ are not independent.
+1.  $X+Z$ would not have a Binomial distribution, because there is not the same probability of win (success) on all trials (18/38 for the first three but 1/38 for the last two).
+
+:::
+::::
+
+```{python}
+X, Z = RV(Binomial(3, 18 / 38) * Binomial(2, 18 / 38))
+
+plt.figure()
+(X + Z).sim(10000).plot()
+Binomial(5, 18 / 38).plot();
+plt.show()
+```
+
+
+::: {#lem-binomial-sum}
+If $X$ and $Y$ are independent, $X$ has a Binomial($n_X$, $p$) distribution, and $Y$ has a Binomial($n_Y$, $p$) distribution then $X+Y$ has a Binomial($n_X+n_Y$, $p$) 
+
+:::
+
+A Binomial(1, $p$) distribution is also known as a **Bernoulli($p$)** distribution, taking a value of 1 with probability $p$ and 0 with probability $1-p$.
+Any *indicator random variable* has a Bernoulli distribution.
+
+If $X_1, X_2, \ldots, X_n$ are independent each with a Bernoulli($p$) distribution, then $X_1+\cdots+X_n$ has a Binomial($n, p$) distribution.
+So any random variable with a Binomial($n$, $p$) distribution has the same distributional properties as $X_1+  X_2+  \cdots+  X_n$, where $X_1, \ldots, X_n$ are independent each with a Bernoulli($p$) distribution. 
+This provides a very convenient representation in many problems.
+
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-binomial-capture-phat}
+
+Continuing @exm-binomial-capture.
+Define the random variable $\hat{p} = X/5$.
+
+1.  What does $\hat{p}$ represent in this context.
+What are its possible values?
+1.  Does $\hat{p}$ have a Binomial distribution?
+Does the distribution of $\hat{p}$ have the same basic *shape* of a Binomial distribution?
+1.  Compute $\IP(\hat{p} = 0.2)$.
+1.  Compute $\E(\hat{p})$.
+Why does this make sense?
+1.  Compute $\SD(\hat{p})$.
+1.  Suppose that 20 butterflies were selected for the second sample at random, with replacement.
+Compute $\SD(\hat{p})$; how does the value compare to the previous part?
+
+:::
+::::
+
+:::: {.callout-tip collapse=true}
+::: {#exm-binomial-capture-phat}
+
+1.  $\hat{p}$ is the *proportion* of butterflies in the second sample that are tagged.
+Possible values are 0, 1/5, 2/5, 3/5, 4/5, 1.
+1.  Technically $\hat{p}$ does not have a Binomial distribution, since a Binomial distribution always corresponds to possible values 0, 1, 2, $\ldots, n$.
+But the distribution of $\hat{p}$ does follow the same shape as the Binomial(5, 0.25) distribution, just with a rescaled variable axis.
+1.  $\IP(\hat{p} = 0.2) = \IP(X = 1)$, which is `Binomial(5, 0.25).pmf(1)`.
+1.  If 25% of the butterflies in the population are tagged, we would expect 25% of the butterflies in a random sample to be tagged.
+$$
+\E(\hat{p}) = \E(X/5) = \E(X)/5 = 5(0.25)/5 = 0.25
+$$
+1. $\SD(X/5) = \SD(X)/5$, so
+$$
+\SD(\hat{p}) = \SD\left(\frac{X}{5}\right) = \frac{\SD(X)}{5} = \frac{\sqrt{5(0.25)(1-0.25)}}{5} = \frac{\sqrt{0.25(1-0.25)}}{\sqrt{5}} = 0.31
+$$
+1.  The calculation is similar to the previous part.
+$$
+\SD(\hat{p}) = \SD\left(\frac{X}{20}\right) = \frac{\SD(X)}{20} = \frac{\sqrt{20(0.25)(1-0.25)}}{20} = \frac{\sqrt{0.25(1-0.25)}}{\sqrt{20}} = 0.165
+$$
+The standard deviation of $\hat{p}$ is smaller when $n$ is larger.
+A sample of size 20 is 4 times larger than a sample of size 5, but the standard deviation is $\sqrt{4}=2$ times smaller when $n=20$ than when $n=5$.
+
+:::
+::::
+
+
+```{python}
+X_5 = RV(Binomial(5, 0.25))
+phat_5 = (X_5 / 5).sim(10000)
+
+phat_5.mean(), phat_5.sd()
+
+X_20 = RV(Binomial(20, 0.25))
+phat_20 = (X_20 / 20).sim(10000)
+
+phat_20.mean(), phat_20.sd()
+
+plt.figure()
+phat_5.plot()
+phat_20.plot()
+plt.show()
+```
+
+Binomial distributions model the absolute number of successes in a sample of size $n$.
+If $X$ is the number of successes then the *sample proportion* is the random variable
+$$
+\hat{p} = \frac{X}{n}
+$$
+For a fixed value of $p$, sample-to-sample variability of $\hat{p}$ *decreases* as sample size $n$ increases.
+\begin{align*}
+\E\left(\hat{p}\right) & = p\\
+\Var\left(\hat{p}\right) & = \frac{p(1-p)}{n}\\
+\SD\left(\hat{p}\right) & = \sqrt{\frac{p(1-p)}{n}}\\
+\end{align*}
+
+
+
+
+## Geometric and Negative Binomial distributions
+
+<!-- 
+Introduce memoryless property through story proof and simulation
+
+NB through story only
+
+
+Define NB as number of trials until r successes here, but wait until multiple RVs chapter to relate NB as sum of independent Geometric, and include there how you could simulate NB using Geometric spinner
+
+Include cdf of Geometric here without calling it cdf?
+
+Provide pmf but without the Binomial coefficient (just "number of ways for x out of n") and then say we'll cover counting later? -->
+
+
+
+
+Binomial distributions are models for the number of successes in a fixed number of Bernoulli trials. 
+But what if the number of trials is not fixed? 
+In particular, what if we keep performing trials until a certain number of successes are obtained?
+
+### Geometric distributions
+
+@exm-geometric-bball provided one such example, where the random variable had a Geometric distribution.
+
+
+
+
+::: {#def-geometric-story}
+Perform Bernoulli($p$) trials until a success occurs and then stop.
+Let $X$ count the total number of trials, including the single success.
+The distribution of $X$ is defined to be the **Geometric($p$) distribution**.
+:::
+
+The Geometric($p$) probability mass function follows from the fact that if $X$ has a  Geometric distribution, then $X = x$ if and only if
+
+-   the first $x-1$ trials are failures, and 
+-   the $x$th (last) trial results in success.
+
+
+::: {#def-geometric-pmf}
+## Geometric probability mass function
+
+A discrete random variable $X$ has a Geometric($p$) distribution if and only if its probability mass function is
+\begin{align*}
+p_{X}(x) & = p (1-p)^{x-1}, & x=1, 2, 3, \ldots
+\end{align*}
+
+:::
+
+The next result follows from the fact that if $X$ has a  Geometric distribution, then $X > x$---that is, more than $x$ trials are needed to achieve the first success---if and only if the first $x$ trials result in failure.
+
+
+::: {#lem-geometric-cdf}
+
+If $X$ has a Geometric($p$) distribution then
+
+$$
+\IP(X > x) = (1-p)^{x}, \qquad  x=1, 2, 3, \ldots
+$$
+
+:::
+
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-geometric-bball-ev-var}
+Continuing @exm-geometric-bball, where $X$ has a Geometric($p$) distribution with $p=0.4$.
+
+1.  What seems like a reasonable shortcut formula for $\E(X)$ in terms of $p$? 
+Hint: it might help to consider the case $p=0.1$ first, then apply similar logic to $p=0.4$ and general $p$.
+1.  Use @tbl-geometric-bball to compute $\E(X)$. 
+Did the shortcut work?
+1.  Interpret $\E(X)$ in context.
+1.  Use simulation to approximate $\E(X)$ and $\Var(X)$.
+1.  Would $\Var(X)$ be bigger or smaller if $p=0.9$? 
+If $p=0.1$?
+
+:::
+::::
+
+:::: {.callout-tip collapse=true}
+::: {#sol-geometric-bball-ev-var}
+1.  Suppose that she only makes 10% of her attempts, so $p=0.1$. 
+That is, she makes 1 in every 10 attempts on average, so it seems reasonable that we would expect her to attempt 10 three pointers on average before she makes one. 
+Therefore, $1/0.1= 10$ seems like a reasonable formula for $\E(X)$ when $p=0.1$.
+In general, $1/p$ seems like a reasonable shortcut for $\E(X)$ if $X$ has a Geometric($p$) distribution.
+1.  The shortcut gives $\E(X) = 1/0.4 = 2.5$, which is consistent with the "long way"
+$$
+\scriptsize{
+(1)(0.4) + (2)(0.24) + (3)(0.144)+(4)(0.0864) + (5)(0.0518) + (6)(0.0311) + (7)(0.0186) + (8)(0.0112) + (9)(0.0067) + \cdots
+}
+$$
+Technically, the sum keeps going but since the probabilities get so small, the contribution of the additional terms is negligible.
+1.  Imagine she does this at every practice session. 
+Over many practice sessions, it takes her 2.5 three point attempts, until she makes one, per practice on average.
+1.  See simulation results below. 
+We're using the "simulate from the distribution method".
+1.  If the probability of success is $p=0.9$ we would not expect to wait very long until the first success, so it would be unlikely for her to need more than a few attempts. 
+If the probability of success is $p=0.1$ then she could make her first attempt and be done quickly, or it could take her a long time. 
+So the variance is greater when $p=0.1$ and less when $p=0.9$.
+The probabilities in the Geometric($p$) pmf decrease to 0 more quickly as $x$ increases when $p$ is close to 1 then when $p$ is close to 0, so the distribution becomes "spread out" as $p$ decreases from 1.
+
+:::
+::::
+
+
+```{python}
+X = RV(Geometric(0.4))
+
+x = X.sim(10000)
+
+x.mean(), x.var(), x.sd()
+```
+
+```{python}
+plt.figure()
+Geometric(0.9).plot();
+Geometric(0.4).plot();
+Geometric(0.1).plot();
+plt.xlim([0, 30]);
+plt.show()
+```
+
+::: {#lem-geometric-ev-var}
+
+If $X$ has a Geometric($p$) distribution then
+
+\begin{align*}
+\E(X) & = \frac{1}{p}\\
+\Var(X) & = \frac{1-p}{p^2}
+\end{align*}
+
+:::
+
+In @exm-geometric-bball-ev-var, $\Var(X) = (1-0.4)/0.4^2 = 3.75$, which is consistent with the simulation results.
+
+If $p=1$ then every trial results in success so $X=1$ always and therefore the variance is 0. 
+If $p$ is close to 1, we expect to see success in the first few trials, so the variance is relatively small.
+If $p$ is close to 0, success could occur on the first trial but we would expect to have to wait a larger number of trials until the first success occurs, resulting in a larger variance.
+As $p$ gets closer to 0, the expression $(1-p)/p^2$ gets larger and larger.
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-lookaway-geometric}
+Recall @exm-lookaway-ltp.
+
+You and your friend are playing the ["lookaway challenge"](https://fivethirtyeight.com/features/what-are-your-chances-of-winning-the-u-s-open/).
+The game consists of possibly multiple rounds. 
+In the first round, you point in one of four directions: up, down, left or right. At the exact same time, your friend also looks in one of those four directions. 
+If your friend looks in the same direction you're pointing, you win! Otherwise, you switch roles and the game continues to the next round---now your friend points in a direction and you try to look away. As long as no one wins, you keep switching off who points and who looks. 
+The game ends, and the current "pointer" wins, whenever the  "looker" looks in the same direction as the pointer.
+
+Suppose that each player is equally likely to point/look in each of the four directions, independently from round to round.
+
+Let $X$ be the number of rounds played in a game.
+
+
+1.  Explain why $X$ has a Geometric distribution, and specify the value of $p$.
+1.  Express the event "the player who starts as the pointer wins the game" as an event involving $X$.
+1.  Explain how you could use simulation to approximate the probability that the player who starts as the pointer wins the game and the expected number of rounds the game lasts.
+1.  Use the Geometric pmf (use software) to compute the probability that the player who starts as the pointer wins the game.
+Compare to the result of @exm-lookaway-ltp.
+1.  Compute and interpret $\E(X)$.
+
+:::
+::::
+
+:::: {.callout-tip collapse=true}
+::: {#sol-lookaway-geometric}
+
+1.  $X$ has a Geometric distribution with parameter $p=0.25$.
+
+    -   Each round is a trial,
+    -   the round either results in success (current pointer wins the round and game ends) or failure (current pointer does not win the round and the game continues),
+    -   the rounds are assumed to be independent
+    -   the probability that the current point wins any particular round is 0.25
+    -   and $X$ counts the number of rounds until the first success
+
+1.  The player who starts as the pointer can only win the game in odd number rounds---when they're the pointer---so the event of interest is the event that $X$ is odd, $\{X \in \{1, 3, 5, 7, \ldots\}\}$.
+1.  See the code below.
+We could just simulate $X$ from the Geometric($p$) distribution, but we'll use the "simulate from the probability space" method just to compare.
+
+    -   To simulate one round, simulate a (pointer, looker) pair of values (up, down, left, right) (or just 1, 2, 3, 4) independently, with equal probability.
+    -   If the pair of values match then the game ends in that round, otherwise the game continues
+    -   Repeat rounds as above, independently, until the game ends (the pair is a match) and then stop.
+    Let $X$ be the number of rounds.
+    -   Repeat the above to simulate many values of $X$.
+    -   Average the simulated values of $X$ to approximate $\E(X)$.
+    -   Count the number of simulated values of $X$ that are odd and divide by the total number of simulated values to approximate the probability that the player who starts as the pointer wins the game.
+
+1.  We need to sum the Geometric(0.25) pmf over $x=1,3,5,\ldots$. 
+See code below.
+The probability is 4/7=0.571, the same as in @exm-lookaway-ltp
+1.  $\E(X) = 1/0.25 = 4$.
+Over many games of the lookaway challenge, the game lasts 4 rounds on average.
+
+:::
+::::
+
+```{python}
+# given a sequence of (point, look) pairs
+# determine the round in which the first match occurs
+def count_rounds(sequence):
+    for r, pair in enumerate(sequence):
+        if pair[0] == pair[1]:
+            return r + 1 # +1 for 0 indexing
+
+# simulate (point, look) pairs independently and equally likely
+# ** inf is to continue indefinitely
+P = BoxModel([1, 2, 3, 4], size = 2) ** inf
+
+X = RV(P, count_rounds)
+
+x = X.sim(10000)
+
+x
+```
+
+
+
+
+
+```{python}
+#| echo: true
+plt.figure()
+x.plot() # simulated distribution
+Geometric(0.25).plot(); # overlay theoretical pmf
+plt.show()
+```
+
+```{python}
+x.mean()
+```
+
+The following approximate probability that the player who starts as the pointer wins the game (which occurs if the game ends in an odd number of rounds).
+
+```{python}
+def is_odd(u):
+    return (u % 2) == 1 # odd if the remainder when dividing by 2 is 1
+
+x.count(is_odd) / x.count()
+```
+
+
+
+
+
+We can find the theoretical probability that $X$ is odd by summing the Geometric(0.25) pmf over $x = 1, 3, 5, \ldots$.
+Technically, the sum keeps going but the probabilities get extremely small as $x$ increases, so we just cut it off after some large value (99 below).
+
+```{python}
+# range(1, 100, 2) is odd numbers from 1 to 99
+Geometric(0.25).pmf(range(1, 100, 2)).sum() 
+```
+
+
+
+### Negative Binomial distributions
+
+Now we'll investigate a generalization of the Geometric situation where we perform Bernoulli trials until a certain number (not necessarily one) of successes are obtained.
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-nb-bball}
+Maya is a basketball player who makes 86% of her free throw attempts. 
+Suppose that she attempts free throws until she makes 5 and then stops. 
+Let $X$ be the total number of free throws she attempts. 
+Assume shot attempts are independent.
+
+
+1.  Does $X$ have a Binomial distribution? 
+A Geometric distribution?
+Why or why not?
+1.  What are the possible values of $X$? 
+Is $X$ discrete or continuous?
+1.  Describe how you could use a tactile simulation to simulate a single value of $X$.
+1.  Describe in words how you could use simulation to approximate $\IP(X=5)$.
+1.  Describe in words how you could use simulation to approximate the distribution of $X$.
+1.  Write and run Symbulate code to approximate $\IP(X=5)$ and the distribution of $X$.
+1.  Compute the theoretical value of $\IP(X = 5)$. 
+Compare to your simulated value.
+Is the theoretical value within the margin of error of the simulated value?
+1.  Interpret in context $\IP(X = 5)$ as a long run relative frequency.
+1.  The distribution of $X$ is called the "NegativeBinomial(5, 0.86)" distribution.
+Use Symbulate to compute $\IP(X = x$ for all possible values $x$, then construct a table, plot, and spinner representing the approximate distribution of $X$.
+(You can cut it off after the probabilities get very small.)
+Are the simulation results consistent with the theoretical distribution?
+1.  What seems like a reasonable shortcut formula for $\E(X)$?
+1.  Use the theoretical pmf to compute $\E(X)$.
+Did the shortcut formula work.
+1.  Interpret $\E(X)$ for this example.
+1.  Would the variance be larger or smaller if attempted free throws until she made 10 instead of 5?
+
+:::
+::::
+
+:::: {.callout-tip collapse=true}
+::: {#sol-nb-bball}
+
+1.  $X$ does not have a Binomial distribution since the number of *trials* is not fixed. 
+The number of *successes* is fixed to be 5, but the number of trials is random.
+$X$ also does not have a Geometric distribution because $X$ counts the number of trials needed for 5 successes, not just one.
+1.  $X$ can take values 5, 6, 7, $\ldots$. 
+Even though it is unlikely that $X$ is very large, there is no fixed upper bound. 
+Even though $X$ can take infinitely values, $X$ is a discrete random variables because it takes *countably* many possible values.
+1.  Construct a spinner that lands on success with probability 0.86.
+Spin the spinner until it lands on 5 successes and stop and count the total number of spins; this is one simulated value of $X$.
+1.  Simulate many values of $X$ as in the previous part. 
+Count the number of simulated values equal to 5 and divide by the total number of simulated values to approximate $\IP(X=5)$.
+1.  Simulate many values of $X$ and summarize the simulated values to find the simulated relative frequency for each possible value.
+1.  See code below.
+1.  In order for $X$ to be 5, Maya must make her first 5 attempts. 
+Since the attempts are independent $\IP(X=5)=(0.86)^5=0.47$, which is consistent with the simulation results.  
+1.  If Maya does this every practice, then in about 47% of practices she will make her first five free throw attempts.
+1.  See the Symbulate code below and @tbl-nb-ball and @tbl-nb-ball.
+The simulation results are consistent with the theoretical distribution.
+1.  On average it takes $1/0.86 = 1.163$ attempts to make a free throw, so it seems reasonable that it would take on average $5(1/0.86)=5.81$ attempts to make 5 free throws.
+1.  The shortcut gives $\E(X) = 5(1/0.86)=5.81$, which is consistent with the "long way"
+$$
+\scriptsize{
+(5)(0.4705) + (6)(0.3293) + (7)(0.1383)+(8)(0.0452) + (9)(0.0127) + (10)(0.0032) + (11)(0.0007) + \cdots
+}
+$$
+Technically, the sum keeps going but since the probabilities get so small, the contribution of the additional terms is negligible.
+1.  If Maya does this at every practice, it takes her on average 5.8 attempts to make 5 free throws.
+1.  The variance would be larger with 10 attempts.
+With every additional required success we "accumulate variability" in the total number of attempts needed to achieve that many successes.
+
+
+:::
+::::
+
+```{python}
+
+r = 5
+def count_until_rth_success(omega):
+    trials_so_far = []
+    for i, w in enumerate(omega):
+        trials_so_far.append(w)
+        if sum(trials_so_far) == r:
+            return i + 1 # +1 for zero-based indexing
+
+# simulate an indefinite (** inf) sequence of Bernoulli trials       
+P = Bernoulli(0.86) ** inf
+
+X = RV(P, count_until_rth_success)
+x = X.sim(10000)
+
+x.plot()
+
+# overlay theretical distribution
+NegativeBinomial(r = 5, p = 0.86).plot();
+plt.show()
+
+```
+
+
+```{python}
+
+x.count_eq(7) / 10000
+
+```
+
+```{python}
+
+x.mean()
+
+```
+
+```{python}
+
+x.var()
+
+```
+
+We can use Symbulate to compute theoretical Negative Binomial probabilities.
+
+
+```{python}
+NegativeBinomial(5, 0.86).pmf([5, 6, 7, 8, 9, 10, 11])
+```
+
+The values $5, \ldots, 11$ account for 99.98% of the probability: $\IP(X \le 11) = 0.9998$
+
+```{python}
+NegativeBinomial(5, 0.86).cdf(11)
+```
+
+```{python}
+NegativeBinomial(5, 0.86).mean()
+```
+
+```{python}
+NegativeBinomial(5, 0.86).var()
+```
+
+
+
+```{r}
+#| label: tbl-nb-ball
+#| echo: false
+#| tbl-cap: "Table representing the the NegativeBinomial(5, 0.86) distribution, the theoretical distribution of $X$ in @exm-nb-bball."
+
+r = 5
+p = 0.86
+
+x = r:(r + 7)
+px = dnbinom(x - r, r, p)
+
+data.frame(x, px) |>
+  kbl(col.names = c("x", "P(X = x)"),
+      digits = 4) |>
+  kable_styling()
+```
+
+```{r}
+#| label: fig-nb-ball
+#| echo: false
+#| fig-cap: "Plot and spinner representing the the NegativeBinomial(5, 0.86) distribution, the theoretical distribution of $X$ in @exm-nb-bball."
+#| fig-subcap: 
+#|   - "Impulse plot"
+#|   - "Spinner; the values 9 and up have been grouped together and their total probability of 1.7% is not displayed."
+#| layout-ncol: 2
+
+# impulse plot
+
+ggplot(data.frame(x, px),
+       aes(x = x,
+           xend = x,
+           y = 0,
+           yend = px)) +
+  geom_segment(linewidth = 1.2, col = "skyblue") +
+  scale_x_continuous(breaks = 5:12) +
+  scale_y_continuous(expand = c(0, 0)) +
+  theme_classic() +
+  theme(legend.position = "none") +
+  labs(x = "x",
+       y = "P(X = x)")
+
+# spinner
+
+x = c(5:8, "9+")
+p = c(dnbinom(0:3, 5, 0.86), 1-pnbinom(4, 5, 0.86))
+
+
+xp <- data.frame(x, p)
+
+cdf = c(0, cumsum(xp$p))
+
+plotp = (cdf[-1] + cdf[-length(cdf)]) / 2
+
+spinner <- ggplot(xp, aes(x="", y=p, fill=x))+
+  geom_bar(width = 1, stat = "identity",
+           color = "black", fill = "white") + 
+  coord_polar("y", start = 0) +
+  theme_void() +
+  scale_y_continuous(breaks = plotp, labels = xp$x) +
+  theme(axis.text.x=element_text(size = 12, face = "bold")) +
+  geom_text(aes(y = plotp,
+                label = percent(p)), size = 4,
+            color=c(rep("black", 4), rep(NA, 1)))
+
+spinner
+```
+
+
+::: {#def-negative-binomial-story}
+Perform Bernoulli($p$) trials until a fixed number, $r$, of successes and then stop.
+Let $X$ count the total number of trials, including the $r$ successes.
+The distribution of $X$ is defined to be the **Negative Binomial($r$, $p$) distribution**.
+:::
+
+A Negative Binomial distribution is specified by two parameters:
+
+-   $r$ (an integer): the fixed number of successes
+-   $p$ (in $[0, 1]$): the fixed marginal probability of success on each Bernoulli trial, or the population proportion of success
+
+
+::: {#lem-nb-ev-var}
+
+If $X$ has a NegativeBinomial($r$, $p$) distribution
+\begin{align*}
+\E(X) & = \frac{r}{p}\\
+\Var(X) & = \frac{r(1-p)}{p^2}
+\end{align*}
+
+:::
+
+
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-nb-geom}
+What is another name for a NegativeBinomial(1, $p$) distribution?
+
+:::
+::::
+
+:::: {.callout-tip collapse=true}
+::: {#sol-nb-geom}
+A NegativeBinomial(1, $p$) distribution is a Geometric($p$) distribution.
+
+:::
+::::
+
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-negative-binomial-sum}
+Xavier bets on red on roulette until he wins 3 bets and then he leaves.
+After Xavier leaves, Zander arrives and bets on black until he wins 2 bets and then he leaves.
+Let $X$ be the number of bets that Xavier makes and let $Z$ be the number of bets that Zander makes.
+
+1.  Identify the distribution of $X$ and the distribution of $Z$.
+1.  Are $X$ and $Z$ independent?
+Explain.
+1.  What does $X+Z$ represent in this context?
+Identify the distribution of $X+Z$ without doing any calculations.
+1.  Use simulation to approximate the distribution of $X+Z$ and confirm your answer to the previous part.
+1.  Suppose that Yolanda starts making bets on the same game as Xavier, and she bets on black until she wins 5 bets. 
+Does $X + Y$ have a Negative Binomial distribution?
+Explain. 
+1.  Suppose instead that Zavier bets on the number 7 until he wins 5 bets.
+Does $X + Z$ have a Negative Binomial distribution in this case?
+Explain.
+:::
+::::
+
+
+:::: {.callout-tip collapse=true}
+::: {#sol-negative-binomial-sum}
+
+1.  $X$ has a NegativeBinomial(3, 18/38) distribution and $Z$ has a NegativeBinomial(2, 18/38) distribution.
+1.  Yes, Xavier and Zander bet on different sets of games and the spins are (physically) independent, so $X$ and $Z$ are independent.
+1.  $X+Z$ is the total number of games played until a total of 5 games are won.
+This satisfies the Negative Binomial situation. 
+Each trial results in either "win" or not.
+The probability of a win on any bet is 18/38; it doesn't matter if they're betting on black or red because each has the same probability of winning.
+The spins are independent.
+Between the two players there is a fixed number of 5 wins and we are counting the total number of bets (trials).
+So $X+Z$ has a NegativeBinomial(5, 18/38) distribution.
+1.  See the results below; the simulated values follow closely a NegativeBinomial(5, 18/38) distribution.
+1.  $X + Y$ does not have a Negative Binomial distribution, because the trials that determine $X$ are not independent of those that determine $Y$.
+The random variables $X$ and $Y$ are not independent.
+1.  $X+Z$ would not have a Negative Binomial distribution, because there is not the same probability of win (success) on all trials (18/38 for Xavier's bets but 1/38 for Zander's).
+
+:::
+::::
+
+```{python}
+X, Z = RV(NegativeBinomial(3, 18 / 38) * NegativeBinomial(2, 18 / 38))
+
+plt.figure()
+(X + Z).sim(10000).plot()
+NegativeBinomial(5, 18 / 38).plot();
+plt.show()
+```
+
+
+::: {#lem-negative-binomial-sum}
+If $X$ and $Y$ are independent, $X$ has a NegativeBinomial($r_X$, $p$) distribution, and $Y$ has a NegativeBinomial($r_Y$, $p$) distribution then $X+Y$ has a NegativeBinomial($r_X+r_Y$, $p$) 
+
+:::
+
+
+If $X_1, X_2, \ldots, X_r$ are independent each with a Geometric($p$) distribution, then $X_1+\cdots+X_r$ has a NegativeBinomial($r, p$) distribution.
+So any random variable with a NegativeBinomial($r$, $p$) distribution has the same distributional properties as $X_1+  X_2+  \cdots+  X_r$, where $X_1, \ldots, X_r$ are independent each with a Geometric($p$) distribution. 
+This provides a very convenient representation in many problems.
+
+
+
+
+
+### Pascal distributions
+
+In a Negative Binomial situation, the total number of successes is fixed ($r$), i.e., not random.  What is random is the number of failures, and hence the total number of trials.
+
+Our definition of a Negative Binomial distribution (and hence a Geometric distribution) provides a model for a random variable which counts the number of Bernoulli($p$) *trials* required until $r$ successes occur, *including* the $r$ trials on which success occurs, so the possible values are $r, r+1, r+2,\ldots$
+
+There is an alternative definition of a Negative Binomial distribution (and hence a Geometric distribution)  which provides a model for a random variable which counts the number of *failures* in Bernoulli($p$) trials required until $r$ successes occur, *excluding* the $r$ trials on which success occurs, so the possible values are $0, 1, 2, \ldots$
+We will refer to this alternative definition as a "Pascal distribution".
+
+::: {#def-pascal-story}
+Perform Bernoulli($p$) trials until a fixed number, $r$, of successes and then stop.
+Let $X$ count the total number of failures (excluding the $r$ successes).
+The distribution of $X$ is defined to be the **Pascal($r$, $p$) distribution**.
+:::
+
+There is not a standard definition of Negative Binomial, and some software programs use "Negative Binomial" to refer to what we're calling "Pascal".
+It's a good idea to always check the documentation of a software package to see what definition is used.
+
+
+
+In Symbulate, a Pascal($r$, $p$) distribution follows this alternate definition. In Symbulate,
+
+-   The possible values of a NegativeBinomial($r$, $p$) distribution are $r, r+1, r+2,\ldots$
+-   The possible values of a Pascal($r$, $p$) distribution are $0, 1, 2,\ldots$
+
+If $X$ has a NegativeBinomial($r$, $p$) distribution then $(X-r)$ has a Pascal($r$, $p$) distribution.
+Similarly, if $Y$ has a Pascal($r$, $p$) distribution then $(Y+r)$ has a NegativeBinomial($r$, $p$) distribution.
+
+
+
+
+## Poisson distributions
+
+
+
+Binomial and Negative Binomial distributions are commonly used for modeling discrete random variables. 
+However, Binomial Negative Binomial models are not appropriate in many situations that involve counting "successes".
+
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-poisson-hr-intro}
+Let $X$ be the number of home runs hit (in total by both teams) in a randomly selected Major League Baseball game.
+
+
+1.  In what ways is this situation like the Binomial situation?
+(What is a trial?
+What is "success"?)
+1.  In what ways is this NOT like the Binomial situation?
+
+:::
+::::
+
+
+:::: {.callout-tip collapse=true}
+::: {#sol-poisson-hr-intro}
+
+1.  Each pitch is a trial, and on each trial either a home run is hit ("success") or not.
+The random variable $X$ counts the number of home runs (successes) over all the trials
+1.  Even though $X$ is counting successes, this is not the Binomial situation.
+    -   The number of trials is not fixed.
+    The total number of pitches varies from game to game.
+    (The average is around 300 pitches per game).
+    -   The probability of success is not the same on each trial.
+    Different batters have different probabilities of hitting home runs.
+    Also, different pitch counts or game situations lead to different probabilities of home runs.
+    -   The trials might not be independent.
+    Make sure you distinguish independence from the previous assumption of unequal probabilities of success; you need to consider conditional probabilities to assess independence.
+    Maybe if a pitcher gives up a home run on one pitch, then the pitcher is "rattled" so the probability that he also gives up a home run on the next pitch increases, or the pitcher gets pulled for a new pitcher which changes the probability of a home run on the next pitch.
+
+:::
+::::
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-poisson-accidents-intro}
+Let $X$ be the number of vehicle crashes involving fatalities that occur in San Luis Obispo County in a randomly selected week.
+
+
+1.  In what ways is this like the Binomial situation?
+(What is a trial?
+What is "success"?)
+1.  In what ways is this NOT like the Binomial situation?
+1.  Which of the following do you think it would be easier to estimate by collecting and analyzing relevant data?
+    -  The total number of vehicles on the road in the county in a week, and the probability that each vehicle is involved in a fatal crash.
+    -  The average number of fatal vehicle crashes per week in the county.
+
+:::
+::::
+
+
+:::: {.callout-tip collapse=true}
+::: {#sol-poisson-accidents-intro}
+
+1.  Each vehicle on the road in the week is a trial, and each vehicle either is either involved in a fatal crash ("success") or not.
+The random variable $X$ counts the number of vehicles involved in fatal crashes (successes).
+(Remember "success" is just a generic label for what you're interested in counting; "success" is not necessarily good.)
+1.  Even though $X$ is counting successes, this is not the Binomial situation.
+    -   The number of trials is not fixed.
+    The total number of vehicles on the road varies from week to week.
+    -   The probability of success is not the same on each trial.
+    Different drivers have different probabilities of being involved in fatal crashes; some drivers are safer than others.
+    Also, different conditions increase the probability of a crash, like driving at night.
+    -   The trials are plausibly not independent.
+    Make sure you distinguish independence from the previous assumption of unequal probabilities of success; you need to consider conditional probabilities to assess independence.
+    If a vehicle is in a crash, then the probability of being involved in a crash increases for the vehicles that are driving near it.
+1.  It would be extremely difficult to estimate the probability that each individual vehicle is involved in a fatal crash.
+You might be able to measure the total number of vehicles in a week at a certain location (e.g., with cables across the road), but doing so for the entire county would be extremely difficult, and it vary from week to week.
+It would be much easier to find data on total number of fatal vehicle crashes in a week, e.g., from police reports, and use it to estimate the average number of fatal vehicle crashes per week in the county.
+That is, you could count the number of "successes" without knowing how many "trials" there were or the probability of "success" on individual trials.
+
+:::
+::::
+
+Binomial and Negative Binomial models have several restrictive assumptions that might not be satisfied in practice:
+
+-   The number of trials must be fixed (not random) and known (for Negative Binomial, the number of successes must be fixed)
+-   The probability of success must be the same for each trial (fixed, not random) and known.
+-   The trials must be independent.
+
+Even when the trials are independent with the same probability of success, fitting a Binomial model to data requires estimation of both $n$ and $p$ individually.
+When the only data available are counts of successes but not trials (e.g., number of fatal vehicle crashes in a week but not number of vehicles) it might not be possible to estimate both $n$ and $p$.
+
+
+
+
+"Poisson models" are more flexible models for counts which do not require all the conditions of the Binomial situation.
+*Poisson distributions* are often used to model the distribution of random variables that count the number of "relatively rare" events that occur over a certain interval of time or in a certain region (e.g., number of car insurance policies that have claims in a day, number of bank loans that go into default, number of mutations in a DNA sequence, number of earthquakes that occurs in SoCal in an hour, etc.)
+
+
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-matching-poisson}
+
+Recall our discussion of the matching problem in @sec-sim-matching-n.
+We observed that, unless $n$ is really small,
+
+-   the long run average number of matches does is (approximately) 1
+-   the distribution of the number of matches ($X$) is approximately the "Poisson(1)" distribution.
+
+The Poisson(1) pmf is represented by @tbl-matching-poisson-distribution and @fig-matching-poisson-distribution.
+
+
+1.  Interpret $\IP(X = 0)$ as a long run relative frequency.
+1.  Describe in words the Poisson(1) distribution.
+What are some relevant features?
+Which values are most likely?
+How much more likely are they than the next most likely value?
+And so on.
+1.  Would it be appropriate to assume that $X$ has a Binomial distribution?
+Explain.
+
+:::
+::::
+
+
+:::: {.callout-tip collapse=true}
+::: {#sol-matching-poisson}
+
+1.  In about 37% of repetitions of the matching problem, there will be no matches.
+For example, in about 37% of Secret Santa drawings, no one will draw their own name.
+1.  We could interpret the distribution in terms of relative frequencies as in the previous part: 18.4% of repetitions of the matching problem result in exactly 2 matches, etc.
+We can also interpret the distribution in terms of relative degrees of likelihood.
+    -   0 and 1 are equally likely, and then the pmf is decreasing as a function of $x$
+    -   2 is 1/2 as likely as 1
+    -   3 is 1/3 as likely as 2,
+    -   4 is 1/4 as likely as 3
+    -   5 is 1/5 as likely as 4, and so on
+1.  In some ways the matching problem does resemble the Binomial situation:
+    -   Each object is a trial and success occurs if it is put in the correct spot.
+    -   There are $n$ trials, fixed.
+    -   Unconditionally, each object is equally likely to be placed in any of the $n$ spots, so the *marginal* probability of success is the same on each trial, $1/n$.
+    -   $X$ counts the number of successes in $n$ trials.
+However, the trials are not independent.
+For example, if object 1 is placed correctly in spot 1, the *conditional* probability that object 2 is placed in spot 2 is $1/(n-1)$; if objects 1 through $n-1$ are placed in their correct spots, then the *conditional* probability that object $n$ is placed in the correct spot is 1.
+Since the trials are not independent, $X$ does not have a Binomial distribution.
+
+:::
+::::
+
+A Poisson distribution has a single parameter, denoted $\mu$, which must be a positive number, $\mu > 0$.
+One way to interpret $\mu$ is as the long run average value.
+In the matching problem 1 is the parameter of the Poisson distribution because 1 is the long run average number of matches.
+We will discuss long run averages in more detail later.
+@fig-poisson-pmfs displays Poisson distributions for a few values of $\mu$.
+
+
+
+```{python}
+#| label: fig-poisson-pmfs
+#| fig-cap: "Probability mass functions of Poisson distributions."
+
+mus = [0.7, 1.6, 2.5, 3.4]
+
+plt.figure();
+for mu in mus:
+  Poisson(mu).plot();
+  
+plt.show()
+```
+
+
+@exm-matching-poisson and @fig-poisson-pmfs illustrate the "Poisson pattern".
+
+::: {#def-poisson-pattern}
+If $X$ has a **Poisson($\mu$) distribution**:
+
+-   The possible values of $X$ are $0, 1, 2, \ldots$.
+-   The parameter $\mu>0$ can be interpreted as the long run average value of $X$.
+-   As a function of $x=0, 1, 2, \ldots$, a Poisson pmf increases for $x<\mu$ and then decreases^[If $\mu$ is a whole number, then the Poisson pmf assigns the same probability to the values $\mu$ and $\mu-1$. If $\mu<1$ then $x=0$ has the highest probability and the pmf decreases from there.] for $x>\mu$, following a particular *Poisson pattern*:
+    -   1 is $\mu$ times as likely as 0
+    -   2 is $\mu/2$ times as likely as 1
+    -   3 is $\mu/3$ times as likely as 2
+    -   4 is $\mu/4$ times as likely as 3
+    -   and so on; in general,
+$$
+\text{Poisson(}\mu\text{) pattern:}\quad x \text{ is } \frac{\mu}{x} \text{ as likely as } x-1 \quad \text{ (for } x = 1, 2, 3, \ldots)
+$$
+-   The probability that $X$ equals 0 is $e^{-\mu}$.
+
+:::
+
+
+
+The Poisson pattern is sufficient to define the shape of a Poisson($\mu$) pmf $p(x), x = 0, 1, 2, \ldots$.
+The final step is to normalize the probabilities defined by the Poisson pattern so that they sum to 1.
+
+For example, for the Poisson(1) distribution in @exm-matching-poisson suppose that 0 accounts for 10000 "units" of probability; remember, this is just an arbitrary baseline.
+Then the Poisson pattern implies that
+
+-   1 accounts for $10000\times 1/1 = 10000$ units
+-   2 accounts for $10000\times 1/2 = 5000$ units
+-   3 accounts for $5000\times 1/3 = 1666.67$ units
+-   4 accounts for $1666.67\times 1/4 = 416.67$ units
+-   5 accounts for $416.67\times 1/5 = 83.33$ units
+-   6 accounts for $83.33\times 1/6 = 13.89$ units
+-   7 accounts for $13.89\times 1/7 = 1.98$ units
+
+And so on.
+Technically, a Poisson(1) distribution assigns positive probability to all whole numbers, but the values $0,\ldots,7$ comprise nearly 100% of the probability.
+The values $0,\ldots,7$ account for a total of 27182.82 "units", so we divide the units corresponding to each of $0,\ldots,7$ by 27182.82 to obtain probabilities which sum to 1, resulting in the values in @tbl-matching-poisson-distribution (e.g., the value 3 corresponds to probability $1666.67 / 27182.82 = 0.0613$).
+Note that, after normalizing, the value 0 corresponds to probability $e^{-1} = 0.3679$.
+
+If $X$ has a Poisson($\mu$) distribution, normalization implies that^[We will see the math behind this later.] the probability that $X$ equals 0 is $e^{-\mu}$.
+This fact provides a baseline for computing other probabilities via the Poisson pattern without dealing with arbitrary "units"^[We can build a Poisson($\mu$) pmf  $p(x)$ from the Poisson pattern, $p(x)=p(x-1)(\mu/x)$, and normalizing, which yields $p(0) = e^{-\mu}$:
+\begin{align*}
+p(1) & = p(0)(\mu/1) = e^{-\mu}\mu,\\
+p(2) & = p(1)(\mu/2) = e^{-\mu}\mu^2/2,\\
+p(3) & = p(2)(\mu/3) = e^{-\mu}\mu^3/3!,\\
+p(4) & = p(3)(\mu/4) = e^{-\mu}\mu^4/4!,
+\end{align*}
+and in general
+$$
+p(x) = e^{-\mu}\mu^x/x!, \qquad x = 0, 1, 2, \ldots
+$$
+].
+
+
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-homerun-poisson}
+
+Let $X$ be the number of home runs hit (in total by both teams) in a randomly selected Major League Baseball game.
+Assume that $X$ has a Poisson(2.4) distribution.
+
+
+1.  In what sense are home runs "relatively rare"?
+1.  What are the possible values of $X$?
+1.  Interpret the parameter 2.4 in context.
+1.  Compute $\IP(X = 2.4)$ without using software.
+1.  Identify the most likely value of $X$ without doing any computations.
+1.  Use Symbulate to compute $\IP(X = 0)$ and interpret the value in context.
+1.  Starting with $\IP(X = 0)$ from the previous part, use the "Poisson pattern" to find, by hand without Symbulate, $\IP(X = x)$ for $x = 1, 2, 3, 4, \ldots$.
+Then use Symbulate to check your values, and display them in a table and plot.
+1.  Compute $\IP(X \le 13)$ and interpret the value in context.  ([The most home runs ever hit in a baseball game is 13](https://www.mlb.com/news/d-backs-and-phillies-set-mlb-home-run-record).)
+1.  Construct a spinner to simulate values of $X$.
+1.  Use Symbulate to simulate many values of $X$ and compare the simulated distribution to the theoretical Poisson distribution.
+
+:::
+::::
+
+
+
+:::: {.callout-tip collapse=true}
+::: {#sol-homerun-poisson}
+
+1.  In a typical baseball game there are around 300 pitches but only a handful of home runs.
+So home runs (successes) are rare relative to the number of pitches (trials).
+1.  Since $X$ has a Poisson distribution, its possible values are $0, 1, 2, \ldots$
+Even though it is rare for a game to have more than a few home runs (see below), technically there is no fixed upper bound for the number of home runs that can happen in a game.
+1.  2.4 is the long run average value of $X$: Over many baseball games there are a total of 2.4 home runs per game on average.
+1.  $\IP(X = 2.4) = 0$ since 2.4 is not a possible value of $X$.
+The long run average is 2.4, but the number of home runs in any game must be a whole number.
+1.  As a function of $x$ a Poisson pmf increases up to $\mu$ and then decreases, so with $\mu = 2.4$ the value $x=2$ will have the highest probability.
+1.  We can use `Poisson(2.4).pmf(0)` to obtain $\IP(X = 0) = 0.091$.
+(We could also use the Poisson normalizing constant: $\IP(X = 0)=e^{-2.4} = 0.091$.)
+Over many baseball games, about 9.1% of games have 0 home runs, so about 89.9% of games have at least one home run.
+In other words, a baseball game is about 10 times  more likely to have at least one home run than to have 0 home runs.
+1.  Starting with $\IP(X = 0) = 0.091$:
+    -   $\IP(X = 1) = \IP(X = 0) \times 2.4 / 1 = 0.091 \times 2.4 / 1 = 0.218$
+    -   $\IP(X = 2) = \IP(X = 1) \times 2.4 / 2 = 0.218 \times 2.4 / 2 = 0.261$
+    -   $\IP(X = 3) = \IP(X = 2) \times 2.4 / 3 = 0.261 \times 2.4 / 3 = 0.209$
+    -   $\IP(X = 4) = \IP(X = 3) \times 2.4 / 4 = 0.209 \times 2.4 / 4 = 0.125$
+    -   and so on; see @fig-poisson-homerun-1 and the right column of @tbl-poisson-hr.
+1.  Just sum the values of the pmf corresponding to the values $x = 0, 1, \ldots, 13$: $\IP(X \le 13) = 0.9999997$.
+There isn't any shorter way to do it.
+In the long run, almost all MLB games have at most 13 home runs. Even though the Poisson(2.4) pmf assigns nonzero probability to all whole numbers 0, 1, 2, $\ldots$, the probability that $X$ takes a value greater than 13 is extremely small.
+1.  See @fig-poisson-homerun-2.
+To simplify the display we have lumped values $6, 7, \ldots$ into one "6+" category.
+1.  See the simulation results below, which match up closely with the theoretical distribution.
+
+:::
+::::
+
+
+```{r}
+#| label: fig-poisson-homerun
+#| echo: false
+#| warning: false
+#| fig-cap: "Plot and spinner representing the the Poisson(2.4) distribution, the theoretical distribution of $X$ in @exm-homerun-poisson."
+#| fig-subcap: 
+#|   - "Impulse plot"
+#|   - "Spinner; the values 6, 7,...  have been grouped together and their total probability of 3.6% is not displayed."
+#| layout-ncol: 2
+
+# impulse plot
+
+x = 0:13
+px = dpois(x, 2.4)
+
+ggplot(data.frame(x, px),
+       aes(x = x,
+           xend = x,
+           y = 0,
+           yend = px)) +
+  geom_segment(linewidth = 1.2, col = "skyblue") +
+  scale_x_continuous(breaks = 0:10, limits = c(0, 10)) +
+  scale_y_continuous(expand = c(0, 0)) +
+  theme_classic() +
+  theme(legend.position = "none") +
+  labs(x = "x",
+       y = "P(X = x)")
+
+# spinner
+
+x = c(0:5, "6+")
+p = c(dpois(0:5, 2.4), 1-ppois(5, 2.4))
+
+
+xp <- data.frame(x, p)
+
+cdf = c(0, cumsum(xp$p))
+
+plotp = (cdf[-1] + cdf[-length(cdf)]) / 2
+
+spinner <- ggplot(xp, aes(x="", y=p, fill=x))+
+  geom_bar(width = 1, stat = "identity",
+           color = "black", fill = "white") + 
+  coord_polar("y", start = 0) +
+  theme_void() +
+  scale_y_continuous(breaks = plotp, labels = xp$x) +
+  theme(axis.text.x=element_text(size = 12, face = "bold")) +
+  geom_text(aes(y = plotp,
+                label = percent(round(p, 3))), size = 4,
+            color=c(rep("black", 6), rep(NA, 1)))
+
+spinner
+```
+
+
+
+Since `Poisson` is a named distribution family in Symbulate, we can use `pmf` to compute probabilities such as $\IP(X = 0)$, $\IP(X = x)$ for $x = 0, 1, 2, \ldots$, and $\IP(X \le 13)$.
+
+```{python}
+Poisson(2.4).pmf(0)
+```
+
+
+
+```{python}
+xs = list(range(13 + 1))
+
+pmf_x = [Poisson(2.4).pmf(x) for x in xs]
+
+print(tabulate({'x': xs,
+                'Poisson(2.4) pmf(x)': pmf_x},
+               headers = 'keys', floatfmt=".4f"))
+```
+
+
+
+```{python}
+Poisson(2.4).pmf(xs).sum()
+```
+
+
+Now for a simulation.
+We define a Symbulate `RV` by specifying its distribution; this basically tells Symbulate to use the spinner in @fig-poisson-homerun-2 to simulate values of $X$.
+
+```{python}
+X = RV(Poisson(2.4))
+```
+
+Now we simulate many values; note that each simulated value is a whole number.
+
+```{python}
+x = X.sim(10000)
+
+x
+```
+
+
+Finally, we summarize the simulated values.
+The average of many simulated values is close to the long run average of 2.4.
+
+```{python}
+x.mean()
+```
+
+We can summarize the simulated values to approximate the distribution of $X$.
+Since we defined $X$ by specifying its Poisson(2.4) distribution, we're basically just verifying that the simulation is doing what we told it to do.
+
+
+```{python}
+x.tabulate(normalize = True)
+```
+
+```{python}
+plt.figure();
+x.plot(); # Plot the simulated values 
+Poisson(2.4).plot(); # Plot the theoretical pmf
+plt.show();
+
+```
+
+
+
+```{r}
+#| echo: false
+#| warning: false
+
+hr = read_csv("_data-files/mlb2023.csv") |>
+  select(field26, field54) |>
+  rename(hr_away = field26,
+         hr_home = field54) |>
+  mutate(hr_total = hr_away + hr_home)
+```
+
+
+```{r}
+#| echo: false
+#| warning: false
+
+n = nrow(hr)
+
+mu = mean(hr$hr_total)
+
+max_hr = max(hr$hr_total) + 1
+
+hr_dist = hr |> count(hr_total, name = "freq") |>
+  add_row(hr_total = setdiff(0:max_hr, unique(hr$hr_total)), freq = 0) |>
+  arrange(hr_total) |>
+  mutate(rel_freq = freq / sum(freq)) |>
+  mutate(poisson_prob = dpois(hr_total, round(mu, 1)))
+```
+
+
+In @exm-homerun-poisson we assumed that the number of home runs per game follows a Poisson(2.4) distribution.
+Is this reasonable?
+@tbl-poisson-hr summarizes home run data^[Source: <https://www.retrosheet.org/gamelogs/index.html>] from all regular season MLB games in the 2023 season.
+There were `r sum(hr$hr_total)` home runs in `r n` games, an average of `r round(mu, 1)` home runs per game.
+The observed relative frequencies are pretty close to the theoretical Poisson(2.4) probabilities; see @fig-poisson-hr for a visual comparison.
+We can see that the Poisson(2.4) distribution models the number of home runs per game reasonably well, at least based on the 2023 data.
+
+
+
+
+
+
+
+
+
+```{r}
+#| label: tbl-poisson-hr
+#| echo: false
+#| tbl-cap: "Data on home runs per game in the 2023 MLB season, compared with the Poisson(2.4) distribution."
+
+hr_dist |>
+  adorn_totals("row") |>
+  kbl(col.names = c("Number of HRs",
+                    "Number of games",
+                    "Proportion of games",
+                    "Poisson probability"),
+      digits = 4) |>
+  kable_styling()
+```
+
+
+```{r}
+#| label: fig-poisson-hr
+#| echo: false
+#| warning: false
+#| fig-cap: "Home runs per game in MLB games. Blue spikes represent observed relative frequencies from 2023 season data. Orange dots represent the Poisson(2.4) pmf."
+
+ggplot(hr_dist,
+       aes(x = hr_total,
+           xend = hr_total,
+           y = 0,
+           yend = rel_freq)) +
+  geom_segment(linewidth = 1.2, col = "skyblue") +
+  geom_point(aes(x = hr_total, y = poisson_prob), color = "orange") +
+  geom_line(aes(x = hr_total, y = poisson_prob), color = "orange") +
+  scale_x_continuous(breaks = 0:11, limits = c(0, 11)) +
+  scale_y_continuous(expand = c(0, 0), breaks = seq(0, 0.3, 0.05), limits = c(0, 0.3)) +
+  theme_classic() +
+  labs(x = "Number of home runs",
+       y = "Proportion of games/Probability")
+```
+
+
+A Poisson distribution is a discrete distribution which assign nonzero probability to countably infinitely many values: $0, 1, 2, \ldots$.
+While there is no fixed upper bound, for many Poisson distributions most of the probability is concentrated over a relatively small range of possible values.
+
+
+
+```{r}
+#| echo: false
+#| warning: false
+
+crashes = read_csv("_data-files/crashes_per_week.csv") |>
+  rename(crashes = freq)
+
+
+```
+
+
+
+```{r}
+#| echo: false
+#| warning: false
+
+n = nrow(crashes)
+
+mu = mean(crashes$crashes)
+
+max_x = max(crashes$crashes) + 1
+
+crashes_dist = crashes |> count(crashes, name = "freq") |>
+  add_row(crashes = setdiff(0:max_x, unique(crashes$crashes)), freq = 0) |>
+  arrange(crashes) |>
+  mutate(rel_freq = freq / sum(freq)) |>
+  mutate(poisson_prob = dpois(crashes, mu))
+```
+
+
+Poisson distributions are often reasonable models for random variables which count successes in situations where successes are rare relative to the number of trials.
+In @exm-poisson-accidents-intro, there are many vehicles on the road but very few of them are involved in fatal crashes.
+Therefore, if $X$ is the number of vehicles crashes involving fatalities that occur in San Luis Obispo County in a randomly selected week, we might assume that $X$ follows a Poisson distribution.
+We could estimate the parameter by collecting data on the number of fatal vehicle crashes in a sample of weeks and computing the average number of fatal crashes per week.
+@tbl-poisson-crashes summarizes such data^[Source: the [California Highway Patrol Statewide Integrated Traffic Records System (CHP-SWITRS)](https://www.chp.ca.gov/programs-services/services-information/switrs-internet-statewide-integrated-traffic-records-system) public dataset available through the Berkeley [Transportation Incident Mapping System (TIMS)](https://tims.berkeley.edu/).] for 2011 through 2020 from San Luis Obispo County.
+There were  `r sum(crashes$crashes)` fatal vehicle crashes in `r n` weeks, an average of `r round(mu, 2)` fatal vehicle crashes per week.
+The observed relative frequencies in @tbl-poisson-crashes are pretty close to the theoretical Poisson(`r round(mu, 2)`) probabilities; see also @fig-poisson-crashes.
+
+```{r}
+#| label: tbl-poisson-crashes
+#| echo: false
+#| tbl-cap: "Data on weekly fatal vehicle crashes in San Luis Obispo County 2011-2020, compared with the Poisson(0.53) distribution."
+
+crashes_dist |>
+  adorn_totals("row") |>
+  kbl(col.names = c("Number of fatal crashes",
+                    "Number of weeks",
+                    "Proportion of weeks",
+                    "Poisson probability"),
+      digits = 4) |>
+  kable_styling()
+```
+
+
+
+```{r}
+#| label: fig-poisson-crashes
+#| echo: false
+#| warning: false
+#| fig-cap: "Weekly fatal vehicle crashes in San Luis Obispo County. Blue spikes represent observed relative frequencies based on 2011-2020 data. Orange dots represent the Poisson(0.53) pmf."
+
+ggplot(crashes_dist,
+       aes(x = crashes,
+           xend = crashes,
+           y = 0,
+           yend = rel_freq)) +
+  geom_segment(linewidth = 1.2, col = "skyblue") +
+  geom_point(aes(x = crashes, y = poisson_prob), color = "orange") +
+  geom_line(aes(x = crashes, y = poisson_prob), color = "orange") +
+  scale_x_continuous(breaks = 0:5) +
+  scale_y_continuous(expand = c(0, 0), limits = c(0, 0.6), breaks = seq(0, 0.6, 0.1)) +
+  theme_classic() +
+  labs(x = "Number of fatal vehicle crashes",
+       y = "Proportion of weeks/Probability")
+```
+
+We have seen two data sets that provide some motivation for the Poisson pattern, and there are many other examples.
+Why is the Poisson pattern so ubiquitous?
+Later we will explore more deeply the theory and properties of Poisson distributions.
+For now just remember that Poisson distributions are one of the most commonly used probability models for discrete random variables, especially when counting "relatively rare" events.
+
+### Poisson paradigm
+
+Introduce properties of Poisson via simulation: sum is Poisson, conditional Binomial here? trick to conditional Binomial is independence. Or wait until multiple RVs chapter?
+
+
+
+
+### Exercises
+
+::: {#exr-crashes-poisson}
+
+Let $X$ be the number of vehicles crashes involving fatalities that occur in San Luis Obispo County in a randomly selected week.
+Assume that $X$ follows a Poisson(0.53) distribution.
+:::
+
+1.  What are the possible values of $X$?
+1.  Interpret the parameter 0.53 in context.
+1.  Compute $\IP(X = 0.53)$ without using software.
+1.  Identify the most likely value of $X$ without doing any computations.
+1.  Use Symbulate to compute $\IP(X \le 6)$ and interpret the value in context.
+1.  Use the "Poisson pattern" and normalization to find, by hand, $\IP(X = x)$ for $x = 0, 1, 2, 3, 4, 5, 6$.
+Hint: assume that 0 represents 100000 "units", use the Poisson pattern to find the "units" corresponding to each of $1, \ldots, 6$, then divide by the total number of "units".
+(Technically, the values $7, 8, 9, \ldots$ have non-zero probability, but the previous part shows that the values $0, \ldots, 6$ account for almost 100% of the probability.)
+Then use Symbulate to check your values, and display them in a table and plot.
+1.  Interpret $\IP(X = 0)$ in context.
+1.  Construct a spinner to simulate values of $X$.
+1.  Use Symbulate to simulate many values of $X$ and compare the simulated distribution to the theoretical Poisson distribution.
+
+
+
+## Hypergeometric distributions - where to put?
+
+Only introduce through sampling without replacement story
+
+capture-recapture MLE? maybe
+
+Fisher exact test? probably
+
+CP example
+
+### Negative Hypergeometric distributions
+
+See Rachel thesis examples
+
+
+## Comparison of common discrete distributions for modeling counting random variables
+
+
+The following table summarizes distributions we have seen that are used to model counting random variables.
+Note that Poisson distributions require the weakest assumptions.
+
+| Distribution      | Number of trials                                 | Number of successes   | Independent trials? | Probability of success                                                               |
+|-------------------|--------------------------------------------------|-----------------------|---------------------|--------------------------------------------------------------------------------------|
+| Binomial          | Fixed and known ($n$)                            | Random ($X$)          | Yes                 | Fixed and known ($p$), <br> same for each trial                                      |
+| Negative Binomial | Random ($X$)                                     | Fixed and known ($r$) | Yes                 | Fixed and known ($p$), <br> same for each trial                                      |
+| Hypergeometric    | Fixed and known ($n$)                            | Random ($X$)          | No                  | Fixed and known ($p = \frac{N_1}{N_1+N_0}$), <br> same for each trial                |
+| Poisson           | “Large” (could be random, <br> could be unknown) | Random ($X$)          | “Not too dependent" | “Comparably small for all trials" <br> (could vary between trials, could be unknown) |
+
+
+Exercise. In each of the following contexts
+
+-   Identify an appropriate random variable
+-   Represent the probability of interest in terms of the random variable using proper notation
+-   Use Symbulate to interpret the probability
+-   Write a clearly worded sentence interpreting the probability in context
+
+
+1.  Binomial
+1.  Hypergeometric
+1.  Negative Binomial
+1.  Poisson
+
+
+## Benford???
+
+Many commonly encountered discrete distributions are models for random variables that count, but not always the case.
+
+
+Include as example of defining RV in Symbulate with BoxModel using possible values and pmf? Could also do with this Geometric, though we need to cutoff or do ">x" ticket. Do the probs need to sum to 1 or will Symbulate automatically normalize?
+
+
+
+Or save until math discrete chapter?
+
+
+## Chapter exercises
+
+
+
+
+
