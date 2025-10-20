@@ -154,7 +154,7 @@ Remember that events often involve random variables.
 Even if the sample space outcomes are equally likely, the possible values of related random variables are usually not.
 
 
-### Some counting rules {#counting}
+### Some counting rules {#sec-counting}
 
 Computing probabilities in the equally likely case reduces to just counting outcomes. 
 In previous sections we often counted outcomes by enumerating them in a list. 
@@ -636,18 +636,23 @@ Every day the price either goes up or goes down, and the movements are independe
 Assume that the probability that the stock price goes up on any single day is 0.25.
 Let $X$ be the *number* of days in which the price goes up in the next 5 days.
 
-
+1.  Identify the distribution of $X$ by name, including the values of any relevant parameters.
 1.  Compute and interpret $\IP(X=5)$.
 1.  Compute the probability that the price goes down today and then up on the following four days.
 1.  Why is $\IP(X=4)$ different from the probability in the previous part?
 1.  How many outcomes (5 day sequences) satisfy the event $\{X=4\}$?
-Compute and interpret $\IP(X=4)$. 
+Answer without listing all the possibilities.
+1.  Compute and interpret $\IP(X=4)$. 
 1.  Compute the probability that the price goes up on the next three days and then down on the following two days.
 1.  Why is $\IP(X=3)$ different from the probability in the previous part?
 1.  How many outcomes (5 day sequences) satisfy the event $\{X=3\}$?
-Compute and interpret $\IP(X=3)$. 
+Answer without listing all the possibilities.
+1.  Compute and interpret $\IP(X=3)$. 
 1.  Suggest a general formula for the probability mass function of $X$.
-
+Then use the pmf to create a table representing the distribution of $X$.
+1.  Recall @exm-binomial-capture.
+Is the random variable $X$ in this problem the same as the random variable $X$ in @exm-binomial-capture?
+1.  Does the random variable $X$ in this problem have the same distribution as the random variable $X$ in @exm-binomial-capture?
 
 :::
 ::::
@@ -655,6 +660,7 @@ Compute and interpret $\IP(X=3)$.
 :::: {.callout-tip collapse=true}
 ::: {#sol-binomial-stock}
 
+1.  $X$ has a Binomial(5, 0.25) distribution.
 1.  Days are independent so we can multiply probabilities
 $$
 \IP(X = 5) = (0.25)(0.25)(0.25)(0.25)(0.25) = (0.25)^5 = \binom{5}{5}(0.25)^5(1-0.25)^{5 -5} = 0.00098
@@ -662,14 +668,33 @@ $$
 In about 0.098\% of 5-day periods the price goes up all 5 days.
 1.  Days are independent so we can multiply probabilities
 $$
+(1-0.25)(0.25)(0.25)(0.25)(0.25) = (0.25)^4(1-0.25) = 0.0029
+$$
+In about 0.29\% of 5-day periods the price goes down on the first day then up on the remaining days.
+1.  FSSSS is only one outcome with $X=4$, but there are others like SSSSF.
+1.  Among the 5 days we need to "choose" 4 to hold the successes, so there are $\binom{5}{4}=5$ total outcomes for which $X = 4$.
+1.  Each outcome with 4 successes and 1 failure has probability $(0.25)^4(1-0.25)^1$, so since there are  $\binom{5}{4}=5$ such outcomes
+$$
+\IP(X = 4) = 5(0.25)^4(0.75) = \binom{5}{4}(0.25)^4(1-0.25)^{5-4} = 0.0146
+$$
+In about 1.46\% of 5-day periods the price goes up on exactly 4 of the 5 days.
+
+1.  Days are independent so we can multiply probabilities
+$$
 (0.25)(0.25)(0.25)(1-0.25)(1-0.25) = (0.25)^3(1-0.25)^{5-3} = 0.0088
 $$
-1.  SSSFF is only one outcome with $X=3$.  There are $\binom{5}{3}=10$ total outcomes for which $X = 3$, each with probability $(0.25)^3(1-0.25)^2$, so 
+In about 0.88\% of 5-day periods the price goes down on the first two days then up on the remaining days.
+1.  SSSFF is only one outcome with $X=3$, but there are others like FFSSS.
+1.  Among the 5 days we need to "choose" 3 to hold the successes, so there are $\binom{5}{3}=10$ total outcomes for which $X = 3$.
+1.  Each outcome with 3 successes and 2 failures has probability $(0.25)^3(1-0.25)^2$, so since there are  $\binom{5}{3}=10$ such outcomes
 $$
-\IP(X = 3) = 10(0.25)^3(1-0.25)^2 = \binom{5}{3}(0.25)^3(1-0.25)^{5-3} = 0.088
+\IP(X = 3) = 10(0.25)^3(0.75)^2 = \binom{5}{3}(0.25)^3(1-0.25)^{5-3} = 0.088
 $$
 In about 8.8\% of 5-day periods the price goes up on exactly 3 of the 5 days.
-1.  The pmf is
+1.  The previous parts suggest the general form of the pmf.
+The possible values are $x=0, 1, 2, 3, 4, 5$.
+There are $\binom{5}{x}$ possible 5-day sequences that result in $x$ up movements, and each of these sequences---with $x$ up movements and $5-x$ down movements---has probability $(0.25)^x(1-0.25)^{5-x}$.
+
 $$
 p(x) = 
 \begin{cases}
@@ -677,22 +702,43 @@ p(x) =
 	0, & \text{otherwise}
 \end{cases}
 $$
-1.  See Example \@ref(exm:binomial-capture) and the discussion following it.
-1.  If price goes up on 25\% of days we would expect $5(0.25) = 1.25$ up movements in 5 days, on average in the long run.
-This is what we get if we compute the expected value the "long way" based on the distribution table.
-1.  These are different random variables. The number of tagged butterflies is different than the number of up price movements.
+
+See @tbl-binomial-pmf, and compare with @tbl-binomial-capture.
+
+1.  These are different random variables. 
+The number of tagged butterflies is different than the number of up price movements.
 1.  Yes, they have the same distribution. While the contexts are different and the variables are measuring different things, probabilistically the situations are equivalent.
 In each situation:
-    -   There are S/F trials (tagged/not, up/not)
-    -   Trials are independent (sampling with replacement, by assumption)
-    -   Probability of success of 0.25 on each trial (13/52, assumed 0.25)
-    -   5 trials (5 butterflies,  5 days)
-    -   $X$ counts the number of successes (number of tagged butterflies, number of up movements)
+
+-   There are S/F trials (tagged/not, up/not)
+-   Trials are independent (sampling with replacement, by assumption)
+-   Probability of success of 0.25 on each trial (13/52, assumed 0.25)
+-   5 trials (5 butterflies,  5 days)
+-   $X$ counts the number of successes (number of tagged butterflies, number of up movements)
+
 Therefore, in each problem the random variable $X$ has a Binomial(5, 0.25) distribution.
+The probability mass function we derived in this problem could have been applied in @exm-binomial-capture.
+The probability mass function in this problem, @tbl-binomial-capture, @fig-binomial-capture-1, and @fig-binomial-capture-2 are all ways of representing the Binomial(5, 0.25) distribution.
 
 :::
 ::::
 
+
+
+| Successes | Failures | Trials |       Outcomes | $x$ |                             $p(x)$ |    Value |
+|----------:|---------:|-------:|---------------:|----:|-----------------------------------:|---------:|
+|         0 |        5 |      5 | $\binom{5}{0}$ |   0 | $\binom{5}{0}0.25^0(1-0.25)^{5-0}$ | 0.237305 |
+|         1 |        4 |      5 | $\binom{5}{1}$ |   1 | $\binom{5}{1}0.25^1(1-0.25)^{5-1}$ | 0.395508 |
+|         2 |        3 |      5 | $\binom{5}{2}$ |   2 | $\binom{5}{2}0.25^2(1-0.25)^{5-2}$ | 0.263672 |
+|         3 |        2 |      5 | $\binom{5}{3}$ |   3 | $\binom{5}{3}0.25^3(1-0.25)^{5-3}$ | 0.087891 |
+|         4 |        1 |      5 | $\binom{5}{4}$ |   4 | $\binom{5}{4}0.25^4(1-0.25)^{5-4}$ | 0.014648 |
+|         5 |        0 |      5 | $\binom{5}{5}$ |   5 | $\binom{5}{5}0.25^5(1-0.25)^{5-5}$ | 0.000977 |
+
+: Table representing the Binomial(5, 0.25) probability mass function. {#tbl-binomial-pmf}
+
+
+
+In the Binomial($n$, $p$) situation, there are $\binom{n}{x}$ S/F sequences that result in exactly $x$ successes---and thus $n-x$ failures---in $n$ trials, and each of these sequences has probability $p^x(1-p)^{n-x}$, leading to the following Binomial($n$, $p$) pmf.
 
 ::: {#def-binomial-pmf}
 ## Binomial pmf
@@ -701,12 +747,6 @@ A discrete random variable $X$ has a **Binomial distribution** with parameters
 $n$, a nonnegative integer, and $p\in[0, 1]$ if and only if its probability mass function is
 \begin{align*}
 p_{X}(x) & = \binom{n}{x} p^x (1-p)^{n-x}, & x=0, 1, 2, \ldots, n
-\end{align*}
-
-If $X$ has a Binomial($n$, $p$) distribution
-\begin{align*}
-\E(X) & = np\\
-\Var(X) & = np(1-p)
 \end{align*}
 
 :::
@@ -718,144 +758,136 @@ If $X$ has a Binomial($n$, $p$) distribution
 
 :::: {.callout-note appearance="simple"}
 ::: {#exm-nb-bball-math}
-Maya is a basketball player who makes 86% of her free throw attempts.  Suppose that she attempts free throws until she makes 5 and then stops.  Let $X$ be the total number of free throws she attempts.  Assume shot attempts are independent.
+Suppose that 86% of Cal Poly students are CA residents.
+Randomly select Cal Poly students one at a time, independently, until you select 5 CA residents, then stop.
+Let $X$ be the total number of students selected.
 
 
-1.  Does $X$ have a Binomial distribution?  Why or why not?
-1.  What are the possible values of $X$? Is $X$ discrete or continuous?
-1.  Compute $\IP(X=5)$
-1.  Compute $\IP(X=6)$
-1.  Compute $\IP(X=7)$
-1.  Compute $\IP(Y=8)$
-1.  Find the probability mass function of $X$.
-1.  What seems like a reasonable general formula for $\E(X)$?  Interpret $\E(X)$ for this example.
-1.  Would the variance be larger or smaller if attempted free throws until she made 10 instead of 5?
+1.  Identify the distribution of $X$ by name, including the values of any relevant parameters.
+1.  Compute and interpret $\IP(X=5)$.
+1.  Compute the probability that the first student is not a CA resident but the next 5 are.
+1.  Why is $\IP(X=6)$ different from the probability in the previous part?
+1.  How many outcomes satisfy the event $\{X=6\}$?
+Answer without listing all the possibilities.
+Hint: careful, it's not $\binom{6}{5}$; why not?
+1.  Compute and interpret $\IP(X=6)$
+1.  Compute the probability that the first two students are not CA residents but the next 5 are.
+1.  Why is $\IP(X=7)$ different from the probability in the previous part?
+1.  How many outcomes satisfy the event $\{X=7\}$?
+Answer without listing all the possibilities.
+Hint: careful, it's not $\binom{7}{5}$; why not?
+1.  Compute and interpret $\IP(X=7)$
+1.  Suggest a formula for the probability mass function of $X$.
+Then use the pmf to create a table representing the distribution of $X$.
+1.  Recall @exm-nb-bball
+Is the random variable $X$ in this problem the same as the random variable $X$ in @exm-nb-bball?
+1.  Does the random variable $X$ in this problem have the same distribution as the random variable $X$ in @exm-nb-bball?
 
 :::
 ::::
 
 :::: {.callout-tip collapse=true}
 ::: {#sol-nb-bball-math}
-1.  $X$ does not have a Binomial distribution since the number of *trials* is not fixed.  The number of *successes* is fixed to be 5, but the number of trials is random.
-1.  $X$ can take values 5, 6, 7, $\ldots$.  Even though it is unlikely that $X$ is very large, there is no fixed upper bound.  Even though $X$ can take infinitely values, $X$ is a discrete random variables because it takes *countably* many possible values.
-1.  In order for $X$ to be 5, Maya must make her first 5 attempts. Since the attempts are independent $\IP(X=5)=(0.86)^5=0.47$.  If Maya does this every practice, then in about 47% of practices she will make her first five free throw attempts.
-1.  In order for $X$ to be 6, Maya must miss exactly one of her first 5 attempts and then make her 6th. (If she didn't miss any of her first 5 attempts then she would be done in 5 attempts.) Consider the case where she misses her first attempt and then makes the next 5; this has probability $(1-0.86)(0.86)^5$.  Any particular sequence with exactly 1 miss among the first 5 attempts and a make on the 6th attempt has this same probability.  There are 5 "spots" for where the 1 miss can go, so there are $\binom{5}{1} = 5$ possible sequences.  Therefore
-    $$
-    \IP(X=6) = \binom{5}{1}(0.86)^5(1-0.86)^1 = 0.329
-    $$
-    Equivalently, the 4 successes, excluding the final success, must occur in the first 5 attempts, so there are $\binom{5}{4}$ possible sequences.  Note that $\binom{5}{1} = 5 = \binom{5}{4}$.  So we can also write
-    $$
-    \IP(X=6) = \binom{5}{4}(0.86)^5(1-0.86)^1 = 0.329
-    $$
-1.  In order for $X$ to be 7, Maya must miss exactly two of her first 6 attempts and then make her 7th. Any particular sequence of this form has probability $(0.86)^5(1-0.86)^2$ and there are $\binom{6}{2}=\binom{6}{4}$ possible sequences.  Therefore
-    \begin{align*}
-    \IP(X=7) & = \binom{6}{2}(0.86)^5(1-0.86)^2 = 0.138\\
-    & = \binom{6}{4}(0.86)^5(1-0.86)^2
-    \end{align*}
-1.  In order for $X$ to be 8, Maya must miss exactly three of her first 7 attempts and then make her 8th. Any particular sequence of this form has probability $(0.86)^5(1-0.86)^3$ and there are $\binom{7}{3}=\binom{7}{4}$ possible sequences.  Therefore
-    \begin{align*}
-    \IP(X=8) & = \binom{7}{3}(0.86)^5(1-0.86)^3 = 0.045\\
-    & = \binom{7}{4}(0.86)^5(1-0.86)^3
-    \end{align*}
-1.  In order for $X$ to take value $x$, the last trial must be success and the first $x-1$ trials must consist of $5-1=4$ successes and $x-5$ failures. There are $\binom{x-1}{5-1}$ ways to have $4$ successes among the first $x-1$ trials.  (This is the same as saying there are $\binom{x-1}{x-5}$ ways to have $x-5$ failures among the first $x-1$ trials.)
-    \begin{align*}
-    p_X(x) = \IP(X=x) & = \binom{x-1}{5-1}(0.86)^5(1-0.86)^{x-5}, \qquad x = 5, 6, 7, \ldots\\
-    & = \binom{x-1}{x-5}(0.86)^5(1-0.86)^{x-5}, \qquad x = 5, 6, 7, \ldots
-    \end{align*}
-1.  On average it takes $1/0.86 = 1.163$ attempts to make a free throw, so it seems reasonable that it would take on average $5(1/0.86)=5.81$ attempts to make 5 free throws.  If Maya does this at every practice, it takes her on average 5.8 attempts to make 5 free throws.
-1.  The variance would be larger with 10 attempts.
+1.  $X$ has a Negative Binomial distribution with $r=5$ and $p=0.86$.
+1.  In order for $X$ to be 5, the first 5 students selected must be CA residents. 
+Since the selections independent $\IP(X=5)=(0.86)^5=0.47$.
+If we use this method to select a sample of Cal Poly students, about 47% of samples will have exactly 5 students.
+1.  Since the selections are independent, the probability that the first student is not a CA resident but the next 5 are is
+$$
+(0.14)(0.86)^5
+$$
+1.  The outcome FSSSSS in the previous part satisifies the event $\{X=6\}$, but there are also other outcomes that do: FSSSSS, SFSSSS, SSFSSS, SSSFSS, SSSSFS.
+1.  Any particular outcome for which $X=6$ must have 4 successes in the first 5 trials and S on the sixth trial.
+(If there were 5 successes in the first 5 trials that would result in $X=5$.)
+Thus we need to "choose" 4 of the first 5 trials to hold the successes, hence there are $\binom{5}{4} = 5$ possibilities.
+In other words, there needs to be exactly 1 failure among the first 5 trials, and there are $\binom{5}{1}=5$ such outcomes.
+The number of outcomes is not $\binom{6}{5}=6$, because that count include the outcome SSSSSF, which does not correspond to $X=6$ in this situation.
+1.  In order for $X$ to be 6, exactly one of the first 5 trials must be failure and the sixth trial must be success.
+Any such sequence has probability $(0.86)^5 (0.14)^1$, and there are
+$binom{5}{1}$ such sequences.
+Therefore
+$$
+\IP(X=6) = \binom{5}{1}(0.86)^5(1-0.86)^1 = 0.329
+$$
+If we use this method to select a sample of Cal Poly students, about 32.9% of samples with 5 CA residents will have exactly 6 students.
+1.  Since the selections are independent, the probability that the first two students are not CA residents but the next 5 are is
+$$
+(0.14)^2(0.86)^5
+$$
+1.  The outcome FFSSSSS in the previous part satisifies the event $\{X=7\}$, but there are also other outcomes that do: FSFSSSS, SFFSSSS, etc.
+1.  Any particular outcome for which $X=7$ must have 4 successes in the first 6 trials and S on the seventh trial.
+(If there were 5 successes in the first 5 or 6 trials that would result in $X=5$ or $X=6$.)
+Thus we need to "choose" 4 of the first 6 trials to hold the successes, hence there are $\binom{6}{4} = 15$ possibilities.
+In other words, there needs to be exactly 2 failures among the first 6 trials, and there are $\binom{6}{2}=15$ such outcomes.
+The number of outcomes is not $\binom{7}{5}=21$, because that count include the outcomes SSSSSFF which results in $X=5$, and the outcomes SSSSFSF, SSSFSSF, SSFSSSF, SFSSSSF, FSSSSSF which results in $X=6$.
+1.  In order for $X$ to be 7, exactly two of the first 6 trials must be failure and the seventh trial must be success.
+Any such sequence has probability $(0.86)^5 (0.14)^2$, and there are
+$binom{6}{2}$ such sequences.
+Therefore
+$$
+\IP(X=7) = \binom{6}{2}(0.86)^5(1-0.86)^2 = 0.138
+$$
+If we use this method to select a sample of Cal Poly students, about 13.8% of samples with 5 CA residents will have exactly 7 students.
+1.  The possible values are $x=5, 6, 7, \ldots$.
+In order for $X$ to take value $x$, the last trial must be success and the first $x-1$ trials must consist of $5-1=4$ successes and $x-5$ failures.
+Any such outcome has probability $(0.86)^5(0.14)^{x-5}$.
+There are $\binom{x-1}{5-1}$ ways to have $4$ successes among the first $x-1$ trials. 
+This is the same as saying there are $\binom{x-1}{x-5}$ ways to have $x-5$ failures among the first $x-1$ trials.
+\begin{align*}
+p_X(x) = \IP(X=x) & = \binom{x-1}{5-1}(0.86)^5(1-0.86)^{x-5}, \qquad x = 5, 6, 7, \ldots\\
+& = \binom{x-1}{x-5}(0.86)^5(1-0.86)^{x-5}, \qquad x = 5, 6, 7, \ldots
+\end{align*}
+See @tbl-negative-binomial-pmf, and compare with @tbl-nb-ball.
+1.  These are different random variables. 
+The number of free throws Maya makes is different than the number of selected CA students who are CA residents.
+1.  Yes, they have the same distribution. While the contexts are different and the variables are measuring different things, probabilistically the situations are equivalent.
+In each situation:
+
+-   There are S/F trials (made/not, CA resident/not)
+-   Trials are independent (by assumption, sampling from large population)
+-   Probability of success of 0.86 on each trial (assumed probability, population proportion)
+-   trials stop at 5 successes (5 made free throws,  5 CA residents)
+-   $X$ counts the number of trials (number of free throw attempts, number of selected students)
+
+Therefore, in each problem the random variable $X$ has a Negative Binomial(5, 0.86) distribution.
+The probability mass function we derived in this problem could have been applied in @exm-nb-bball.
+The probability mass function in this problem, @tbl-nb-ball, @fig-nb-bball-1, and @fig-nb-bball-2 are all ways of representing the NegativeBinomial(5, 0.86) distribution.
 
 :::
 ::::
 
-```{python}
-
-r = 5
-def count_until_rth_success(omega):
-    trials_so_far = []
-    for i, w in enumerate(omega):
-        trials_so_far.append(w)
-        if sum(trials_so_far) == r:
-            return i + 1 
-        
-P = Bernoulli(0.86) ** inf
-
-X = RV(P, count_until_rth_success)
-x = X.sim(10000)
-
-x.plot()
-
-NegativeBinomial(r = 5, p = 0.86).plot()
-plt.show()
-
-```
 
 
-```{python}
+| Successes | Failures | Trials |             Outcomes | $x$ |                                    $p(x)$ |  Value |
+|----------:|---------:|-------:|---------------------:|----:|------------------------------------------:|-------:|
+|         5 |        0 |      5 |   $\binom{5-1}{5-5}$ |   5 |    $\binom{5-1}{5-5}0.86^5(1-0.86)^{5-5}$ | 0.4704 |
+|         5 |        1 |      6 |   $\binom{6-1}{6-5}$ |   6 |    $\binom{6-1}{6-5}0.86^5(1-0.86)^{6-5}$ | 0.3293 |
+|         5 |        2 |      7 |   $\binom{7-1}{7-5}$ |   7 |    $\binom{7-1}{7-5}0.86^5(1-0.86)^{7-5}$ | 0.1383 |
+|         5 |        3 |      8 |   $\binom{8-1}{8-5}$ |   8 |    $\binom{8-1}{8-5}0.86^5(1-0.86)^{8-5}$ | 0.0452 |
+|         5 |        4 |      9 |   $\binom{9-1}{9-5}$ |   9 |    $\binom{9-1}{9-5}0.86^5(1-0.86)^{9-5}$ | 0.0127 |
+|         5 |        5 |     10 | $\binom{10-1}{10-5}$ |  10 | $\binom{10-1}{10-5}0.86^5(1-0.86)^{10-5}$ | 0.0032 |
+|         5 |        6 |     11 | $\binom{11-1}{11-5}$ |  11 | $\binom{11-1}{11-5}0.86^5(1-0.86)^{11-5}$ | 0.0007 |
 
-x.count_eq(7) / 10000, NegativeBinomial(r = 5, p = 0.86).pmf(7)
-
-```
-
-```{python}
-
-x.mean(), NegativeBinomial(r = 5, p = 0.86).mean()
-
-```
-
-```{python}
-
-x.var(), NegativeBinomial(r = 5, p = 0.86).var()
-
-```
+: Table representing the NegativeBinomial(5, 0.86) probability mass function. {#tbl-negative-binomial-pmf}
 
 
 
-Suppose you perform a sequence of Bernoulli($p$) trials until $r$ successes occur and then stop.  Let $X$ be the total number of *trials* performed, including the trials on which the successes occur.  Then $X$ has a NegativeBinomial($r$,$p$) distribution. In this situation, exactly $x$ trials are performed if and only if
 
--   there are exactly $r-1$ successes among the first $x-1$ trials, and 
--   the $x$th (last) trial results in success.
+In the NegativeBinomial($r$, $p$) situation, there are $\binom{x-1}{x-r}$ S/F sequences that result in exactly $x-r$ failures---and thus $r-1$ succeses---in the first $x-1$ trials and success on trial $x$, and each of these sequences has probability $p^r(1-p)^{x-5}$, leading to the following Negative Binomial($r$, $p$) pmf.
 
-There are $\binom{x-1}{r-1}$ possible sequences that satisfy the above, and each of these sequences --- with $r$ successes and $x-r$ failures --- has probability $p^r(1-p)^{x-r}$.
 
 
 ::: {#def-nb-pmf}
 
-A discrete random variable $X$ has a **Negative Binomial distribution** with parameters $r$, a positive integer, and  $p\in[0, 1]$ if its probability mass function is
+A discrete random variable $X$ has a **Negative Binomial distribution** with parameters $r$, a positive integer, and  $p\in[0, 1]$ if and only if its probability mass function is
 \begin{align*}
 p_{X}(x) & = \binom{x-1}{r-1}p^r(1-p)^{x-r}, & x=r, r+1, r+2, \ldots
 \end{align*}
-If $X$ has a NegativeBinomial($r$, $p$) distribution
-\begin{align*}
-\E(X) & = \frac{r}{p}\\
-\Var(X) & = \frac{r(1-p)}{p^2}
-\end{align*}
+
 
 :::
 
-
-Suppose you perform a sequence of Bernoulli($p$) trials until $r$ successes occur and then stop.  Let $X$ be the total number of *trials* performed, including the trials on which the successes occur.  Then $X$ has a NegativeBinomial($r$,$p$) distribution. In this situation, exactly $x$ trials are performed if and only if
-
--   there are exactly $r-1$ successes among the first $x-1$ trials, and 
--   the $x$th (last) trial results in success.
-
-There are $\binom{x-1}{r-1}$ possible sequences that satisfy the above, and each of these sequences --- with $r$ successes and $x-r$ failures --- has probability $p^r(1-p)^{x-r}$.
-
-:::: {.callout-note appearance="simple"}
-::: {#exm-nb-geom}
-What is another name for a NegativeBinomial(1,$p$) distribution?
-
-:::
-::::
-
-:::: {.callout-tip collapse=true}
-::: {#sol-nb-geom}
-A NegativeBinomial(1,$p$) distribution is a Geometric($p$) distribution.
-
-:::
-::::
-
-
+<!-- 
 :::: {.callout-note appearance="simple"}
 ::: {#exm-nb-geom-sum}
 Suppose $X_1, \ldots, X_r$ are independent each with a Geometric($p$) distribution.  What is the distribution of $X_1+\cdots + X_r$?  Find the expected value and variance of this distribution.
@@ -887,4 +919,131 @@ $$
 :::
 ::::
 
+ -->
+
+
+
+## Hypergeometric distributions
+
+ 
+:::: {.callout-note appearance="simple"}
+::: {#exm-hyper-capture-math}
+Shuffle a standard deck of 52 cards (13 cards in each of 4 suits) and deal 5 cards without replacement.
+Let $X$ be the number of hearts dealt.
+
+
+1.  Identify the distribution of $X$ by name, including the values of any relevant parameters.
+1.  Compute and interpret $\IP(X=0)$. 
+Can you compute in two ways?
+1.  Compute the probability that the first card is a heart but the next four are not.
+1.  Why is $\IP(X=1)$ different from the probability in the previous part?
+1.  How many outcomes (5 card hands) satisfy the event $\{X=1\}$?
+Answer without listing all the possibilities.
+1.  Compute the probability that the first four cards are not but the fifth card is.
+1.  Compute and interpret $\IP(X=1)$.
+Can you compute in two ways? 
+1.  Suggest a general formula for the probability mass function of $X$.
+Then use the pmf to create a table representing the distribution of $X$.
+1.  Recall @exm-hyper-capture.
+Is the random variable $X$ in this problem the same as the random variable $X$ in @exm-hyper-capture?
+1.  Does the random variable $X$ in this problem have the same distribution as the random variable $X$ in @exm-hyper-capture?
+
+:::
+::::
+
+
+:::: {.callout-tip collapse=true}
+::: {#sol-hyper-capture-math}
+
+1.  $X$ has a Hypergeometric distribution with $n=5$, $N_1=13$ and $N_0=39$.
+1.  We can use the multiplication rule. 
+The probability that the first card is not a heart is 39/52. 
+Given that the first is not a heart, the conditional probability that the second card is not a heart is $38/51$. 
+Given that the first two cards are not hearts, the conditional probability that the third card is not a heart is $37/50$. 
+And so on. 
+The probability that none of the cards are hearts is
+$$
+\IP(X = 0) = \left(\frac{39}{52}\right)\left(\frac{38}{51}\right)\left(\frac{37}{50}\right)\left(\frac{36}{49}\right)\left(\frac{35}{48}\right) = 0.2215
+$$
+We can also use the partitioning strategy from @sec-counting. 
+We need to choose 0 cards from the 13 hearts and 5 cards from the 39 other cards.
+$$
+\IP(X = 0) = \frac{\binom{13}{0}\binom{39}{5}}{\binom{52}{5}}  = 0.2215
+$$
+The two methods are equivalent.
+1.  We can use the multiplication rule. 
+The probability that the first card selected is a heart is 13/52. 
+Given that the first is a heart, the conditional probability that the second card is not a heart is 39/51, and so on. 
+$$
+\left(\frac{13}{52}\right)\left(\frac{39}{51}\right)\left(\frac{38}{50}\right)\left(\frac{37}{49}\right)\left(\frac{36}{48}\right) = 0.0822
+$$
+1.  SFFFF is only one outcome that satisfies $X=1$ but there are also others like FFFFS.
+1.  Among the 5 cards we need to "choose" 1 to hold the heart, so there are $\binom{5}{1}=5$ total outcomes for which $X = 1$.
+1.  The probability of the outcome FFFFS is the same as the probability of the outcome SFFFF. 
+$$
+\left(\frac{39}{52}\right)\left(\frac{38}{51}\right)\left(\frac{37}{50}\right)\left(\frac{36}{49}\right)\left(\frac{13}{48}\right) = 0.0822
+$$
+1.  The probability of any particular 5 card hand with 1 heart is 0.0822. 
+There are $\binom{5}{1}=5$ such sequences. 
+Therefore
+$$
+\IP(X = 1) = \binom{5}{1}\left(\frac{13}{52}\right)\left(\frac{39}{51}\right)\left(\frac{38}{50}\right)\left(\frac{37}{49}\right)\left(\frac{36}{48}\right)  = 0.4114.
+$$
+We can also use the partitioning strategy. 
+We need to choose 1 card from the 13 hearts and 4 cards from the 39 other cards.
+$$
+\frac{\binom{13}{1}\binom{39}{4}}{\binom{52}{5}}  = 0.4114.
+$$
+The two methods are equivalent.
+1.  The partitioning method provides a more compact expression. 
+In order to have a sample of size 5 with exactly $x$ hearts, we need to select $x$ cards from the 13 hearts, and the remaining $5-x$ cards from the 39 other cards.
+$$
+p_X(x) = \frac{\binom{13}{x}\binom{39}{5-x}}{\binom{52}{5}}, \qquad x = 0, 1, 2, 3, 4, 5.
+$$
+1.  These are different random variables. 
+The number of hearts dealt is not the same as the number of tagged butterflies.
+1.  Yes, both random variables have the Hypergeometric(5, 13, 39) distribution. 
+The probability mass function we derived in this problem could have been applied in @exm-hyper-capture.
+The probability mass function in this problem, @tbl-hyper-capture, @fig-hyper-capture-1, and @fig-hyper-capture-2 are all ways of representing the Hypergeometric(5, 13, 39) distribution.
+
+
+:::
+::::
+
+
+
+
+| Successes | Failures | Trials | $x$ |                                             $p(x)$ |  Value |
+|----------:|---------:|-------:|----:|---------------------------------------------------:|-------:|
+|         0 |        5 |      5 |   0 | $\frac{\binom{13}{0}\binom{39}{5}}{\binom{52}{5}}$ | 0.2215 |
+|         1 |        4 |      5 |   1 | $\frac{\binom{13}{1}\binom{39}{4}}{\binom{52}{5}}$ | 0.4114 |
+|         2 |        3 |      5 |   2 | $\frac{\binom{13}{2}\binom{39}{3}}{\binom{52}{5}}$ | 0.2743 |
+|         3 |        2 |      5 |   3 | $\frac{\binom{13}{3}\binom{39}{2}}{\binom{52}{5}}$ | 0.0815 |
+|         4 |        1 |      5 |   4 | $\frac{\binom{13}{4}\binom{39}{1}}{\binom{52}{5}}$ | 0.0107 |
+|         5 |        0 |      5 |   5 | $\frac{\binom{13}{5}\binom{39}{0}}{\binom{52}{5}}$ | 0.0005 |
+
+: Table representing the Hypergeometric($n=5$, $N_1=13$, $N_0=39$) probability mass function. {#tbl-hyper-pmf}
+
+
+
+::: {#def-hypergeometric-pmf}
+## Hypergeometric pmf
+
+A discrete random variable $X$ has a **Hypergeometric distribution** with parameters
+if and only if its probability mass function is
+
+\begin{align*}
+p_{X}(x) & = \frac{\binom{N_1}{x}\binom{N_0}{n-x}}{\binom{N_0+N_1}{n}},\quad  x =0, 1, \ldots, n; x\le N_1; x\ge n-N_0
+\end{align*}
+
+
+:::
+
+Regarding the possible values
+
+-   The largest possible value of $X$ is $\min(n, N_1)$, since there can't be more successes in the sample than in the population. 
+-   The smallest possible value of $X$ is $\max(0, n-N_0)$ since there can't be more failures in the sample than in the population (that is, $n-X\le N_0$). 
+
+Often $N_0$ and $N_1$ are large relative to $n$ in which case $X$ takes
+values $0, 1,\ldots, n$.
 

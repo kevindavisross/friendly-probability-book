@@ -2190,7 +2190,7 @@ Similarly, if $Y$ has a Pascal($r$, $p$) distribution then $(Y+r)$ has a Negativ
 
 
 Binomial and Negative Binomial distributions are commonly used for modeling discrete random variables. 
-However, Binomial Negative Binomial models are not appropriate in many situations that involve counting "successes".
+However, Binomial and Negative Binomial models are not appropriate in many situations that involve counting "successes".
 
 
 :::: {.callout-note appearance="simple"}
@@ -2333,16 +2333,15 @@ Since the trials are not independent, $X$ does not have a Binomial distribution.
 ::::
 
 A Poisson distribution has a single parameter, denoted $\mu$, which must be a positive number, $\mu > 0$.
-One way to interpret $\mu$ is as the long run average value.
+One way to interpret $\mu$ is as the expected value, that is, long run average value.
 In the matching problem 1 is the parameter of the Poisson distribution because 1 is the long run average number of matches.
-We will discuss long run averages in more detail later.
 @fig-poisson-pmfs displays Poisson distributions for a few values of $\mu$.
 
 
 
 ```{python}
 #| label: fig-poisson-pmfs
-#| fig-cap: "Probability mass functions of Poisson distributions."
+#| fig-cap: "Probability mass functions of Poisson distributions; $\\mu$ values, from left to right, 0.7, 1.6, 2.5, 3.4."
 
 mus = [0.7, 1.6, 2.5, 3.4]
 
@@ -2355,22 +2354,20 @@ plt.show()
 
 
 @exm-matching-poisson and @fig-poisson-pmfs illustrate the "Poisson pattern".
+As a function of $x=0, 1, 2, \ldots$, a Poisson($\mu$) pmf increases for $x<\mu$ and then decreases^[If $\mu$ is a whole number, then the Poisson pmf assigns the same probability to the values $\mu$ and $\mu-1$. If $\mu<1$ then $x=0$ has the highest probability and the pmf decreases from there.] for $x>\mu$, following a particular *Poisson pattern*:
+
+-   1 is $\mu$ times as likely as 0
+-   2 is $\mu/2$ times as likely as 1
+-   3 is $\mu/3$ times as likely as 2
+-   4 is $\mu/4$ times as likely as 3
+-   and so on.
 
 ::: {#def-poisson-pattern}
-If $X$ has a **Poisson($\mu$) distribution**:
+A random variable $X$ has a **Poisson($\mu$) distribution** if the possible values are $0, 1, 2, \ldots$ and the pmf follows the
 
--   The possible values of $X$ are $0, 1, 2, \ldots$.
--   The parameter $\mu>0$ can be interpreted as the long run average value of $X$.
--   As a function of $x=0, 1, 2, \ldots$, a Poisson pmf increases for $x<\mu$ and then decreases^[If $\mu$ is a whole number, then the Poisson pmf assigns the same probability to the values $\mu$ and $\mu-1$. If $\mu<1$ then $x=0$ has the highest probability and the pmf decreases from there.] for $x>\mu$, following a particular *Poisson pattern*:
-    -   1 is $\mu$ times as likely as 0
-    -   2 is $\mu/2$ times as likely as 1
-    -   3 is $\mu/3$ times as likely as 2
-    -   4 is $\mu/4$ times as likely as 3
-    -   and so on; in general,
 $$
 \text{Poisson(}\mu\text{) pattern:}\quad x \text{ is } \frac{\mu}{x} \text{ as likely as } x-1 \quad \text{ (for } x = 1, 2, 3, \ldots)
 $$
--   The probability that $X$ equals 0 is $e^{-\mu}$.
 
 :::
 
@@ -2382,6 +2379,7 @@ The final step is to normalize the probabilities defined by the Poisson pattern 
 For example, for the Poisson(1) distribution in @exm-matching-poisson suppose that 0 accounts for 10000 "units" of probability; remember, this is just an arbitrary baseline.
 Then the Poisson pattern implies that
 
+-   0 accounts for $10000$ units (just an assumed baseline)
 -   1 accounts for $10000\times 1/1 = 10000$ units
 -   2 accounts for $10000\times 1/2 = 5000$ units
 -   3 accounts for $5000\times 1/3 = 1666.67$ units
@@ -2394,6 +2392,8 @@ And so on.
 Technically, a Poisson(1) distribution assigns positive probability to all whole numbers, but the values $0,\ldots,7$ comprise nearly 100% of the probability.
 The values $0,\ldots,7$ account for a total of 27182.82 "units", so we divide the units corresponding to each of $0,\ldots,7$ by 27182.82 to obtain probabilities which sum to 1, resulting in the values in @tbl-matching-poisson-distribution (e.g., the value 3 corresponds to probability $1666.67 / 27182.82 = 0.0613$).
 Note that, after normalizing, the value 0 corresponds to probability $e^{-1} = 0.3679$.
+
+
 
 If $X$ has a Poisson($\mu$) distribution, normalization implies that^[We will see the math behind this later.] the probability that $X$ equals 0 is $e^{-\mu}$.
 This fact provides a baseline for computing other probabilities via the Poisson pattern without dealing with arbitrary "units"^[We can build a Poisson($\mu$) pmf  $p(x)$ from the Poisson pattern, $p(x)=p(x-1)(\mu/x)$, and normalizing, which yields $p(0) = e^{-\mu}$:
@@ -2426,9 +2426,12 @@ Assume that $X$ has a Poisson(2.4) distribution.
 1.  Use Symbulate to compute $\IP(X = 0)$ and interpret the value in context.
 1.  Starting with $\IP(X = 0)$ from the previous part, use the "Poisson pattern" to find, by hand without Symbulate, $\IP(X = x)$ for $x = 1, 2, 3, 4, \ldots$.
 Then use Symbulate to check your values, and display them in a table and plot.
-1.  Compute $\IP(X \le 13)$ and interpret the value in context.  ([The most home runs ever hit in a baseball game is 13](https://www.mlb.com/news/d-backs-and-phillies-set-mlb-home-run-record).)
+1.  Compute $\IP(X \le 13)$ and interpret the value in context. 
+([The most home runs ever hit in a baseball game is 13](https://www.mlb.com/news/d-backs-and-phillies-set-mlb-home-run-record).)
 1.  Construct a spinner to simulate values of $X$.
-1.  Use Symbulate to simulate many values of $X$ and compare the simulated distribution to the theoretical Poisson distribution.
+1.  Compute $\E(X)$.
+1.  Compute $\Var(X)$.
+1.  Use Symbulate to simulate many values of $X$ and compare the simulated distribution to the theoretical Poisson distribution and its expected value and variance.
 
 :::
 ::::
@@ -2461,6 +2464,21 @@ There isn't any shorter way to do it.
 In the long run, almost all MLB games have at most 13 home runs. Even though the Poisson(2.4) pmf assigns nonzero probability to all whole numbers 0, 1, 2, $\ldots$, the probability that $X$ takes a value greater than 13 is extremely small.
 1.  See @fig-poisson-homerun-2.
 To simplify the display we have lumped values $6, 7, \ldots$ into one "6+" category.
+1.  Compute the probability-weighted average to find $\E(X)=2.4$.
+$$
+\scriptsize{
+(0)(0.0907)+(1)(0.2177)+(2)(0.2613)+(3)(0.2090)+(4)(0.1254)+(5)(0.0602)+(6)(0.0241)+(7)(0.0083)+(8)(0.0025)+(9)(0.0007)+\cdots
+}
+$$
+Technically the sum would keep going but since the probabilities get so small the contribution of the remaining terms is negligible.
+1.  Compute $\E(X^2)=8.16$.
+$$
+\scriptsize{
+(0^2)(0.0907)+(1^2)(0.2177)+(2^2)(0.2613)+(3^2)(0.2090)+(4^2)(0.1254)+(5^2)(0.0602)+(6^2)(0.0241)+(7^2)(0.0083)+(8^2)(0.0025)+(9^2)(0.0007)+\cdots
+}
+$$
+Technically the sum would keep going but since the probabilities get so small the contribution of the remaining terms is negligible.
+Then $\Var(X) = \E(X^2)- (\E(X))^2 = 8.16 - 2.4^2 = 2.4$
 1.  See the simulation results below, which match up closely with the theoretical distribution.
 
 :::
@@ -2547,6 +2565,9 @@ print(tabulate({'x': xs,
 Poisson(2.4).pmf(xs).sum()
 ```
 
+```{python}
+Poisson(2.4).cdf(13)
+```
 
 Now for a simulation.
 We define a Symbulate `RV` by specifying its distribution; this basically tells Symbulate to use the spinner in @fig-poisson-homerun-2 to simulate values of $X$.
@@ -2569,6 +2590,10 @@ The average of many simulated values is close to the long run average of 2.4.
 
 ```{python}
 x.mean()
+```
+
+```{python}
+x.var()
 ```
 
 We can summarize the simulated values to approximate the distribution of $X$.
@@ -2758,9 +2783,46 @@ Why is the Poisson pattern so ubiquitous?
 Later we will explore more deeply the theory and properties of Poisson distributions.
 For now just remember that Poisson distributions are one of the most commonly used probability models for discrete random variables, especially when counting "relatively rare" events.
 
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-poisson-var}
+@fig-poisson-pmfs displays Poisson($\mu$) pmfs for a few values of $\mu$. 
+As $\mu$ increases, does the variance increases, decrease, or stay the same?
+:::
+::::
+
+:::: {.callout-tip collapse=true}
+::: {#sol-poisson-var}
+As $\mu$ increases, the variance increases.
+For Poisson($\mu$) pmf $p(x)$
+
+-   $p(x)$ increases for $x<\mu$: $\frac{p(x)}{p(x-1)} = \frac{\mu}{x}>1$ if $x<\mu$. 
+The larger $\mu$ is, the longer and slower the probabilities increase for $x<\mu$.
+-   $p(x)$ decreases for $x>\mu$: $\frac{p(x)}{p(x-1)} = \frac{\mu}{x}<1$ if $x>\mu$. 
+The larger $\mu$ is, the longer and slower the probabilities decrease for $x>\mu$.
+
+
+:::
+::::
+
+
+It wasn't a coincidence in @exm-exm-homerun-poisson that both $\E(X)$ and $\Var(X)$ were equal to 2.4.
+
+::: {#lem-poisson-ev-var}
+If $X$ has a Poisson($\mu$) distribution
+
+\begin{align*}
+\E(X) & = \mu\\
+\Var(X) & = \mu
+\end{align*}
+:::
+
+
 ### Poisson paradigm
 
-Introduce properties of Poisson via simulation: sum is Poisson, conditional Binomial here? trick to conditional Binomial is independence. Or wait until multiple RVs chapter?
+TBA
+
+<!-- Introduce properties of Poisson via simulation: sum is Poisson, conditional Binomial here? trick to conditional Binomial is independence. Or wait until multiple RVs chapter? -->
 
 
 
@@ -2788,19 +2850,276 @@ Then use Symbulate to check your values, and display them in a table and plot.
 
 
 
-## Hypergeometric distributions - where to put?
+## Hypergeometric distributions
 
+
+
+<!-- 
 Only introduce through sampling without replacement story
 
 capture-recapture MLE? maybe
 
 Fisher exact test? probably
 
-CP example
+CP example -->
 
-### Negative Hypergeometric distributions
 
-See Rachel thesis examples
+
+
+
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-hyper-capture}
+Recall @exm-binomial-capture.
+Now we'll assume the sampling is conducted *without replacement*.
+
+You first capture a sample of $N_1$ butterflies, selected randomly without replacement, and tag them and release them. 
+At a later date, you then capture a second sample of $n$ butterflies, selected randomly ***without* replacement**. 
+Let $X$ be the number of butterflies in the second sample that have tags (because they were also caught in the first sample). 
+(Assume that the tagging has no effect on behavior, so that selection in the first sample is independent of selection in the second sample.)
+
+In practice, $N$ is unknown. 
+But let's start with a simpler, but unrealistic, example where there are $N=52$ butterflies, $N_1 = 13$ are tagged in the first sample, and $n=5$ is the size of the second sample.
+
+1.  What are the possible values of $X$?
+1.  Does $X$ has a Binomial distribution?
+Hint: be careful about why.
+1.  Describe how you could use a tactile simulation to simulate a single value of $X$.
+1.  Describe in words how you could use simulation to approximate $\IP(X=0)$.
+1.  Describe in words how you could use simulation to approximate the distribution of $X$.
+1.  Write and run Symbulate code to approximate $\IP(X=0)$ and the distribution of $X$.
+1.  Construct a table, plot, and spinner representing the approximate distribution of $X$.
+1.  Compute $\IP(X = 0)$.
+Compare to your simulated value.
+1.  Interpret in context $\IP(X = 0)$.
+1.  Suggest a shortcut formula for $\E(X)$.
+Does it seem consistent with the simulation results?
+1.  Would $\Var(X)$ be greater than, less than, or equal to the variance from @exm-binomial-capture (where the sampling was with replacement)?
+
+:::
+::::
+
+:::: {.callout-tip collapse=true}
+::: {#sol-hyper-capture}
+
+1.  $X$ can take values 0, 1, 2, 3, 4, 5.
+1.  No. 
+$X$ satifies all the conditions of the Binomial situation except for one:
+When sampling without replacement the individual selections are not independent. 
+For example, the conditional probability that the second butterfly is tagged given that the first is tagged is 12/51, but the conditional probability that the second butterfly is tagged given that the first is not tagged is 13/51. 
+(The unconditional probability of success is still 13/52 on each trial.)
+1.  We could use a deck of 52 cards, with 13 labeled "tagged" (say the clubs) and the others not.
+Shuffle the deck and draw 5 cards *without* replacement, and let $X$ be the number of cards out of the 5 drawn that say "tagged".
+1.  Repeat the steps in part 2 many times to simulate many values of $X$, say 10000.
+Count the number of repetitions that result in $X=0$ and divide by the total number of repetitions (10000); this relative frequency approximates $\IP(X = 0)$.
+1.  Simulate many values of $X$ (say 10000) and find the simulated relative frequency of each possible value: $0, 1, 2, 3, 4, 5$.
+1.  See Symbulate code below.
+1.  Compare to @tbl-hyper-capture and @fig-hyper-capture.
+These represent the theoretical distribution of $X$, but your simulation-based approximation should be similar (see our Symbulate output below).
+1.  We can use the multiplication rule (just not for independent events). 
+The probability that the first butterfly selected is not tagged is 39/52. 
+Given that the first is not tagged, the conditional probability that the second butterfly selected is not tagged is $38/51$. 
+Given that the first two butterflies selected are not tagged, the conditional probability that the third butterfly selected is not tagged is $37/50$. And so on. 
+The probability that none of the butterflies selected are tagged is
+$$
+\IP(X = 0) = \left(\frac{39}{52}\right)\left(\frac{38}{51}\right)\left(\frac{37}{50}\right)\left(\frac{36}{49}\right)\left(\frac{35}{48}\right) = 0.2215
+$$
+1.  In this scenario, 22.2% of possible *samples* of 5 butterflies contain 0 tagged butterflies.
+1.  Since the proportion of butterflies in the population that are tagged is 13/52, we expect the proportion in the sample that are tagged to also be 13/52; in other words we expect $(13/52)(5) = 1.25$ butterflies in the sample to be tagged.
+1.  The variance be greater if the sampling was with replacement.  Sampling without replacement, each selection conditionally restricts the number of possibilities, allowing for less variability in the number of successes in the sample.  For example, sampling with replacement yields a slightly larger probability for $\{X=5\}$ than sampling without replacement does. 
+(As a more extreme example, suppose instead that the sample size was $n=20$. 
+Then, the largest possible value of $X$ is 13 when sampling without replacement but 20 when sampling with replacement.)
+
+:::
+::::
+
+The following Symbulate code implements the simulation in @exm-hyper-capture.
+We define a box model with 13 tickets labeled 1 ("tagged") and 39 labeled 0 ("not tagged"), and select 5 *without* replacement.
+
+```{python}
+#| label: sym-cards-hyper
+
+P = BoxModel({1: 13, 0: 39}, size = 5, replace = False)
+X = RV(P, sum)
+x = X.sim(10000)
+
+plt.figure();
+x.plot(); # plot the simulated values
+Hypergeometric(N1 = 13, N0 = 39, n = 5).plot(); # overlay theoretical pmf
+plt.show();
+
+```
+
+```{python}
+
+x.count_eq(0) / 10000
+
+```
+
+
+
+```{python}
+
+x.mean()
+
+```
+
+
+```{python}
+
+x.var()
+
+```
+
+The random variable $X$ in @exm-hyper-capture has a Hypergeometric distribution with parameters $n=5$, $N_1=13$, and $N_0=39$.
+
+
+::: {#def-hypergeometric-story}
+
+Imagine a box containing $N=N_1+N_0$ tickets, $N_1$ of which are labeled 1 ("success") and
+$N_0$ of which are labeled 0 ("failure"). 
+Randomly select $n$ tickets from the box *without replacement* and let $X$ be the number of tickets in the sample that are labeled 1 (success). 
+The distribution of $X$ is defined to be the **Hypergeometric($n$, $N_1$, $N_0$)** distribution.  
+:::
+
+
+A Hypergeometric distribution is specified by three parameters:
+
+-   $n$ (an integer): the sample size
+-   $N_1$: the number of successes in the population
+-   $N_0$: the number of failures in the population (so that the population size is $N_1+N_0$)
+
+
+
+We can use Symbulate to compute the pmf for @exm-hyper-capture.
+
+```{python}
+Hypergeometric(n = 5, N1 = 13, N0 = 30).pmf(0)
+```
+
+```{python}
+Hypergeometric(n = 5, N1 = 13, N0 = 30).pmf([0, 1, 2, 3, 4, 5])
+```
+
+
+```{r}
+#| label: tbl-hyper-capture
+#| echo: false
+#| tbl-cap: "Table representing the Hypergeometric(13, 39, 5) distribution, the theoretical distribution of $X$ in @exm-hyper-capture."
+
+n = 5
+p = 0.25
+
+x = 0:n
+px = dhyper(x, m = 13, n = 39, k = 5)
+
+data.frame(x, px) |>
+  kbl(col.names = c("x", "P(X = x)"),
+      digits = 4) |>
+  kable_styling()
+```
+
+```{r}
+#| label: fig-hyper-capture
+#| echo: false
+#| fig-cap: "Plot and spinner representing the Hypergeometric(13, 39, 5) distribution, the theoretical distribution of $X$ in @exm-hyper-capture."
+#| fig-subcap: 
+#|   - "Impulse plot"
+#|   - "Spinner; the values 4 and 5 have been grouped together and their total probability of 1.1% is not displayed."
+#| layout-ncol: 2
+
+# impulse plot
+
+ggplot(data.frame(x, px),
+       aes(x = x,
+           xend = x,
+           y = 0,
+           yend = px)) +
+  geom_segment(linewidth = 1.2, col = "skyblue") +
+  scale_x_continuous(breaks = 0:5) +
+  scale_y_continuous(expand = c(0, 0)) +
+  theme_classic() +
+  theme(legend.position = "none") +
+  labs(x = "x",
+       y = "P(X = x)")
+
+# spinner
+
+x = c(0:3, "4-5")
+p = c(dhyper(0:3, m = 13, n = 39, k = 5), 1-phyper(3, m = 13, n = 39, k = 5))
+
+
+xp <- data.frame(x, p)
+
+cdf = c(0, cumsum(xp$p))
+
+plotp = (cdf[-1] + cdf[-length(cdf)]) / 2
+
+spinner <- ggplot(xp, aes(x="", y=p, fill=x))+
+  geom_bar(width = 1, stat = "identity",
+           color = "black", fill = "white") + 
+  coord_polar("y", start = 0) +
+  theme_void() +
+  scale_y_continuous(breaks = plotp, labels = xp$x) +
+  theme(axis.text.x=element_text(size = 12, face = "bold")) +
+  geom_text(aes(y = plotp,
+                label = percent(p)), size = 4,
+            color=c(rep("black", 4), rep(NA, 1)))
+
+spinner
+```
+
+
+
+
+The population size is $N=N_1+N_0$ and the sample size is $n$. 
+The population proportion of success is $p=N_1/N$. 
+The random variable $X$ counts the number of successes in the sample, and so $X/n$ is the sample proportion of success. 
+However, since the selections are made without replacement, the draws are not independent, and it is not enough to just specify $p$ to determine the distribution of $X$ (or $X/n$).
+
+
+The largest possible value of $X$ is $\min(n, N_1)$, since there can't be more successes in the sample than in the population. 
+The smallest possible value of $X$ is $\max(0, n-N_0)$ since there can't be more failures in the sample than in the population (that is, $n-X\le N_0$). 
+Often $N_0$ and $N_1$ are large relative to $n$ in which case $X$ takes
+values $0, 1,\ldots, n$.
+
+
+::: {#lem-hyper-ev-var}
+If $X$ has a Hypergeometric($n$, $N_1$, $N_0$) distribution, with $p=\frac{N_1}{N_1+N_0}$ distribution then
+
+\begin{align*}
+\E(X) & = np\\
+\Var(X) & = np(1-p)\frac{N-n}{N-1}
+\end{align*}
+
+:::
+
+
+
+The quantity $\frac{N-n}{N-1}<1$ which appears in the variance formula is called the *finite population
+correction*.  
+We will investigate this factor in more detail later.
+
+<!-- Suppose there are 20,426 undergrads at Cal Poly, 17,015 of whom are CA -->
+<!-- residents. Select a SRS of 100 Cal Poly undergrads, and let $X$ be the -->
+<!-- number of CA residents in the sample. -->
+
+
+<!-- Compute the probability that there are at exactly 80 CA residents in the -->
+<!-- sample if the selection is done *with* replacement. -->
+
+<!-- Compute the probability that there are at exactly 80 CA residents in the -->
+<!-- sample if the selection is done *without* replacement. -->
+
+
+
+
+
+
+<!-- ### Negative Hypergeometric distributions -->
+
+
+<!-- See Rachel thesis examples -->
 
 
 ## Comparison of common discrete distributions for modeling counting random variables
@@ -2817,7 +3136,7 @@ Note that Poisson distributions require the weakest assumptions.
 | Poisson           | “Large” (could be random, <br> could be unknown) | Random ($X$)          | “Not too dependent" | “Comparably small for all trials" <br> (could vary between trials, could be unknown) |
 
 
-Exercise. In each of the following contexts
+<!-- Exercise. In each of the following contexts
 
 -   Identify an appropriate random variable
 -   Represent the probability of interest in terms of the random variable using proper notation
@@ -2828,10 +3147,10 @@ Exercise. In each of the following contexts
 1.  Binomial
 1.  Hypergeometric
 1.  Negative Binomial
-1.  Poisson
+1.  Poisson -->
 
 
-## Benford???
+<!-- ## Benford???
 
 Many commonly encountered discrete distributions are models for random variables that count, but not always the case.
 
@@ -2840,7 +3159,7 @@ Include as example of defining RV in Symbulate with BoxModel using possible valu
 
 
 
-Or save until math discrete chapter?
+Or save until math discrete chapter? -->
 
 
 ## Chapter exercises
