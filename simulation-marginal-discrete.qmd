@@ -947,7 +947,7 @@ Geometric(0.4).pmf(3)
 
 ## Simulating from a marginal distribution
 
-Recall from @sec-simulate-from-distribution that there are basic methods for simulating a value $x$ of a random variable $X$.
+Recall from @sec-simulate-from-distribution that there are two basic methods for simulating a value $x$ of a random variable $X$.
 
 1. **Simulate from the probability space.**
 Simulate an outcome $\omega$ from the underlying probability space and set $x = X(\omega)$.
@@ -1025,7 +1025,7 @@ Assume shot attempts are independent.
 
 1.  Spin a spinner that lands on success with probability 0.4 (and failure otherwise) until it lands on success then stop; $X$ is the number of spins.
 This is the method represented by the Symbulate code after @exm-geometric-bball.
-1.  Construct a spinner representing the probability mass function in part 7 (see @fig-geometric-bball-sim) then spin it once; the resulting value is $X$.
+1.  Construct a spinner representing the probability mass function in part 7 (see @fig-geometric-bball) then spin it once; the resulting value is $X$.
 1.  Simulate many values of $X$ (using either method) then summarize the simulated values: For each possible value, compute the simulated relative frequency, e.g. to approximate $\IP(X = 3)$ count the number of repetitions resulting in an $X$ value of 3 and divide by the total number of repetitions.
 1.  See below.
 The simulation results are consistent with the @exm-geometric-bball and the simulation based on the "simulate from the probability space" method.
@@ -2325,7 +2325,8 @@ We can also interpret the distribution in terms of relative degrees of likelihoo
     -   There are $n$ trials, fixed.
     -   Unconditionally, each object is equally likely to be placed in any of the $n$ spots, so the *marginal* probability of success is the same on each trial, $1/n$.
     -   $X$ counts the number of successes in $n$ trials.
-However, the trials are not independent.
+
+    However, the trials are not independent.
 For example, if object 1 is placed correctly in spot 1, the *conditional* probability that object 2 is placed in spot 2 is $1/(n-1)$; if objects 1 through $n-1$ are placed in their correct spots, then the *conditional* probability that object $n$ is placed in the correct spot is 1.
 Since the trials are not independent, $X$ does not have a Binomial distribution.
 
@@ -2806,10 +2807,10 @@ The larger $\mu$ is, the longer and slower the probabilities decrease for $x>\mu
 ::::
 
 
-It wasn't a coincidence in @exm-exm-homerun-poisson that both $\E(X)$ and $\Var(X)$ were equal to 2.4.
+It wasn't a coincidence in @exm-homerun-poisson that both $\E(X)$ and $\Var(X)$ were equal to 2.4.
 
 ::: {#lem-poisson-ev-var}
-If $X$ has a Poisson($\mu$) distribution
+If $X$ has a Poisson($\mu$) distribution then
 
 \begin{align*}
 \E(X) & = \mu\\
@@ -2817,12 +2818,552 @@ If $X$ has a Poisson($\mu$) distribution
 \end{align*}
 :::
 
+For a Poisson distribution, both the mean and variance are equal to $\mu$, but remember that the mean is measured in the count units (e.g., home runs) but the variance is measured in squared units (e.g., $\text{(home runs)}^2$).
+
+### Poisson aggregration
+
+@tbl-poisson-crashes showed that the number of fatal crashes in each *week* in SLO County followed, approximately, the Poisson pattern.
+What if instead we had looked at crashes in each *month* or each *year*?
+
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-poisson-aggregation}
+Suppose that the number of fatal crashes in SLO County in a week follows, approximately, a Poisson(0.53) distribution, independently from week to week.
+Let $X$ be the number of fatal crashes in a period of 4 consecutive weeks (close enough to a "month").
+
+
+1.  How could you use a spinner to simulate a value of $X$?
+1.  What is $\E(X)$? 
+You should be able to compute it without knowing the distribution of $X$.
+1.  Use simulation to approximate the distribution of $X$. 
+Does the approximate distribution follow (approximately) the Poisson pattern?
+
+:::
+::::
+
+:::: {.callout-tip collapse=true}
+::: {#sol-poisson-aggregation}
+
+1.  Construct a spinner corresponding to  Poisson(0.53) distribution; see @tbl-poisson-crashes. 
+Spin the spinner 4 times and sum the values; this is one value of $X$.
+1.  $\E(X) = 4(0.53)=2.12$. 
+If there are 0.53 accidents per week on average, there are 2.12 accidents per 4-week period on average.
+1.  See simulation results below. 
+The simulated distribution of $X$ does roughly follow the Poisson pattern with $\mu = 2.12$.
+
+:::
+::::
+
+
+
+```{python}
+
+P = Poisson(0.53) ** 4
+
+X = RV(P, sum)
+
+(RV(P) & X).sim(10)
+
+```
+
+```{python}
+
+x = X.sim(10000)
+
+x.tabulate(normalize = True)
+
+```
+
+```{python}
+
+plt.figure()
+x.plot()
+Poisson(2.12).plot();
+plt.show();
+
+```
+
+@exm-poisson-aggregation is an example of "Poisson aggregation".
+
+
+
+::: {#lem-poisson-aggregation}
+## Poisson aggregation
+
+If $X$ and $Y$ are independent, $X$ has a Poisson($\mu_X$) distribution,  and $Y$ has a Poisson($\mu_Y$) distribution, then $X+Y$ has a Poisson($\mu_X+\mu_Y$) distribution.
+
+:::
+
+If $X$ has mean $\mu_X$ and $Y$ has mean $\mu_Y$ then linearity of expected value implies that $X+Y$ has mean $\mu_X + \mu_Y$. 
+What Poisson aggregation says is that if component counts are independent and each follows a Poisson pattern, then the total count also follows a Poisson pattern.
+
+
+<!-- Add crash data example of aggregration-->
+
+<!-- %\begin{exer} -->
+<!-- %	(Don't do what Donny Don't does.) Suppose $X$ and $Y$ are  independent with $X\sim\text{Poisson}(1)$ and $Y\sim\text{Poisson}(2)$.  Explain what is wrong in each of Donny's following responses. -->
+<!-- %\end{exer} -->
+<!-- %\bee -->
+<!-- %\item Find the pmf of $Z=X+Y$.  ``The pmf of $Z$ is the sum of the pmfs of $X$ and $Y$.'' -->
+<!-- %\item Find the pmf of $Z=X+Y$.  ``Wait, I think the pmf of $Z$ is the product of the pmfs of $X$ and $Y$.'' -->
+<!-- %\item Compute $\IP(X+Y=3)$.  ``$\IP(X+Y=3) = \IP(X=3) + \IP(Y=3)$.'' -->
+<!-- %\item Compute $\IP(X+Y=3)$.  ``Wait, I think it's $\IP(X+Y=3) = \IP(X=1) + \IP(Y=2)$.'' -->
+<!-- %\item Compute $\IP(X+Y=3)$.  ``Wait, I think it's $\IP(X+Y=3) = \IP(X=1)\times \IP(Y=2)$.'' -->
+<!-- %\item Find the distribution of $W=2X$.  ``Since $W = X + X$, the distribution of $W$ is Poisson(2).''  -->
+<!-- %\eee -->
+
+
+
 
 ### Poisson paradigm
 
-TBA
+This section will provide some background on why the Poisson pattern is so ubiquitous.
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-poisson-typos}
+Suppose that the number of typographical errors on a randomly selected page of a textbook has a Poisson distribution with parameter $\mu = 0.3$.
+
+1.  Find the probability that a randomly selected page has no typographical errors.
+1.  Find the probability that a randomly selected page has exactly one typographical error.
+1.  Find the probability that a randomly selected page has exactly two typographical errors.
+1.  Find the probability that a randomly selected page has at least three typographical errors.
+1.  Provide a long run interpretation of the parameter $\mu=0.3$.
+1.  Suppose that each page in the book contains exactly 2000 characters and that the probability that any single character is a typo is 0.00015, independently of all other characters. 
+Let $X$ be the number of characters on a randomly selected page that are typos. 
+Identify the distribution of $X$ and its expected value and variance, and compare to a Poisson(0.3) distribution.
+
+:::
+::::
+
+:::: {.callout-tip collapse=true}
+::: {#sol-poisson-typos}
+
+Let $X$ be the number of typos. 
+Since $\mu=0.3<1$, the Poisson pattern implies that the probability mass function will be largest when $x=0$.
+
+1.  `Poisson(0.3).pmf(0)` show that^[You could also compute $e^{-0.3} = 0.741$.] $\IP(X = 0) = 0.741$.
+About 74.1% of pages have 0 typos.
+
+1.  By the Poisson pattern, $\IP(X =1) = (0.3/1)\IP(X = 0) = (0.3)(0.741) = 0.222$.
+About 22.2% of pages have exactly 1 typo.
+    
+1.  By the Poisson pattern, $\IP(X =2) = (0.3/2)\IP(X = 1) = (0.3/2)(0.222) = 0.033$.
+About 3.3% of pages have exactly 2 typos.
+    
+1.  Since $\IP(X \ge  3) = 1 - \IP(X \le 2)$ we can try `1 - Poisson(0.3).cdf(2)` or use the results of the previous parts
+$$
+\IP(X \ge  3) = 1 - \IP(X \le 2) = 1 - (0.741 + 0.222 + 0.033) = 0.0036
+$$
+About 0.36% of pages have at least 3 typos.
+    
+1.  There are 0.3 typos per page on average.
+    
+1.  In this case $X$ has a Binomial(2000, 0.00015) distribution with mean $2000(0.00015) = 0.3$ and variance $2000(0.00015)(1-0.00015) = 0.299955 \approx 0.3 = 2000(0.00015)$. 
+See below for a simulation; the Binomial(2000, 0.00015) is very similar to the Poisson(0.3) distribution.
+    
+:::
+::::
+
+
+```{python}
+
+plt.figure()
+
+# simulate from Binomial(2000, 0.0015)
+RV(Binomial(2000, 0.00015)).sim(10000).plot('impulse')
+
+# compare to Poisson(0.3) pmf
+Poisson(0.3).plot();
+
+plt.show();
+
+```
+
+@exm-poisson-typos is an example of the "Poisson approximation to the Binomial". 
+
+
+
+
+::: {#lem-poisson-approximation-to-binomial}
+## Poisson approximation to Binomial
+
+If $X$ counts the number of successes in a Binomial situation where the number of trials $n$ is large and the probability of success on any trial $p$ is small, then $X$ has an approximate Poisson distribution with parameter $np$.
+:::
+
+
+
+Poisson approximation of Binomial is one way that Poisson distributions arise, but it is far from the only way. 
+Much of the usefulness of Poisson models is that they do not require the strict assumptions of the Binomial situation.
+
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-birthday-poisson}
+
+Recall the birthday problem from Example @exm-birthday: in a group of $n$ people what is the probability that at least two have the same birthday? 
+(Ignore multiple births and February 29 and assume that the other 365 days are all equally likely.) 
+We will investigate this problem using Poisson approximation. 
+Imagine that we have a trial for each possible *pair* of people in the group, and let "success" indicate that the pair shares a birthday. 
+
+In each of the following parts, consider both $n=30$ and general $n$.
+
+
+
+1.  How many trials are there? 
+1.  Do the trials have the same probability of success? 
+If so, what is it?
+1.  Are any *two* trials independent? 
+To answer this questions, suppose that three people in the group are Ki-taek, Chung-sook, and Ki-jung and consider any *two* of the trials that involve these three people.
+1.  Are any *three* trials independent? 
+Consider the three trials that involve Ki-taek, Chung-sook, and Ki-jung.
+1.  Let $X$ be the number of *pairs* that share a birthday. 
+Does $X$ have a Binomial distribution?
+1.  In what way are the trials "not too dependent"?
+1.  Compute and interpret $\E(X)$.
+1.  Use simulation to approximate the distribution of $X$ when $n=30$. 
+Does it follow the Poisson pattern?
+1.  Repeat the previous part for a few different values of $n$.
+1.  Approximate the probability that at least two people share the same birthday. 
+Compare to the theoretical values from Example @exm-birthday.
+1.  Using the approximation from the previous part, how large does $n$ need to be for the approximate probability to be at least 0.5?
+
+:::
+::::
+
+:::: {.callout-tip collapse=true}
+::: {#sol-birthday-poisson}
+
+
+
+
+1.  Each pair is a trial so there are $\binom{n}{2}$ trials. 
+If $n=30$ there are $\binom{30}{2}=435$ pairs.
+
+1.  The probability of success on any trial is 1/365. 
+Whatever the birthday of one of the people in the pair, the probability that the other has the same birthday is 1/365.
+Another way to see this: For any two people, there are $365\times 365$ possible pairs of birthdays ((Jan 1, Jan 1), (Jan 1, Jan 2), etc.), of which there are 365 possibilities in which the two share a birthday ((Jan 1, Jan 1), (Jan 2, Jan 2), etc.), so the probability is $\frac{365}{365\times 365}$.   
+
+1.  Yes, any *two* trials are independent. 
+Let $A$ be the event that Ki-taek and Chung-sook share a birthday, and let $B$ be the event that Ki-taek and Ki-jung share a birthday. 
+Then $\IP(A)=1/365$ and $\IP(B)=1/365$. 
+The event $A\cap B$ is the event that all three share a birthday. 
+$\IP(A\cap B) =(1/365)^2$, since whatever the birthday of one of the people, the probability that the other two people both have that birthday is $(1/365)^2$.
+Another way: There are $365^3$ possible triples of birthdays for the three people ((Jan 1 for Ki-taek, Jan 1 for Ki-jung, Jan 2 for Chung-sook), etc) of which there are 365 possibilities in which all three share a birthday (e.g., (Jan 1, Jan 1, Jan 1), etc). 
+Therefore
+$$
+    \IP(A\cap B) = \frac{365}{365^3} =    \left(\frac{1}{365}\right)\left(\frac{1}{365}\right) = \IP(A)\IP(B),
+$$
+so $A$ and $B$ are independent.
+
+1.  No, not every set of three trials is independent. 
+Let $A$ be the event that Ki-taek and Chung-sook share a birthday, let $B$ be the event that Ki-taek and Ki-jung share a birthday, and let $C$ be the event that Chung-sook and Ki-jung share a birthday. 
+Then $\IP(A)=\IP(B)=\IP(C)=1/365$.  The event $A \cap B\cap C$ is the event that all three people share the same birthday, which has probability $\frac{1}{365^2}$ as in the previous part. 
+Therefore,
+$$
+      \IP(A\cap B\cap B) = \frac{365}{365^3} \neq \left(\frac{1}{365}\right)\left(\frac{1}{365}\right)\left(\frac{1}{365}\right) = \IP(A)\IP(B)\IP(C)
+$$
+So these three trials are not independent. 
+Alternatively, if $A$ and $B$ are both true, then $C$ must also be true so $\IP(C|A\cap B)=1 \neq 1/365 =\IP(C)$.
+However, there are many sets of three trials that are independent; in particular, any three trials involving six distinct people are independent.
+
+1.  Since the trials are not independent, $X$ does not have a Binomial distribution.
+
+1.  Any two trials are independent. 
+Many sets of three trials are independent. 
+Many sets of four trials are independent (e.g., any set involving 8 distinct people), etc. 
+So generally, information on multiple events is required to change the conditional probabilities of other events. 
+In this way, the trials are "not too dependent".
+
+1. There are $\binom{n}{2}$ trials and the probability of success on each trial is 1/365, so
+$$
+\E(X) = \binom{n}{2}\left(\frac{1}{365}\right)  
+$$
+For $n=30$: $\E(X) = \binom{30}{2}\left(\frac{1}{365}\right) = 435/365 = 1.19$.
+Over many groups of 30 people, we expect 1.19 pairs of people to share a birthday per group on average.
+
+    Remember, the "number of trials $\times$ probability of success" formula works regardless of whether the trials are independent (as long as the probability of success is the same for all trials).
+
+1.  See the simulation results for $n=30$ below. 
+The simulated distribution follows approximately the Poisson pattern with $\mu = 1.19$.
+
+1.  You can do a sensivity analysis to see that the distribution of $X$ follows approximately the Poisson pattern, with $\mu = \binom{n}{2}/365$ (which depends on $n$.) 
+We only display the results for $n=50$ in which case $\E(X) = \binom{50}{2}/365 = 3.36$.
+
+1.  The probability that at least two people share the same birthday is $1-\IP(X=0)$. 
+When $n=30$, $X$ has an approximate Poisson(1.19) distribution, so `1 - Poisson(1.19).pmf(0)` yields 0.696, which is pretty close to the theoretical value of 0.706 from @exm-birthday.
+We could also compute $1 - \IP(X=0) \approx 1 - e^{-1.19}$.  
+
+    For a general $n$ we approximate $1-\IP(X=0)$ as `1 - Poisson(-math.comb(n, 2) / 365).pmf(0)` (or $1 - \IP(X=0) \approx 1 - e^{-\binom{n}{2}/365}$). 
+    @fig-birthday-poisson plots the theoretical probability and the approximate probability for different values of $n$; the approximation seems to work pretty well.
+
+1.  We can try different values of `n` in `1 - Poisson(-math.comb(n, 2) / 365).pmf(0)` to find that the smallest value of $n$ for which the approximate probability $\IP(X \ge 1)$ is at least 0.5 is $n=23$, in which case $\E(X) = \binom{23}{2}/365 = 253/365 = 0.693$ and the approximate $\IP(X \ge 1)$ is $1-e^{-0.693}=0.500$. 
+The theoretical probability for $n=23$ is 0.507.  
+
+:::
+::::
+
+
+```{python}
+import itertools
+
+# count_matching_pairs takes as an input a list of birthdays
+# returns as output the number of pairs that share a birthday
+# Note the 2 in itertools.combinations is for pairs
+
+def count_matching_pairs(outcome):
+    return sum([1 for i in itertools.combinations(outcome, 2) if len(set(i)) == 1])
+    
+# 2 pairs have a match in the following: (0, 1), (2, 3)
+count_matching_pairs((3, 3, 4, 4, 6)) 
+
+# 6 pairs have a match in the following:
+# (0, 1), (0, 2), (0, 3), (1, 2), (1, 3), (2, 3)
+count_matching_pairs((3, 3, 3, 3, 4))
+```
+
+
+```{python}
+
+n = 30
+
+P = BoxModel(list(range(365)), size = n, replace = True)
+
+X = RV(P, count_matching_pairs)
+
+x = X.sim(10000)
+
+
+import math
+
+# theoretical E(X)
+mu = math.comb(n, 2) / 365
+mu
+
+# simulation-based approximation of E(X)
+x.mean()
+
+# simulation-based approximation of P(X >= 1)
+1 - x.count_eq(0) / 10000
+```
+
+```{python}
+plt.figure();
+
+# plot the simulate values
+x.plot()
+
+# overlay Poisson patterm
+Poisson(mu).plot();
+plt.show();
+
+```
+
+
+```{python}
+
+n = 50
+
+P = BoxModel(list(range(365)), size = n, replace = True)
+
+plt.figure()
+RV(P, count_matching_pairs).sim(10000).plot()
+
+Poisson(math.comb(n, 2) / 365).plot();
+plt.show();
+
+```
+
+
+
+
+```{r}
+#| label: fig-birthday-poisson
+#| echo: false
+#| warning: false
+#| fig-cap: Probability of at least one birthday match as a function of the number of people in the room, along with the Poisson approximation.  When there are at least 23 people, the probability of at least one birthday match is at least 0.5.
+
+
+
+nmax <- 60
+d <- seq(from = 365, to = 365 - nmax + 1, by = -1) / 365
+pn <- 1 - cumprod(d)
+n0 <- 23
+pn0 = 1 - exp(-choose(23, 2) / 365)
+
+
+df <- data.frame(
+  n = 1:nmax,
+  theoretical = pn) |>
+    mutate(approximate = 1 - exp(-choose(n, 2) / 365)) |>
+    pivot_longer(!n, names_to = "type", values_to = "probability")
+
+
+ggplot(df, aes(x = n, y = probability, color = type, shape = type)) +
+  geom_point() +
+  annotate("segment", x = n0, xend = n0, y = 0, yend = pn0,
+           linetype = "dashed", linewidth = 1, color = "black") +
+  annotate("segment", x = 0, xend = n0, y = pn0, yend = pn0,
+           linetype = "dashed", linewidth = 1, color = "black") +
+  labs(
+    x = "Number of people in room",
+    y = "Probability of at least one birthday match"
+  ) +
+  ylim(0, 1) +
+  theme_minimal()
+
+```
+
+We already computed the probability that at least two people share a birthday, so the Poisson approximation in @exm-birthday-poisson isn't that exciting.
+But what about the probability that at least *three* people share a birthday? 
+This is much harder to solve analytically, but we can apply Poisson approximation in much the same was as we did in @exm-birthday-poisson.
+
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-poisson-birthday-three}
+
+Under the assumptions of the birthday problem, consider the probability that at least *three* people in a group of $n$ people share a birthday. 
+How large does $n$ need to be for the probability to be greater than 0.5?
+We'll use Poisson approximation to address these questions.
+
+1.  What is an appropriate random variable $X$? 
+Hint: consider what we did in @exm-birthday-poisson.
+1.  Compute $\E(X)$ for both $n=30$ and general $n$.
+1.  Why might it be reasonable to assume $X$ has a Poisson distribution?
+1.  Assume that $X$ has a Poisson distribution and approximate the probability that at least three people share a birthday when $n=30$.
+1.  Try different values of $n$ and find the $n$ for which the probability is at least 0.5.
+1.  Use simulation to approximate the distribution of $X$ for a few values of $n$, including the value you found in the previous part. 
+Does the distribution of $X$ follow (approximately) the Poisson pattern?
+:::
+::::
+
+
+:::: {.callout-tip collapse=true}
+::: {#sol-poisson-birthday-three}
+
+1.  We can consider any three people as a trial.
+Let $X$ be the number of trios in which all three people share a birthday.
+1.  There are $\binom{n}{3}$ trios of people; e.g., there are $\binom{30}{3} = 4060$ trios when $n=30$.
+We showed in @exm-birthday-poisson that the probability that any three people share a birthday is $\frac{1}{365^2}$.
+Therefore, $\E(X) = \binom{n}{3}\left(\frac{1}{365^2}\right)$.
+When $n=30$, $\E(X) = (4060)/365^2 = 0.03$.
+Over many groups of 30 people, we would only expect 0.03 trios to share a birthday per group on average.
+1.  We are counting successes when the number of trials is large and the probability of success on any trial is small, so it might be reasonable to assume $X$ has an approximate Poisson distribution. 
+1.  The probability that at least three people share the same birthday is $1-\IP(X=0)$. 
+When $n=30$, $X$ has an approximate Poisson(0.03) distribution, so `1 - Poisson(0.03).pmf(0)` yields 0.03; in only 3% of groups of 30 people do at least three people share a birthday.
+We could also compute $1 - \IP(X=0) \approx 1 - e^{-0.03}$.  
+
+    For a general $n$ we approximate $1-\IP(X=0)$ as `1 - Poisson(-math.comb(n, 3) / 365**2).pmf(0)` (or $1 - \IP(X=0) \approx 1 - e^{-\binom{n}{3}/365^2}$). 
+
+1.  We can try different values of `n` in `1 - Poisson(-math.comb(n, 2) / 365).pmf(0)` to find that the smallest value of $n$ for which the approximate probability $\IP(X \ge 1)$ is at least 0.5 is $n=84$, in which case, $\binom{84}{3} = 95284$, $\E(X) = \binom{84}{3}/365^2 = 0.715$ and the approximate $\IP(X \ge 1)$ is $1-e^{-0.715}=0.511$. 
+1.  See the simulation results below; the Poisson approximation works pretty well.
+
+:::
+::::
+
+
+
+```{python}
+import itertools
+
+# count_matching_pairs takes as an input a list of birthdays
+# returns as output the number of trios that share a birthday
+# Note the 3 in itertools.combinations is for trios
+
+def count_matching_trios(outcome):
+    return sum([1 for i in itertools.combinations(outcome, 3) if len(set(i)) == 1])
+    
+# 0 trios have a match in the following
+count_matching_trios((3, 3, 4, 4, 6)) 
+
+# 4 trios have a match in the following:
+# (0, 1, 2), (0, 1, 3), (0, 2, 3), (1, 2, 3)
+count_matching_trios((3, 3, 3, 3, 4))
+```
+
+
+```{python}
+#| cache: true
+
+n = 84
+
+P = BoxModel(list(range(365)), size = n, replace = True)
+
+X = RV(P, count_matching_trios)
+
+x = X.sim(10000)
+
+# theoretical E(X)
+mu = math.comb(n, 3) / 365**2
+mu
+
+# simulation-based approximation of E(X)
+print(x.mean())
+
+# simulation-based approximation of P(X >= 1)
+print(1 - x.count_eq(0) / 10000)
+
+
+# plot the simulated values
+plt.figure();
+x.plot()
+
+# overlay Poisson patterm
+Poisson(mu).plot();
+plt.show();
+
+```
+
+
+@exm-birthday-poisson and @exm-poisson-birthday-three illustrate that a Poisson approximation for the number of successes can be applied when the number of trials is large and the probability of success is small even when the trials are not independent. 
+In fact, a Poisson approximation often applies even when the probability of success isn't the same for every trial, as is the case for @exm-poisson-hr-intro (see @fig-poisson-hr) and @exm-poisson-accidents-intro (see @fig-poisson-crashes).
+
+
+
+::: {#lem-poisson-paradigm}
+## Poisson paradigm
+
+Let $A_1, A_2, \ldots, A_n$ be a collection of $n$ events. 
+Suppose event $i$ occurs with marginal probability $p_i=\IP(A_i)$. 
+Let $N = \ind_{A_i} + \ind_{A_2} + \cdots + \ind_{A_n}$ be the random variable which counts the number of the events in the collection which occur. 
+Suppose
+
+- $n$ is "large",
+- $p_1, \ldots, p_n$ are "comparably small", and
+- the events $A_1, \ldots, A_n$ are "not too dependent",
+
+Then $N$ has an approximate Poisson distribution with parameter $\E(N) = p_1 + \cdots + p_n$.
+:::
+
+We are leaving the terms "large", "comparably small", and "not too dependent" undefined. 
+There are many different versions of Poisson approximations which make these ideas more precise. 
+We only remark that Poisson approximation holds in a wide variety of situations.
+
+The individual event probabilities $p_i$ can be different, but they must be "comparably small". 
+If one $p_i$ is much greater than the others, then the count random variable $N$ is dominated by whether event $A_i$ occurs or not. 
+Also, as long as $\E(N)$ is available, it is not necessary to know the individual $p_i$.
+
+As long as the $p_i$ are comparably small, we only need to know the sum $p_1 +\cdots +p_n$ and not the individual $p_i$'s' to apply the Poisson approximation. 
+We can estimate $\E(N) = p_1+\cdots+p_n$ directly by collecting data on observed counts (like in @fig-poisson-hr and @fig-poisson-crashes) without having to estimate individual $p_i$'s.'
+
+
+Even though $n$ is a constant in the above statement of the Poisson paradigm, there are other versions in which the number of events is random and unknown.  
 
 <!-- Introduce properties of Poisson via simulation: sum is Poisson, conditional Binomial here? trick to conditional Binomial is independence. Or wait until multiple RVs chapter? -->
+
+
+Some advantages for using a Poisson model rather than a Binomial (or Negative Binomial) model
+
+-   In a Poisson model, the number of trials doesn't need to be specified; it can be unknown or random (e.g. the number of automobiles on a highway varies from day to day). 
+The number of trials just has to be "large" (though what constitutes large depends on the situation; $n$ didn't have to be very large in the matching problem for the Poisson approximation to kick in.)
+    -   In a Binomial model, the number of trials must be fixed and known (or fixed and known successed for Negative Binomial).
+-   In a Poisson model, the probability of success does not need to be the same for all trials, and the probability of success for individual trials does not need to be known or estimated. 
+The only requirement is that the probability of success is "comparably small" for all trials.
+    -   In a Binomial (or Negative Binomial) model, the probability of success must be the same for all trials and must be fixed and known.
+-   Fitting a Poisson model to data only requires data on total counts, so that the average number of successes can be estimated.
+    -   Fitting a Binomial model to data requires results from individual trials so that the probability of success can be estimated. 
+    (For example, you would need to know both the total number of automobiles on the road and the number that got into accidents.)
+-   In a Poisson model, the trials are not required to be strictly independent as long as the trials are "not too dependent".
+    -   In a Binomial (or Negative Binomial) model, the trials must be independent.
+
 
 
 

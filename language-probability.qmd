@@ -4751,16 +4751,10 @@ df <- data.frame(
 
 ggplot(df, aes(x = n, y = pn)) +
   geom_point() +
-  geom_segment(aes(x = n0, xend = n0, y = 0, yend = pn[n0]),
-               linetype = "dashed", linewidth = 1, color = "skyblue") +
-  geom_segment(aes(x = 0, xend = n0, y = pn[n0], yend = pn[n0]),
-               linetype = "dashed", linewidth = 1, color = "skyblue") +
-  # annotate("text", x = n0 + 2, y = pn[n0], 
-  #          label = paste0("P ≈ ", round(pn[n0], 3)), 
-  #          hjust = 0, vjust = -0.5, color = "skyblue4") +
-  # annotate("text", x = n0, y = -0.03, 
-  #          label = paste0("n = ", n0), 
-  #          vjust = 1.5, color = "skyblue4") +
+  annotate("segment", x = n0, xend = n0, y = 0, yend = df$pn[n0],
+           linetype = "dashed", linewidth = 1, color = "skyblue") +
+  annotate("segment", x = 0, xend = n0, y = df$pn[n0], yend = df$pn[n0],
+           linetype = "dashed", linewidth = 1, color = "skyblue") +
   labs(
     x = "Number of people in room",
     y = "Probability of at least one birthday match"

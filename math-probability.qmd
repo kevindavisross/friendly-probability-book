@@ -804,7 +804,7 @@ In other words, there needs to be exactly 1 failure among the first 5 trials, an
 The number of outcomes is not $\binom{6}{5}=6$, because that count include the outcome SSSSSF, which does not correspond to $X=6$ in this situation.
 1.  In order for $X$ to be 6, exactly one of the first 5 trials must be failure and the sixth trial must be success.
 Any such sequence has probability $(0.86)^5 (0.14)^1$, and there are
-$binom{5}{1}$ such sequences.
+$\binom{5}{1}$ such sequences.
 Therefore
 $$
 \IP(X=6) = \binom{5}{1}(0.86)^5(1-0.86)^1 = 0.329
@@ -822,7 +822,7 @@ In other words, there needs to be exactly 2 failures among the first 6 trials, a
 The number of outcomes is not $\binom{7}{5}=21$, because that count include the outcomes SSSSSFF which results in $X=5$, and the outcomes SSSSFSF, SSSFSSF, SSFSSSF, SFSSSSF, FSSSSSF which results in $X=6$.
 1.  In order for $X$ to be 7, exactly two of the first 6 trials must be failure and the seventh trial must be success.
 Any such sequence has probability $(0.86)^5 (0.14)^2$, and there are
-$binom{6}{2}$ such sequences.
+$\binom{6}{2}$ such sequences.
 Therefore
 $$
 \IP(X=7) = \binom{6}{2}(0.86)^5(1-0.86)^2 = 0.138
@@ -922,6 +922,303 @@ $$
  -->
 
 
+
+## Poisson distributions
+
+
+### Poisson pmf
+
+Recall the Poisson pattern @def-poisson-pattern.
+We can build a Poisson($\mu$) pmf  $p(x)$ from the Poisson pattern, $p(x)=p(x-1)(\mu/x)$, and normalizing. 
+First we'll use the Poisson pattern to express $p(x)$ in terms of $p(0)$.
+\begin{align*}
+p(1) & = p(0)(\mu/1) = p(0)\mu,\\
+p(2) & = p(1)(\mu/2) = p(0)\mu^2/2,\\
+p(3) & = p(2)(\mu/3) = p(0)\mu^3/3!,\\
+p(4) & = p(3)(\mu/4) = p(0)\mu^4/4!,
+\end{align*}
+and in general
+$$
+p(x) = p(0)\frac{\mu^x}{x!}, \qquad x = 0, 1, 2, \ldots
+$$
+Now we can find $p(0)$ to ensure that the probabilities sum to 1
+$$
+1 = p(0) + p(1) + p(2)  + \cdots = p(0)[1 + \mu + \mu^2/2 + \mu^3/3! + \mu^4/4! + \cdots] = p(0)\sum_{x = 0}^\infty \frac{\mu^x}{x!}
+$$
+Recalling the series expansion $e^{\mu} = \sum_{x=0}^\infty \frac{\mu^x}{x!}$ yield $1 = p(0)e^\mu$, and so $p(0) = e^{-\mu}$.
+
+
+::: {#def-poisson-pmf}
+A discrete random variable $X$ has a **Poisson distribution** with parameter $\mu>0$ if and only if its probability mass function $p_X$ satisfies
+$$
+p_X(x) = \frac{e^{-\mu}\mu^x}{x!}, \quad x=0,1,2,\ldots
+$$
+:::
+
+
+The shape of a Poisson pmf as a function of $x$ is given by $\mu^x/x!$. 
+The constant $e^{-\mu}$ simply renormalizes the heights of the pmf so  that the probabilities sum to 1.
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-homerun-poisson-math}
+
+Let $X$ be the number of home runs hit (in total by both teams) in a randomly selected Major League Baseball game.
+Assume that $X$ has a Poisson(2.4) distribution.
+
+1.  Specify the pmf of $X$.
+1.  Use the pmf to compute $\IP(X = 0)$.
+1.  Use the pmf to compute $\IP(X = x)$ for $x=1, \ldots, 9$.
+1.  Find and interpret the ratio of $\IP(X = 5)$ to $\IP(X = 3)$. 
+Does the value $e^{-2.4}$ affect this ratio?
+
+:::
+::::
+
+
+:::: {.callout-tip collapse=true}
+::: {#sol-homerun-poisson-math}
+
+1.  The pmf of $X$ is
+$$
+p_X(x) = \frac{e^{-2.4}2.4^x}{x!}, \quad x=0,1,2,\ldots
+$$
+1.  $\IP(X = 0) = \frac{e^{-2.4}2.4^0}{0!} = e^{-2.4} = 0.091$.
+1.  Just plug the values into the pmf. 
+For example, $\IP(X = 3) = \frac{e^{-2.4}2.4^3}{3!} = 0.209$. 
+See @tbl-homerun-poisson-math.
+1.  The ratio is
+$$
+\frac{\IP(X=5)}{\IP(X=3)} = \frac{p_X(5)}{p_X(3)} = \frac{e^{-2.4}2.4^5/5!}{e^{-2.4}2.4^3/3!} = \frac{2.4^5/5!}{2.4^3/3!} = \frac{2.4^2}{(5)(4)}= 0.288
+$$
+Games with 5 home runs occur about 0.288 times less frequently than games with 3 home runs. 
+The constant $e^{-2.4}$ does not affect this ratio.
+
+:::
+::::
+
+| $x$ |                         $p(x)$ | Value |
+|-----|-------------------------------:|------:|
+| 0   |     $e^{-2.4}\frac{2.4^0}{0!}$ | 0.091 |
+| 1   |     $e^{-2.4}\frac{2.4^1}{1!}$ | 0.218 |
+| 2   |     $e^{-2.4}\frac{2.4^2}{2!}$ | 0.261 |
+| 3   |     $e^{-2.4}\frac{2.4^3}{3!}$ | 0.209 |
+| 4   |     $e^{-2.4}\frac{2.4^4}{4!}$ | 0.125 |
+| 5   |     $e^{-2.4}\frac{2.4^5}{5!}$ | 0.060 |
+| 6   |     $e^{-2.4}\frac{2.4^6}{6!}$ | 0.024 |
+| 7   |     $e^{-2.4}\frac{2.4^7}{7!}$ | 0.008 |
+| 8   |     $e^{-2.4}\frac{2.4^8}{8!}$ | 0.002 |
+| 9   |     $e^{-2.4}\frac{2.4^9}{9!}$ | 0.000 |
+
+: Table representing the Poisson(2.4) probability mass function {#tbl-homerun-poisson-math}
+
+
+### Expected value
+
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-homerun-poisson-ev-math}
+
+Let $X$ be the number of home runs hit (in total by both teams) in a randomly selected Major League Baseball game.
+Assume that $X$ has a Poisson(2.4) distribution.
+
+
+
+1.  Recall from Example @exm-homerun-poisson that $\IP(X \le 13) =0.9999998$. 
+Evaluate the pmf for $x=0, 1, \ldots, 13$ and use arithmetic to compute $\E(X)$.
+(This will technically only give an approximation, since there is non-zero probability that $X>13$, but the calculation will give you a concrete example before jumping to the next part.)
+1.  Use the pmf and infinite series to compute $\E(X)$.
+
+:::
+::::
+
+
+:::: {.callout-note collapse=true}
+::: {#sol-homerun-poisson-ev-math}
+
+1.  See @exm-homerun-poisson-math and @tbl-homerun-poisson-math for calculation of the probabilities.
+Just multiply the values in @tbl-homerun-poisson-math by their probabilities (the values in the table are rounded, so use software---see code below---to avoid rounding errors)
+\begin{align*}
+\sum_{x = 0}^{13} x p_X(x) & = \sum_{x = 0}^{13} x \left(e^{-2.4} \frac{2.4^x}{x!}\right) & & \\
+& = \left(0\right)\left(e^{-2.4} \frac{2.4^0}{0!}\right) + \left(1\right)\left(e^{-2.4} \frac{2.4^1}{1!}\right) + \left(2\right)\left(e^{-2.4} \frac{2.4^2}{2!}\right) + \cdots + \left(13\right)\left(e^{-2.4} \frac{2.4^{13}}{13!}\right)
+\end{align*}
+The sum is approximately 2.4.
+<!--$$ 
+{\scriptsize
+`{r} paste("(", 0:13, ")", "(", round(dpois(0:13, 2.4), 5),")", collapse = "+", sep = "")` = `{r} round(sum((0:13) * dpois(0:13, 2.4)), 3)`
+}$$ -->
+
+
+
+1. $\E(X) = 2.4$. 
+$X$ is a discrete random variable that takes infinitely many possible values. 
+The sum in the expected value definition is now an infinite series.
+
+\begin{align*}
+\E(X) & = \sum_{x = 0}^\infty x p_X(x) & & \\
+& = \sum_{x = 0}^\infty x \left(e^{-2.4} \frac{2.4^x}{x!}\right) & & \\
+& = \sum_{x = 1}^\infty e^{-2.4} \frac{2.4^x}{(x-1)!}& & (x=0 \text{ term is 0})\\
+& = 2.4 \sum_{x = 1}^\infty e^{-2.4} \frac{2.4^{x-1}}{(x-1)!} & & \\
+& = 2.4(1) & & \text{Taylor series for $e^u$ at $u=2.4$}
+\end{align*}
+
+
+:::
+::::
+
+```{python}
+sum([x * Poisson(2.4).pmf(x) for x in range(14)])
+```
+
+```{python}
+sum([x * Poisson(2.4).pmf(x) for x in range(50)])
+```
+
+
+```{python}
+Poisson(2.4).mean()
+```
+
+### Poisson aggregation
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-poisson-aggregation-math}
+Suppose $X_1$ and $X_2$ are independent, each having a Poisson(1) distribution, and let $X=X_1+X_2$. 
+Also suppose $Y$ has a Poisson(2) distribution.
+For example suppose that $(X_1, X_2)$ represents the number of home runs hit by the (home, away) team in a baseball game, so $X$ is the total number of home runs hit by either team in the game, and $Y$ is the number of accidents that occur in a day on a particular stretch of highway 
+
+
+1.  How could you use a spinner to simulate a value of $X$? 
+Of $Y$? 
+Are $X$ and $Y$ the same variable?
+1.  Compute $\IP(X=0)$. 
+(Hint: what $(X_1, X_2)$ pairs yield $X=0$). 
+Compare to $\IP(Y=0)$.
+1.  Compute $\IP(X=1)$. 
+(Hint: what $(X_1, X_2)$ pairs yield $X=1$). 
+Compare to $\IP(Y=1)$.
+1.  Compute $\IP(X=2)$. 
+(Hint: what $(X_1, X_2)$ pairs yield $X=2$).  
+Compare to $\IP(Y=2)$.
+1.  Are $X$ and $Y$ the same variable? Do $X$ and $Y$ have the same distribution?
+
+:::
+::::
+
+:::: {.callout-tip collapse=true}
+::: {#sol-poisson-aggregation-math}
+
+1.  How could you use a spinner to simulate a value of $X$?  Of $Y$?  Are $X$ and $Y$ the same variable?
+    To generate a value of $X$: Construct a spinner corresponding to  Poisson(1) distribution (see Figure \@ref(fig:poisson-spinners1)), spin it twice and add the values together.  To generate a value of $Y$: construct a spinner corresponding to a Poisson(2) distribution and spin it once (see Figure \@ref(fig:poisson-spinners2)). $X$ and $Y$ are not the same random variable; they are measuring different things.  The sum of two spins of the Poisson(1) spinner does not have to be equal to the result of the spin of the Poisson(2) spinner.
+
+1.  Compute $\IP(X=0)$.  (Hint: what $(X_1, X_2)$ pairs yield $X=0$).  Compare to $\IP(Y=0)$.
+    The only way $X$ can be 0 is if both $X_1$ and $X_2$ are 0.
+    \begin{align*}
+    \IP(X = 0) & = \IP(X_1 = 0, X_2 = 0) & &\\
+    & = \IP(X_1 = 0)\IP(X_2 = 0) & & \text{independence}\\
+    & = \left(\frac{e^{-1}1^0}{0!}\right)\left(\frac{e^{-1}1^0}{0!}\right) & & \text{Poisson(1) pmf of $X_1, X_2$}\\
+    & = (0.368)(0.368) = 0.135 & & \\
+    & = \frac{e^{-2}2^0}{0!} & & \text{algebra} \\
+    & = \IP(Y = 0) & & \text{Poisson(2) pmf of $Y$}
+    \end{align*}
+1.  Compute $\IP(X=1)$.  (Hint: what $(X_1, X_2)$ pairs yield $X=1$).  Compare to $\IP(Y=1)$.
+    The only way $X$ can be 1 is if $X_1=1, X_2 = 0$ or $X_1 = 0, X_2=1$.
+    \begin{align*}
+    \IP(X = 1) & = \IP(X_1 = 1, X_2 = 0) + \IP(X_1 = 0, X_2 = 1)& &\\
+    & = \IP(X_1 = 1)\IP(X_2 = 0) + \IP(X_1 = 0)\IP(X_2 = 1) & & \text{independence}\\
+    & = 2\left(\frac{e^{-1}1^1}{1!}\right)\left(\frac{e^{-1}1^0}{0!}\right) & & \text{Poisson(1) pmf of $X_1, X_2$}\\
+    & = 2(0.368)(0.368) = 0.271 & & \\
+    & = \frac{e^{-2}2^1}{1!} & & \text{algebra} \\
+    & = \IP(Y = 1) & & \text{Poisson(2) pmf of $Y$}
+    \end{align*}
+1.  Compute $\IP(X=2)$.  (Hint: what $(X_1, X_2)$ pairs yield $X=2$).  Compare to $\IP(Y=2)$.
+    The only way $X$ can be 2 is if $X_1=2, X_2 = 0$ or $X_1 = 1, X_2=1$ or $X_1=0, X_2 = 2$.
+    \begin{align*}
+    \IP(X = 2) & = \IP(X_1 = 2, X_2 = 0) + \IP(X_1 = 1, X_2 = 1) + \IP(X_1 = 0, X_2 = 2)& &\\
+    & = \IP(X_1 = 2)\IP(X_2 = 0) + \IP(X_1 = 1)\IP(X_2 = 1)  + \IP(X_1 = 0)\IP(X_2 = 2)& & \text{independence}\\
+    & = 2\left(\frac{e^{-1}1^2}{2!}\right)\left(\frac{e^{-1}1^0}{0!}\right) + \left(\frac{e^{-1}1^1}{1!}\right)\left(\frac{e^{-1}1^1}{1!}\right) & & \text{Poisson(1) pmf of $X_1, X_2$}\\
+    & = 2(0.184)(0.368) + (0.368)(0.368)= 0.271 & & \\
+    & = \frac{e^{-2}2^2}{2!} & & \text{algebra} \\
+    & = \IP(Y = 2) & & \text{Poisson(2) pmf of $Y$}
+    \end{align*}
+1. Are $X$ and $Y$ the same variable? Do $X$ and $Y$ have the same distribution?
+    We already said that $X$ and $Y$ are not the same random variable.  But the above calculations suggest that $X$ and $Y$ do have the same distributions.  See the simulation results below.
+
+:::
+::::
+
+
+Poisson aggregration can be proven using the law of total probability^[There are easier proofs, e.g., using moment generating functions.] as in @exm-poisson-aggregation-math. 
+We want to show that $p_{X+Y}(z) =  \frac{e^{-(\mu_X+\mu_Y)}(\mu_X+\mu_Y)^z}{z!}$ for $z=0,1,2,\ldots$
+
+\begin{align*}
+\IP(X+Y=z)
+& \stackrel{\text{(LTP)}}{=}
+\sum_{x=0}^\infty \IP(X=x,X+Y=z) = \sum_{x=0}^z \IP(X=x,Y=z-x) \\
+& \stackrel{\text{(indep.)}}{=}
+\sum_{x=0}^z 
+\IP(X=x)\IP(Y=z-x)\\
+& =
+\sum_{x=0}^z \left(\frac{e^{-\mu_X}\mu_X^x}{x!}\right)\left(\frac{e^{-\mu_Y}\mu_Y^{z-x}}{(z-x)!}\right)\\
+& \stackrel{\text{(algebra)}}{=} \frac{e^{-(\mu_X+\mu_Y)}(\mu_X+\mu_Y)^z}{z!}\sum_{x=0}^z\frac{z!}{x!(z-x)!}\left(\frac{\mu_X}{\mu_X+\mu_Y}\right)^x\left(1-\frac{\mu_X}{\mu_X+\mu_Y}\right)^{z-x}\\
+& \stackrel{\text{(binom.)}}{=}
+\frac{e^{-(\mu_X+\mu_Y)}(\mu_X+\mu_Y)^z}{z!}
+\end{align*}
+
+
+
+### Poisson approximation
+
+
+We saw in Example @exm-poisson-typos that the Binomial(2000, 0.00015) distribution is approximately the Poisson(0.3) distribution. 
+Let's see why. 
+We'll reparametrize the Binomial($2000, 0.00015$) pmf in terms of the mean $0.3$, and apply some algebra and some approximations. 
+Remember, the pmf is a distribution on values of the count $x$, for $x=0, 1, 2, \ldots$, but the probabilities are negligible if $x$ is not small.
+
+
+\begin{align*}
+& \quad \binom{2000}{x}0.00015^x(1-0.00015)^{2000-x}\\
+= & \quad \frac{2000!}{x!(2000-x)!}\frac{0.3^x}{2000^x}\left(1-\frac{0.3}{2000}\right)^{2000}(1-0.00015)^{-x} & & \text{algebra, $0.00015=0.3/2000$}\\
+= & \quad \frac{2000(2000-1)(2000-2)\cdots(2000-x+1)}{(2000)(2000)(2000)\cdots(2000)}\frac{0.3^x}{x!}\left(1-\frac{0.3}{2000}\right)^{2000}(1-0.00015)^{-x} & & \text{algebra, rearranging}\\
+= & \quad \left(1-\frac{1}{2000}\right)\left(1-\frac{2}{2000}\right)\cdots\left(1-\frac{x-1}{2000}\right)\frac{0.3^x}{x!}(0.7408)(1-0.00015)^{-x} & & \text{algebra, rearranging}\\
+\approx & \quad (1)\frac{0.3^x}{x!}(0.7408)(1) & & \text{approximating, for $x$ small}\\
+\approx & \quad e^{-0.3} \frac{0.3^x}{x!}
+\end{align*}
+
+
+The above calculation shows that the Binomial(2000, 0.3) pmf is approximately equal to the Poisson(0.3) pmf.
+
+Now we'll consider a general Binomial situation. 
+Let $X$ count the number of successes in $n$ Bernoulli($p$) trials, so $X$ has a  Binomial($n$,$p$) distribution.
+Suppose that $n$ is "large", $p$ is "small" (so success is "rare") and $np$ is "moderate".
+Then $X$ has an approximate Poisson distribution with mean $np$.
+The following states this idea more formally. 
+The limits in the following make precise the notions of "large" ($n\to \infty$), "small" ($p_n\to 0$), and  "moderate" ($np_n\to \mu \in (0,\infty)$).
+
+
+
+
+::: {#lem-poisson-approximation-to-binomial-math}
+## Poisson approximation to Binomial.
+
+Consider $n$ Bernoulli trials with probability of success on each trial^[When there are $n$ trials, the probability of success on each of the $n$ trials is $p_n$.  The subscript $n$ indicates that this value can change as $n$ changes (e.g. 1/10 when $n=10$, 1/100 when $n=100$), so that when $n$ is large $p$ is small enough to maintain relative "rarity".] equal to $p_n$.   Suppose that $n\to\infty$ while $p_n\to0$ and $np_n\to\mu$, where $0<\mu<\infty$.  Then
+for $x=0,1,2,\ldots$
+$$
+\lim_{n\to\infty} \binom{n}{x} p_n^x \left(1-p_n\right)^{n-x} = \frac{e^{-\mu}\mu^x}{x!}
+$$
+
+:::
+
+The proof relies on the same ideas we used in the Binomial(2000, 0.00015) approximation above. 
+Fix $x=0,1,2,\ldots$  (Since we are letting $n\to\infty$ we can assume that $n>x$.)  Some algebra and rearranging yields
+
+\begin{align*}
+\binom{n}{x} p_n^x \left(1-p_n\right)^{n-x} &= \left(\frac{n!}{x!(n-x)!}\right)\left(\frac{np_n}{n}\right)^x\left(1-p_n\right)^n\left(1-p_n\right)^{-x}\\
+& = \left(\frac{n(n-1)(n-2)\cdots(n-x+1)}{n^x}\right)\left(\frac{\left(np_n\right)^x}{x!}\right)\left(1-\frac{np_n}{n}\right)^n\left(1-p_n\right)^{-x}\\
+& \to (1)\left(\frac{\mu^x}{x!}\right)e^{-\mu}(1)
+\end{align*}
+
+
+The proof of the more general "Poisson paradigm" is beyond the scope of this book.
 
 ## Hypergeometric distributions
 
