@@ -1,4 +1,4 @@
-# Marginal Distributions of Discrete Random Variables {#sec-simulation-marginal-discrete}
+# Marginal Distributions of Continuous Random Variables {#sec-simulation-marginal-continuous}
 
 
 {{< include _r_setup.qmd >}}
@@ -11,4 +11,1707 @@ $$
 $$
 :::
 
-TBA
+
+
+Random variables measure numerical quantities of interest associated with a random phenomenon.
+Random variables can potentially take many different values, usually with some values or intervals of values more probable than others.
+Even when outcomes of a random phenomenon are equally likely, values of related random variables are usually not.
+The **(probability) distribution** of a collection of random variables identifies the possible values that the random variables can take and a way of determining their relative likelihoods.
+We will see several ways to describe distributions, some of which depend on the number and types (discrete or continuous) of the random variables under investigation.
+
+Commonly encountered random variables can be classified as discrete or continuous (or a mixture of the two[^distribution-1]).
+
+[^distribution-1]: There is another type of weird random variable which has a "singular" distribution, like the [Cantor distribution](https://en.wikipedia.org/wiki/Cantor_distribution), but we're counting these random variables as not commonly encountered.
+
+-   A **discrete** random variable can take on only countably many isolated points on a number line.
+These are often counting type variables.
+Note that "countably many" includes the case of countably infinite, such as $\{0, 1, 2, \ldots\}$.
+-   A **continuous** random variable can take any value within some uncountable interval, such as $[0, 1]$, $[0,\infty)$, or $(-\infty, \infty)$.
+These are often measurement type variables.
+
+We will see a few ways of specifying a distribution, including
+
+-   A well labeled *plot*
+-   A *table* of possible values and corresponding probabilities for discrete random variables.
+This could be a two-way table for the joint distribution of two discrete random variables (or multi-way table)
+-   A *probability mass function* for discrete random variables which maps possible values $x$ --- or $(x, y)$ pairs, etc --- to their respective probability.
+-   A *probability density function* for continuous random variables which maps possible values $x$ --- or $(x, y)$ pairs, etc --- to their respective probability "density".
+-   A *cumulative distribution function*, which provides all the percentiles (a.k.a. quantiles) of the distribution
+-   By *name, including values of relevant parameters*, e.g., "Uniform(0, 60)", "Normal(30, 10)", "Poisson(1)", "BivariateNormal(30, 30, 10, 10, 0.7)".
+We will see that some probabilistic situations are so common that the corresponding distributions have special names.
+Each named distribution has corresponding *parameters*, e.g., 0 and 60 are the parameters of the Uniform(0, 60) distribution.
+Always be sure to specify values of relevant parameters, e.g., "Normal(30, 10) distribution" rather than just "Normal distribution".
+Be careful: different named distributions have different identifying parameters.
+For example, the parameters 0 and 60 mean something different for the Uniform(0, 60) distribution than for the Normal(0, 60) distribution.
+
+
+
+Distributions of random variables can be thought of as collections of probabilities of events involving the random variables.
+As for probabilities, we can interpret probability distributions of random variables as:
+
+- *long run relative frequency distributions*: what pattern of values would emerge if we repeated the random process many times and observed many values of the random variables?  
+- *subjective probability distributions*: which potential values of these uncertain numerical quantities are relatively more plausible than others?
+
+Regardless of the interpretation, we can use simulation to investigate distributions of random variables: simulate many values of the random variables and summarize them in various ways to describe the pattern of variability.
+We will often represent distributions as spinners (or a collection of spinners) which when spun many times achieve the appropriate long run pattern of values of the random variables.
+
+Most interesting problems involve two or more random variables defined on the same probability space.
+In these situations, we can consider how the variables vary together and study relationships between them.
+A **joint distribution** describes the full pattern of variability of a collection of random variables.
+In the context of multiple random variables, the distribution of any one of the random variables alone is called a **marginal distribution**.
+
+
+
+
+
+The continuous analog of a probability mass function (pmf) is a probability density function (pdf).
+However, while pmfs and pdfs play analogous roles, they are different in one fundamental way; namely, a pmf outputs probabilities directly, while a pdf does not.
+
+## Histograms and densities
+
+
+We'll start with the simplest continuous situation.
+Uniform probability measures are the continuous analog of equally likely outcomes.
+The standard uniform model is the Uniform(0, 1) distribution corresponding to the spinner in @fig-uniform-spinner-10-sectors which returns values between^[Why is the interval $[0, 1]$ the standard instead of some other range of values?  Because probabilities take values in $[0, 1]$.  We will see why this is useful in more detail later.] 0 and 1.
+Only select rounded values are displayed, but the spinner represents an idealized model where the spinner is infinitely precise so that any real number between 0 and 1 is a possible value.
+We assume that the (infinitely fine) needle is "equally likely" to land on any value between 0 and 1.
+
+
+
+
+```{r}
+#| label: fig-uniform-spinner-10-sectors
+#| echo: false
+#| fig-cap: "A continuous Uniform(0, 1) spinner. It's the same spinner on both sides just with different values displayed. Only selected rounded values are displayed, but in the idealized model the spinner is infinitely precise so that any real number between 0 and 1 is a possible value."
+#| fig-subcap: 
+#|   - "Each sector is 10% of the total area"
+#|   - "Each sector is 1/12 of the total area"
+#| layout-ncol: 2
+
+n = 10
+
+xp <- data.frame(
+  x = (0:(n-1))/n,
+  p = rep(1/n, n)
+  )
+
+cdf = c(0, cumsum(xp$p))
+
+plotp = (cdf[-1] + cdf[-length(cdf)]) / 2
+  
+spinner1 <- ggplot(xp, aes(x="", y=p, fill=x))+
+  geom_bar(width = 1, stat = "identity", color="black", fill="white") + 
+  coord_polar("y", start=0) +
+  theme_void() +
+  # plot the possible values on the outside
+  scale_y_continuous(breaks = xp$x, minor_breaks = (0:99)/100, labels=c("1|0", 1 * xp$x[-1])) +
+  theme(axis.text.x=element_text(size=14, face="bold")) +
+      annotate(geom="segment", y=(0:99)/100, yend = (0:99)/100,
+             x=1.48, xend= 1.52)
+  # plot the probabilities as percents inside
+  # ggtitle(paste("Uniform(0, 1) model", sep=""))
+
+spinner1
+
+
+n = 12
+
+xp <- data.frame(
+  x = (0:(n-1))/n,
+  p = rep(1/n, n)
+  )
+
+cdf = c(0, cumsum(xp$p))
+
+plotp = (cdf[-1] + cdf[-length(cdf)]) / 2
+  
+spinner2 <- ggplot(xp, aes(x="", y=p, fill=x))+
+  geom_bar(width = 1, stat = "identity", color="black", fill="white") + 
+  coord_polar("y", start=0) +
+  theme_void() +
+  # plot the possible values on the outside
+  scale_y_continuous(breaks = xp$x, labels=c("1|0", round(1 * xp$x[-1], 3))) +
+  theme(axis.text.x=element_text(size=14, face="bold"))
+      # annotate(geom="segment", y=(0:99)/100, yend = (0:99)/100,
+      #        x=1.48, xend= 1.52) +
+  # plot the probabilities as percents inside
+  # ggtitle(paste("Uniform(0, 1) model", sep=""))
+
+spinner2
+
+```
+
+Let $U$ be the random variable representing the result of a single spin of the Uniform(0, 1) spinner.
+The following Symbulate code defines this `RV` and simulates 100 values of it.
+
+
+```{python}
+
+U = RV(Uniform(0, 1))
+
+u = U.sim(100)
+
+u
+```
+
+Notice the number of decimal places^[In practice we would rarely care about this many decimal places. We call your attention to the decimals merely to illustrate the continuous nature of the values.].  Remember that for a continuous random variable, any value in some uncountable interval is possible.  For the Uniform(0, 1), any value in the continuous interval between 0 and 1 is a distinct possible value: 0.20000000000... is different from 0.20000000001... is different from 0.2000000000000000000001... and so on.
+
+The rug plot displays 100 simulated values of $U$.  Note that the values seem to be "evenly spread" between 0 and 1, though there is some natural simulation variability.
+
+
+
+
+
+```{python}
+plt.figure()
+u.plot('rug')
+plt.show()
+```
+
+
+For continuous random variables, finding frequencies of individual values and impulse plots don't make any sense since each simulated value will only occur once in the simulation. (Again, note the number of decimal places; if the first simulated value is 0.040815162342, we're not going to see that exact value again.)
+Instead, we summarize simulated values of continuous random variables in a *histogram* (the Symbulate default plot for summarizing values on a continuous scale).
+A **histogram** groups the observed values into "bins" and plots frequencies or *densities* for each bin^[Symbulate chooses the number of bins automatically, but you can set the number of bins using the `bins` option, e.g., `.plot(bins = 10)`].
+In a histogram, one axis is a number line representing values of the variable; the other axis is frequency or density.
+We'll discuss "density" in more detail soon.
+
+
+
+
+```{python}
+plt.figure()
+u.plot()
+plt.show()
+```
+
+
+Below we add a rug plot to the histogram to see the individual values that into each bin (we also change the number of bins).
+We also add the argument `normalize = False` to display bin frequencies, that is, counts of the simulated values falling in each bin, on the vertical axis.
+
+
+
+
+```{python}
+
+plt.figure()
+u.plot(['rug', 'hist'], bins = 10, normalize = False)
+plt.show()
+
+```
+
+
+Typically, in a histogram *areas* of bars represent relative frequencies; in which case the axis which represents the height of the bars is called "density".
+It is common practice that the bins all have the same width^[
+Symbulate will always produce a histogram with equal bin widths.] so that the ratio of the heights of two different bars is equal to the ratio of their areas.
+That is, with equal bin widths, bars with the same height represent the same area/relative frequency; though the area of the bar rather than the height is the actual relative frequency. 
+While the bins in a histogram typically have the same width, we will also use histograms with unequal bin widths to illustrate some ideas.
+
+The distribution of a random variable represents its long run pattern of variation, so we won't get a very clear picture with just 100 simulated values.
+Now we simulate many values of $U$ and summarize them.
+We see that the histogram bars all have roughly the same height, represented by the horizontal line, and hence roughly the same area/relative frequency, though there are some natural fluctuations due to the randomness in the simulation.
+
+
+
+
+```{python}
+
+u = U.sim(10000)
+
+plt.figure()
+
+u.plot() # histogram of simulated values
+Uniform(0, 1).plot(); # plots the horizontal line of constant height
+
+plt.show()
+
+```
+
+If we simulate even more values and use even more bins, we can see that the density height is roughly the same for all possible value (aside from some natural simulation variability).
+This "curve" with constant height over [0, 1] is called the "Uniform(0, 1) density".
+
+
+
+
+```{python}
+
+u = U.sim(100000)
+
+plt.figure()
+
+u.plot(bins = 100) # histogram of simulated values
+Uniform(0, 1).plot(); # plots the horizontal line of constant height
+
+plt.show()
+
+```
+
+
+We can approximate the probability that $U$ is less than 0.2 by the corresponding relative frequency.
+
+```{python}
+u.count_lt(0.2) / u.count()
+```
+
+
+*Area* represents relative frequency/probability for histograms/densities.
+The total area under a density curve must be 1 to account for 100% probability.
+The Uniform(0, 1) density has a constant height of 1 over the range [0, 1], so the total area under the curve---a rectangle with base 1 and height 1---is 1. 
+We can compute $\IP(U < 0.2)$ as the area under the Uniform(0, 1) density over the range [0, 0.2], a rectangle with base 0.2 and height 1, so $\IP(U < 0.2) = 0.2$.
+
+
+```{python}
+plt.figure()
+
+u.plot() # histogram of simulated values
+Uniform(0, 1).plot().shade(lt = 0.2) # Uniform(0, 1) density with area less than (lt) 0.2 shaded
+
+plt.show()
+
+```
+
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-uniform-zero-prob-sim}
+Let $U$ be a random variable with a Uniform(0, 1) distribution.
+Suppose we want to approximate $\IP(U = 0.2)$; that is,  $\IP(U = 0.2000000000000000000000\ldots)$, the probability that $U$ is equal to 0.2 with infinite precision.
+
+1.  Use simulation to approximate $\IP(U = 0.2)$.
+1.  What do you notice? Why does this make sense?
+1.  Use simulation to approximate $\IP(|U - 0.2|<0.005) = \IP(0.195 < U < 0.205)$, the probability that $U$ *rounded to two decimal places* is equal to 0.2.
+1.  Use simulation to approximate $\IP(|U - 0.2|<0.0005) = \IP(0.1995 < U < 0.2005)$, the probability that $U$ *rounded to three decimal places* is equal to 0.2.
+1.  Explain why $\IP(U = 0.2) = 0.$ Also explain, why this is not a problem in practical applications.
+
+:::
+::::
+
+:::: {.callout-tip collapse=true}
+::: {#sol-uniform-zero-prob-sim-sol}
+
+1.  No matter how many values we simulate, the simulated frequency of 0.2000000000000000000000 is going to be 0.
+1.  Any value in the uncountable, continuous interval [0, 1] is possible. The chance of getting 0.2000000000000000000, with infinite precision, is 0.
+1.  While no simulated value is equal to 0.2, about 1% of the simulated values are within 0.005 of 0.2.
+1.  While no simulated value is equal to 0.2, about 0.1% of the simulated values are within 0.0005 of 0.2.
+1.  See below for discussion.
+
+:::
+::::
+
+```{python}
+
+u.count_eq(0.2000000000000000000000)
+
+```
+
+```{python}
+
+u.filter_lt(0.205).filter_gt(0.195)
+
+```
+
+```{python}
+
+abs(u - 0.2).count_lt(0.01 / 2) / u.count()
+
+```
+
+
+```{python}
+
+u.filter_lt(0.2005).filter_gt(0.1995)
+
+```
+
+```{python}
+
+abs(u - 0.2).count_lt(0.001 / 2) / u.count()
+
+```
+
+
+@exm-uniform-zero-prob-sim is a reminder of the discussion in @sec-meeting-probspace.
+**The probability that a continuous random variable $X$ equals any particular value is 0.**
+A continuous random variable can take uncountably many distinct values. Simulating values of a continuous random variable corresponds to an idealized spinner with an infinitely precise needle which can land on any value in a continuous scale.
+Of course, infinite precision is not practical, but continuous distributions are often reasonable and tractable mathematical models.
+
+In the Uniform(0, 1) case, $0.200000000\ldots$ is different than $0.200000000010\ldots$ is different than $0.2000000000000001\ldots$, etc.  Consider the spinner in @fig-uniform-spinner-10-sectors-1. The spinner in the picture only has tick marks in increments of 0.01.
+When we spin, the probability that the needle lands closest to the 0.2 tick mark is 0.01.  But if the spinner were labeled in 1000 increments of 0.001, the probability of landing closest to the 0.2 tick mark is 0.001.  And with four decimal places of precision, the probability is 0.0001. And so on.  The more precise we mark the axis, the smaller the probability the spinner lands closest to the 0.2 tick mark.  The Uniform(0, 1) density represents what happens in the limit as the spinner becomes infinitely precise.  The probability of landing closest to the 0.2 tick mark gets smaller and smaller, eventually becoming 0 in the limit.
+In terms of density, the region under the Uniform(0, 1) density over the point 0.2 is a line segment with no area.
+
+
+Even though any specific value of a continuous random variable has probability 0, *intervals* can have positive probability.
+In particular, the probability that a continuous random variable  is "close to" a specific value can be positive.
+For example, $\IP(|U - 0.2|<0.005) = \IP(0.195 < U < 0.205)$ corresponds to the area under the Uniform(0, 1) density over the range [0.195, 0.205], a rectangle with base 0.01 and height 1, so $\IP(0.195 < U < 0.205) = 0.01$.
+If "close to" means "rounded to two decimal places", then the probability that $U$ is close to 0.2 is 0.01.
+
+In practical applications involving continuous random variables we always have some reasonable degree of precision in mind.
+For example, if we're interested in the probability that the high temperature tomorrow is 70 degrees F, we're talking to the nearest degree, or maybe 0.1 degrees, but not "exactly equal to 70.0000000000000".
+In practical applications involving continuous random variables, "equal to" really means "close to", and "close to" probabilities correspond to intervals which can have positive probability.
+
+## Uniform distributions
+
+
+The Uniform(0, 1) distribution is just one particular Uniform distribution.
+A Uniform distribution has two parameters: the smallest and largest possible values of the variable.
+Any Uniform distribution has the same shape: the density is constant (flat) over the range of possible values (and the density is 0 otherwise).
+The spinner corresponding to a Uniform distribution will have evenly spaced values around the circular axis (that is, the cirular axis has a linear scale).
+
+We have previously encountered a Uniform(0, 60) distribution; see @exm-meeting-probspace1d-uniform and @exm-meeting-box-sim.
+@fig-meeting-uniform-spinner displays a Uniform(0, 60) spinner; notice that the values are evenly spaced between 0 and 60.
+Let $X$ be the random variable representing the result of a single spin of the Uniform(0, 60) spinner.
+The following Symbulate code defines this `RV` then simulates and summarizes values of it.
+
+
+```{python}
+
+X = RV(Uniform(0, 60))
+
+x = X.sim(10000)
+
+x
+
+plt.figure()
+
+x.plot() # histogram of simulated values
+Uniform(0, 60).plot().shade(lt = 15) # Uniform(0, 60) density 
+
+plt.show()
+
+x.count_lt(15) / x.count()
+
+```
+
+
+
+
+
+Remember that in a histogram, *area* represents relative frequency.
+The Uniform(0, 60) distribution covers a wider range of possible values than the Uniform(0, 1) distribution.
+The density is still constant but notice how the values on the vertical density axis change to compensate for the longer range on the horizontal variable axis.
+The histogram bars now all have a height of roughly $\frac{1}{60} = 0.0167$ (aside from natural simulation variability).
+The total area of the rectangle with a height of $\frac{1}{60}$ and a base of $60-0$ is 1.
+Since the density height is constant, probabilities are represented by areas of rectangles, e.g.,  $\IP(X < 15) = (15-0)(1/60) = 0.25$.
+
+
+The constant height property of a Uniform distribution corresponds to the general behavior of Uniform probability measures introduced in @sec-meeting-probspace.
+A single continuous random variable takes values along a number line.
+If a random variable has a Uniform distribution, the probability that the random variable lies in a certain interval of the number line is proportional to the length of the interval, namely, the length of the interval of interest divided by the length of the interval of possible values.
+
+
+
+## Introduction to non-uniform densities {#sec-histogram-to-density}
+
+Most interesting random variables do not have Uniform distributions.
+We'll now start to investigate non-uniform densities.
+Throughout this section we'll consider the Normal(30, 10) distribution that we have used in @sec-language-simulation-tactile-meeting and @sec-meeting-sim to simulate arrival times in the meeting problem.
+We'll use spinners and histograms to motivate the shape of the Normal(30, 10) density.
+
+
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-normal-spinner-histogram}
+
+Suppose we use the Normal(30, 10) spinner in @fig-meeting-normal-spinner to simulate many values.
+What would a histogram of the simulated values look like?
+Use @exm-meeting-tactile-sim-normal and the discussion following it to sketch a histogram with six bins with cutoffs 0, 10, 20, 30, 40, 50, 60.
+What should the areas of the histogram bars be?
+The density heights?
+What does the shape of the histogram tell you, roughly, about the distribution of values?
+:::
+::::
+
+
+:::: {.callout-tip collapse=true}
+::: {#sol-normal-spinner-histogram}
+
+@exm-meeting-tactile-sim-normal and @tbl-meeting-uniform-normal-compare show that the interval [0, 10] corresponds to a probability of 0.025, so the area of the histogram bar for the [0, 10] bin should be 0.025.
+Since the base of this bar has length 10, the height of the bar should be 0.025/10; that is, the density for [0, 10] should be 0.0025.
+Similarly, the density for [50, 60] should be 0.0025, while the density for each of [10, 20] and [40, 50] should be 0.135/10 = 0.0136, and the density for each of [20, 30] and [30, 40] should be 0.341/10 = 0.0341.
+@fig-normal-spinner-histogram sketches a histogram with these six bins and the corresponding density heights; the areas of the bars correspond to the areas of the sectors of the spinner in @fig-meeting-normal-spinner-2.
+The shape of this distribution indicates that values are more likely to be near 30 and less likely to be near 0 or 60.
+
+:::
+::::
+
+```{r}
+#| label: fig-normal-spinner-histogram
+#| echo: false
+
+# endpoints
+breaks <- (0:6) * 10
+
+# midpoints
+midpoints <- (breaks[-1] + breaks[-length(breaks)]) / 2
+
+# widths
+widths = 10
+
+# density height
+densities = c(0.025, 0.136, 0.341, 0.341, 0.136, 0.025) / widths
+
+data <- data.frame(midpoints, densities, widths)
+
+# percentogram
+ggplot(data,
+       aes(x = midpoints,
+           y = densities)) +
+  geom_bar(stat = "identity",
+           width = widths,
+           fill = "skyblue", color = "black") +
+  scale_x_continuous(breaks = round(breaks, 2)) +
+  scale_y_continuous(expand = c(0, 0),
+                     limits = c(0, 0.035),
+                     breaks = seq(0, 0.035, 0.005)) +
+  labs(x = "x", y = "Density") +
+  theme_classic()
+```
+
+Let's try to fill in more of the shape of the Normal(30, 10) distribution.
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-normal-spinner-percentogram}
+
+Suppose we use the Normal(30, 10) spinner in @fig-meeting-normal-spinner to simulate many values.
+In @fig-meeting-normal-spinner-1 the spinner has been divided into 12 sectors, each with equal area.
+Pay close attention to the values on the spinner axis; they do not follow a linear scale.
+
+1.  Sketch a histogram corresponding to @fig-meeting-normal-spinner-1 with 12 bins of *unequal* width.
+What should the area of each histogram bar be?
+What should the density heights of the bars be?
+Be careful!
+The variable axis of the histogram should still be a number line with linear scale---e.g., the interval [0, 10] should be the same length as the interval [10, 20]---but the histogram bins will not have the same width.
+1.  @fig-meeting-normal-spinner-finer fills in more detail for the Normal(30, 10) spinner.
+(You can check that @fig-meeting-normal-spinner-finer is consistent with @fig-meeting-normal-spinner.)
+Sketch a histogram corresponding to @fig-meeting-normal-spinner-finer-1 with 20 bins of *unequal* width.
+1.  @fig-meeting-normal-spinner-finer-2 fills in even more detail.
+Sketch a smooth curve that describes the shape of the Normal(30, 10).
+
+:::
+::::
+
+```{r}
+#| label: fig-meeting-normal-spinner-finer
+#| echo: false
+#| warning: false
+#| fig-cap: "A continuous *Normal(30, 10)* spinner. The same spinner is displayed on both sides, with different features highlighted on the left and right. Only selected rounded values are displayed, but in the idealized model the spinner is infinitely precise so that any real number is a possible outcome. Notice that the values on the axis are *not* evenly spaced."
+#| fig-subcap: 
+#|   - "Each sector is 5% of the total area"
+#|   - "Each sector is 1% of the total area"
+#| layout-ncol: 2
+
+mu = 30
+sigma = 10
+min_x = 0
+max_x = 60
+
+n = 20
+
+xp <- data.frame(
+  x = (0:(n-1))/n,
+  p = rep(1/n, n)
+  )
+
+cdf = c(0, cumsum(xp$p))
+
+plotp = (cdf[-1] + cdf[-length(cdf)]) / 2
+  
+spinner1 <- ggplot(xp, aes(x="", y=p, fill=x))+
+  geom_bar(width = 1, stat = "identity", color="black", fill="white") + 
+  coord_polar("y", start=0) +
+  theme_void() +
+  # plot the possible values on the outside
+  scale_y_continuous(breaks = xp$x, labels=c("60|0", round(30 + 10 * qnorm(xp$x[-1]), 2))) +
+  # theme(axis.text.x=element_text(size=12, face="bold"))
+    theme(axis.text.x=element_text(size=10, face = "bold", angle=c(0, 90-180/10*(1:9), -90-180/10*(10:19))))
+
+spinner1
+
+
+n = 100
+
+xp <- data.frame(
+  x = (0:(n-1))/n,
+  p = rep(1/n, n)
+  )
+
+cdf = c(0, cumsum(xp$p))
+
+plotp = (cdf[-1] + cdf[-length(cdf)]) / 2
+  
+spinner2 <- ggplot(xp, aes(x="", y=p, fill=x))+
+  geom_bar(width = 1, stat = "identity", color="black", fill="white") + 
+  coord_polar("y", start=0) +
+  theme_void() +
+  # plot the possible values on the outside
+  scale_y_continuous(breaks = xp$x, minor_breaks = (0:99)/100, labels=c("60|0", round(30 + 10 * qnorm(xp$x[-1]), 2))) +
+  theme(axis.text.x=element_text(size=7, angle=c(0, 90-180/50*(1:49), -90-180/50*(50:99))))
+
+spinner2
+
+```
+
+
+
+:::: {.callout-tip collapse=true}
+::: {#sol-normal-spinner-percentogram}
+
+1.  Each histogram bar will correspond to a sector of the spinner, so each histogram bar will have area 1/12.
+However, since the widths of the bars are unequal, the heights of the bars will also be unequal.
+For example, there will be a bin for:
+    -    [0, 13.55] with an area of 1/12 and a density height of $(1/12)/(13.55 - 0 ) = (1/12) / 13.55 = 0.0062$
+    -    [13.55, 17.18] with an area of 1/12 and a density height of $(1/12)/(17.18 - 13.55) = (1/12)/3.63 = 0.0230$
+    -    [17.18, 19.64] with an area of 1/12 and a density height of $(1/12)/(19.64 - 17.18) = (1/12)/2.46 = 0.0339$
+    -    and so on, until
+    -    [42.82, 46.45] with an area of 1/12 and a density height of $(1/12)/(46.45 - 42.82) = (1/12)/3.63 = 0.0230$
+    -    [46.45, 60] with an area of 1/12 and a density height of $(1/12)/(60 - 46.45 ) = (1/12) / 13.55 = 0.0062$.
+    
+    See @fig-normal-percentogram-12.
+Each bar of the histogram has the same area^[Histograms with bars of equal *area* are sometimes called ["percentograms"](https://statmodeling.stat.columbia.edu/2023/04/13/the-percentogram-a-histogram-binned-by-percentages-of-the-cumulative-distribution-rather-than-using-fixed-bin-widths/).], but different widths and heights.
+
+1.  The process is similar to the previous part, but now each sector and each histogram bin has area 0.05.
+See @fig-normal-percentogram-1.
+
+1.  As we refine the spinner, the histogram starts to have a smooth symmetric, bell shape.
+See @fig-normal-percentogram-2.
+
+:::
+::::
+
+```{r}
+#| label: fig-normal-percentogram-12
+#| echo: false
+#| warning: false
+#| fig-cap: "Histogram corresponding to the spinner in @fig-meeting-normal-spinner-1. All bars have the same area (1/12), but the bin widths are unequal."
+
+create_normal_percentogram(1 / 12, mu = mu, sigma = sigma, min_x = min_x, max_x = max_x) +
+    theme(axis.text.x=element_text(size = 10, angle = 90, vjust = 0.5))
+```
+
+```{r}
+#| label: fig-normal-percentogram
+#| echo: false
+#| warning: false
+#| fig-cap: "Histograms corresponding to a Normal(30, 10) distribution. In each histogram, all bars have the same area, but the bin widths are unequal."
+#| fig-subcap: 
+#|   - "Histogram corresponding to @fig-meeting-normal-spinner-finer-1. Each bar has 5% of the total area"
+#|   - "Histogram corresponding to @fig-meeting-normal-spinner-finer-2. Each bar has 1% of the total area"
+#| layout-ncol: 2
+
+create_normal_percentogram(0.05, mu = mu, sigma = sigma, min_x = min_x, max_x = max_x) +
+    theme(axis.text.x=element_text(size = 8, angle = 90, vjust = 0.5))
+
+create_normal_percentogram(0.01, mu = mu, sigma = sigma, min_x = min_x, max_x = max_x) +
+    theme(axis.text.x=element_text(size = 6, angle = 90, vjust = 0.5)) +
+  stat_function(fun = dnorm,
+                args = list(mean = mu, sd = sigma),
+                color = "orange",
+                linewidth = 1.5,
+                xlim = c(min_x, max_x))
+
+```
+
+
+The histograms with unequal bin widths in @exm-normal-spinner-percentogram help illustrate how their shape corresponds to equal-area-sectors of spinners, but in practice we usually use histograms with equal bin widths.
+
+
+@exm-normal-spinner-histogram and @exm-normal-spinner-percentogram suggest a smooth, symmetric bell shape for a Normal(30, 10) density.
+Now we'll investigate further via simulation.
+We first define a Symbulate `RV` by specifying its marginal distribution.
+
+```{python}
+
+X = RV(Normal(30, 10))
+
+```
+
+
+Now we simulate a few values and plot them.
+
+```{python}
+x = X.sim(100)
+x
+
+plt.figure();
+x.plot(['hist', 'rug'])
+plt.show()
+```
+
+
+
+It appears that the distribution is not "flat" like in the Uniform case; values near 30 seem to occur more often than values near 0 or 60.
+We'll get a much clearer picture of the distribution if we  simulate many values.
+First we simulate 10000 values of $X$ and summarize the simulated values in a histogram with 6 bins.
+
+
+Technical note: the Normal(30, 10) spinners we have seen so far don't exactly correspond to Normal distributions because they only return values between 0 and 60, while for a true Normal distribution any real number is a possible value.
+In particular, if $X$ has a Normal(30, 10) distribution, the probability that $X$ takes a value outside of [0, 60] is about 0.003.
+That is, when simulating 10000 values from a Normal(30, 10) distribution we would expect to see around 30 values outside of [10, 60].
+For direct comparison with @fig-normal-spinner-histogram, we have discarded simulated values outside of [0, 60] using the `filter` functions.
+
+
+
+
+```{python}
+#| label: fig-normal-spinner-histogram-sim
+
+x = X.sim(10000)
+
+plt.figure();
+x.filter_gt(0).filter_lt(60).plot(bins = 6)
+plt.show()
+
+```
+
+We see that the pattern of variability of the simulated values matches what we expected in @fig-normal-spinner-histogram.
+What about a histogram with more bins?
+(From now on, we'll summarize all simulated values, including those outside of [0, 60].)
+
+
+```{python}
+plt.figure();
+x.plot();
+plt.show()
+
+```
+
+We start to see a symmetric bell-shaped pattern, but the histogram is still "chunky".
+Imagine that we
+
+-   keep simulating more and more values, and
+-   make the histogram bin widths smaller and smaller.
+
+Then the “chunky” histogram would get “smoother”.
+The following plot summarizes the results of 100,000 simulated values in a histogram with 360 bins of equal width.
+(In the arrival time context, each bin corresponds to roughly a one second interval.)
+The command `Normal(30, 10).plot()` overlays the smooth curve modeling the theoretical shape of the distribution of $X$.
+This curve is an example of a *probability density function* (pdf, or simply "density").
+
+```{python}
+#| label: fig-normal-histogram-to-density-sim
+#| fig-cap: "Histogram of values simulated from a Normal(30, 10) distribution.  The smooth solid curve models the theoretical probability density function." 
+
+x = X.sim(100000)
+
+
+plt.figure();
+x.plot(bins = 360) # histogram of simulated values
+Normal(30, 10).plot() # plot the Normal(30, 10) density curve
+plt.show()
+
+```
+
+
+
+
+
+
+The bell-shaped curve depicting the Normal(30, 10) density is one **probability density function**.
+Probability density functions for continuous random variables are analogous to probability mass functions for discrete random variables.
+However, while they play analogous roles, they are different in one fundamental way; namely, a probability mass function outputs probabilities directly, while a probability density function does not.
+A probability density function only provides the density height; the *area under the density curve determines probabilities*.
+See @fig-normal-pdf-shade for an example.
+We will investigate densities in general, as well as Normal distributions, in more detail later.
+
+```{python}
+#| label: fig-normal-pdf-shade
+#| fig-cap: "Normal(30, 10) density; shaded area represents (roughly) 34.1% of the area under the curve and corresponds to the probability that the variable takea a value between 20 and 30."
+
+plt.figure()
+Normal(30, 10).plot().shade(gt = 20, lt = 30)
+plt.show()
+```
+
+
+The examples in this section illustrate that we can construct a spinner to represent a particular distribution by stretching intervals with high probability and shrinking intervals with low probability in just the right way.
+But what is "just the right way"?
+For example, how did we know where to put the values on the spinner axis in @fig-meeting-normal-spinner-finer to achieve the particular bell shape of the Normal(30, 10) distribution?
+The key to understanding the shape of a distribution---and to constructing a spinner to represent it---is provided by *percentiles*.
+
+
+
+
+
+
+
+
+
+
+## Percentiles
+
+
+We have all encountered percentiles at some point in our lives, perhaps in a context like the following.
+
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-height-percentile}
+
+Maggie and Seamus are babies who have just turned one.
+At their one-year visits to their pediatrician:
+
+-   Maggie is 76cm tall and in the [75th percentile of height for females](https://www.cdc.gov/growthcharts/data/set1clinical/cj41l018.pdf).
+-   Seamus is 72cm tall and in the [10th percentile of height for males](https://www.cdc.gov/growthcharts/data/set1clinical/cj41l017.pdf).
+
+Explain what these percentiles mean.
+
+:::
+::::
+
+:::: {.callout-tip collapse=true}
+::: {#sol-height-percentile}
+
+-   75% of one-year-old females are less than 76cm tall, and 25% are more than 76cm tall.
+So Maggie is taller than 75% of one-year-old females.
+-   10% of one-year-old males are less than 72cm tall, and 90% are more than 72cm tall.
+So the wee baby Seamus is taller than only 10% of one-year-old boys.
+
+:::
+::::
+
+A distribution is basically just a collection of *percentiles*.
+Roughly, the value $x$ is the $p$th **percentile** (a.k.a. quantile) of a distribution of a random variable $X$ if $p$ percent of values of the variable are less than or equal to $x$: $\IP(X\le x) = p$.
+Given all the percentiles we can determine the probability that the random variable lies in any interval.
+
+Percentiles commonly reported in summaries include:
+
+-   The *median*, that is, 50th percentile
+-   The *first (or lower) quartile*, that is, the 25th percentile
+-   The *third (or upper) quartile*, that is, the 75th percentile
+
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-meeting-normal-percentile}
+Recall that the spinner in @fig-meeting-normal-spinner represents the Normal(30, 10) distribution.
+According to this distribution:
+
+1.  What percent of values are less than 23.26?
+1.  What is the 25th percentile?
+1.  What is the 75th percentile?
+1.  A value of 40 corresponds to what percentile?
+1.  What percent of values are between 23.26 and 40?
+
+:::
+::::
+
+:::: {.callout-tip collapse=true}
+::: {#sol-meeting-normal-percentile-sol}
+
+1.  25% of values are less than 23.26.
+1.  The previous part implies that 23.26 is the 25th percentile.
+1.  75% of values are less than 36.74, so 36.74 is the 75th percentile.
+1.  40 is (roughly) the 84th percentile.
+About 84% of values are less than 40.
+1.  About 84% of values are less than 40 and about 25% values are less than 23.26, so about 59% of values are between 23.26 and 40. 
+
+:::
+::::
+
+
+
+A spinner describes a distribution by basically representing all its percentiles.
+
+-   The 25th percentile goes 25% of the way around the axis (at "3 o'clock")
+-   The 50th percentile goes 50% of the way around the axis (at "6 o'clock")
+-   The 75th percentile goes 75% of the way around the axis (at "9 o'clock")
+
+And so on.
+Filling in the circular axis of the spinner with the appropriate percentiles determines the probability that the random variable lies in any interval.
+
+In Symbulate, percentiles of simulated values can be computed using `quantile(p)` where `p` is between 0 and 1, e.g., `p = 0.25` for the 25th percentile.
+
+
+
+```{python}
+
+X = RV(Normal(30, 10))
+
+x = X.sim(10000)
+
+x.quantile(0.25)
+
+x.quantile(0.75)
+
+x.quantile(0.84)
+
+x.quantile(0.975)
+```
+
+Remember, we're dealing with simulated values so they won't follow the theoretical distribution exactly.
+
+
+
+For named distributions, we can also compute quantiles of the theoretical distribution in Symbulate using code of the form `Distribution(parameters).quantile(p)`.
+
+```{python}
+Normal(30, 10).quantile(0.25)
+```
+
+```{python}
+Normal(30, 10).quantile([0.75, 0.84, 0.975])
+```
+
+Continuing in this way we can fill in the rest of the axis labels on the Normal(30, 10) spinner.
+For example, `Normal(30, 10).quantile(0.854)` tells us the value that should go 85.4% of the way around the spinner axis (at "10:15"); roughly `Normal(30, 10).quantile([0.01, 0.02, ..., 0.99, 0.99])` defines the spinner in @fig-meeting-normal-spinner-finer-2.
+The percentiles of the Normal(30, 10) distribution are what determine its particular bell shape, which we will study in more detail later.
+
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-quake-percentile-table}
+In a certain region, times (minutes) between occurrences of earthquakes (of any magnitude) have a distribution with percentiles displayed in @tbl-quake-percentile-table.
+
+1.  Construct a spinner corresponding to this distribution.
+1.  Sketch a histogram of this distribution with unequal bin widths.
+What might a smooth density look like?
+1.  Sketch a histogram of this distribution with equal bin widths.
+
+:::
+::::
+
+```{r}
+#| label: tbl-quake-percentile-table
+#| echo: false
+#| tbl-cap: "Percentiles for @exm-quake-percentile-table."
+
+
+exponential_spinner = data.frame(p = 0.1 * (1:9)) |>
+  mutate(x = round(qexp(p, rate = 1 / 120), 1))
+
+exponential_spinner |>
+  mutate(p = paste(100 * p, "th", sep = "")) |>
+  kbl(col.names = c("Percentile", "Value (minutes)")) |>
+  kable_styling()
+  
+```
+
+
+
+:::: {.callout-tip collapse=true}
+::: {#sol-percentile-table}
+
+1.  Since $X$ measures times between earthquakes, the smallest possible value of $X$ is 0 but there is no fixed upper bound.
+Create a spinner with 10 equal sectors with an axis starting from 0 at "12 o'clock"; see @fig-percentile-table-spinner.
+The 10th percentile goes 10% of the way around (a little after "1 o'clock"), the 50th percentile goes at 50% of the way around (at "6 o'clock"), etc.
+1.  We usually use with a histogram with even bins, but sometimes it helps to start sketching a histogram with uneven bins.
+We know that 10% of the values are between 0 and 12.6, 10% are between 12.6 and 26.8, 10% are between 26.8 and 42.8, etc.
+So if we split the bins of the histogram based on these percentiles, each bar would correspond to a relative frequency of 10%.
+But remember that in a histogram *area* represents relative frequency.
+So each of the bars would have the same area, but the bins are unequally spaced, so the bars would not have the same height.
+For example, the first bin has area of 10% over a base of (0, 12.6), while the 80-90 percentile bin has area 10% spread over the interval (193.1, 276.3), so the bar for (193.1, 276.3) will have a smaller height than the bar for (0, 12.6).
+See @fig-percentile-table-histograms-1.
+It seems that a smooth density curve would have an exponentially decreasing shape.
+1.  We don't have enough information to construct the histogram in detail but we can sketch a histogram with a shape similar to the one from the previous part, but now with equal bin widths.
+See @fig-percentile-table-histograms-2.
+We can see that density is highest near 0 and decreases as $x$ increases.
+Notice how intervals where the density is high are stretched out on the spinner axis, while regions where the density is low are shrunk.
+(The highest percentile provided is the 90th, so we don't know what a reasonable upper bound for the scale is, so that almost all values would fall below it.)
+
+:::
+::::
+
+
+```{r}
+#| label: fig-percentile-table-spinner
+#| echo: false
+#| fig-cap: "Spinner for @exm-quake-percentile-table and @tbl-quake-percentile-table."
+
+
+n = 10
+
+xp <- data.frame(
+  x = (0:(n - 1))/n,
+  p = rep(1 / n, n)
+)
+
+cdf = c(0, cumsum(xp$p))
+
+plotp = (cdf[-1] + cdf[-length(cdf)]) / 2
+
+spinner <- ggplot(xp, aes(x="", y=p, fill=x))+
+  geom_bar(width = 1, stat = "identity", color="black", fill="white") + 
+  coord_polar("y", start=0) +
+  theme_void() +
+  # plot the possible values on the outside
+  scale_y_continuous(breaks = xp$x, labels=c("?|0", exponential_spinner$x)) +
+  theme(axis.text.x=element_text(size=12, face="bold")) +
+  # plot the probabilities as percents inside
+  geom_text(aes(y = plotp,
+                label = format(percent(round(p, 2)),0)), size=4)
+
+spinner
+```
+
+```{r}
+#| label: fig-percentile-table-histograms
+#| echo: false
+#| fig-cap: "Histograms for @exm-quake-percentile-table"
+#| fig-subcap: 
+#|   - "Bars with equal area, but unequal bin width"
+#|   - "Bars with equal bin width, but unequal area"
+#| layout-ncol: 2
+
+# percentogram
+breaks <- c(0, exponential_spinner$x, 600)
+midpoints <- (breaks[-1] + breaks[-length(breaks)]) / 2
+widths = diff(breaks)
+densities = 0.1 / widths
+
+data <- data.frame(midpoints, densities, widths)
+
+ggplot(data,
+       aes(x = midpoints,
+           y = densities)) +
+  geom_bar(stat = "identity",
+           width = widths,
+           fill = "skyblue", color = "black") +
+  scale_x_continuous(breaks = round(breaks, 2)) +
+  scale_y_continuous(expand = c(0, 0)) +
+  labs(x = "x", y = "Density") +
+  theme_classic() +
+  theme(axis.text.x=element_text(size = 8, angle = 90, vjust = 0.5)) +
+  stat_function(fun = dexp,
+                args = list(rate = 1 / 120),
+                color = "orange",
+                linewidth = 1.5,
+                xlim = c(0, 600))
+
+# histogram
+breaks <- seq(0, 600, 30)
+
+# midpoints
+midpoints <- (breaks[-1] + breaks[-length(breaks)]) / 2
+
+# widths
+widths = 30
+
+# density height
+densities = diff(pexp(breaks, rate = 1 / 120)) / widths
+
+data <- data.frame(midpoints, densities, widths)
+
+# percentogram
+ggplot(data,
+       aes(x = midpoints,
+           y = densities)) +
+  geom_bar(stat = "identity",
+           width = widths,
+           fill = "skyblue", color = "black") +
+  scale_x_continuous(breaks = round(breaks, 2),
+                     limits = c(0, 600)) +
+  scale_y_continuous(expand = c(0, 0)) +
+  labs(x = "x", y = "Density") +
+  theme_classic() +
+  stat_function(fun = dexp,
+                args = list(rate = 1 / 120),
+                color = "orange",
+                linewidth = 1.5,
+                xlim = c(0, 600))
+```
+
+
+@exm-quake-percentile-table is an example of an *Exponential distribution*.
+We will study Exponential distributions in more detail later, including some situations (like times between earthquakes) where Exponential distributions are reasonable models based on real data.
+
+
+## Cumulative distribution functions and quantile functions {#sec-cdf-quantile}
+
+A distribution of a continuous random variable is a collection of percentiles.
+The more percentiles we provide, the fuller the description of the distribution, the finer we can make the corresponding histogram and spinner, and the better the picture of the smooth density.
+Now we'll see how to specify *all* the percentiles to achieve a complete description of a distribution.
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-meeting-nonuniform-cdf}
+Recall @exm-meeting-nonuniform-probspace1.
+Assume that the probability that Han arrives before time $x$ (minutes after noon) is $(x/60)^2$ for $0\le x\le 60$.
+Let $X$ be the random variable representing Han's arrival time.
+
+1.  Compute and interpret $\IP(X \le 30)$.
+1.  Compute and interpret $\IP(X \le 42.42)$.
+1.  Compute and interpret $\IP(X \le 51.96)$.
+1.  What do the previous parts tell you about the percentiles of $X$?
+1.  Use the answers to the previous parts to start to construct a spinner for simulating values of $X$.
+1.  How could you fill in more of the spinner?
+For example, where should you place the values 10, 20, 30, 40, 50 on the spinner axis?
+1.  @fig-meeting-nonuniform-spinner-2 displays the spinner with the values 10, 20, 30, 40, 50 marked.
+Suppose this spinner is used to simulate many values of $X$.
+Sketch what you would expect a histogram with 6 bins of equal width to look like.
+What does this say about the distribution of $X$?
+
+:::
+::::
+
+:::: {.callout-tip collapse=true}
+::: {#sol-meeting-nonuniform-cdf}
+
+1.  $\IP(X \le 30) = (30 / 60)^2 = 0.25$.
+Over many days, Han arrives before 12:30 on 25% of days.
+Han is 3 times more likely to arrive after 12:30 than before.
+1.  $\IP(X \le 42.42) = (42.42 / 60)^2 = 0.5$.
+Over many days, Han arrives before 12:42:42 on 50% of days.
+Han is equally likely to arrive after 12:42:42 as before.
+1.  $\IP(X \le 51.96) = (51.96 / 60)^2 = 0.75$.
+Over many days, Han arrives before 12:51:96 on 75% of days.
+Han is 3 times more likely to arrive before 12:51:96 than after.
+1.  30 minutes after noon is the 25th percentile, 42.42 minutes after noon is the 50th percentile, and 51.96 minutes after noon is the 75th percentile.
+Roughly $(x/60)^2$ percent of values are less than $x$, so the function $(x/60)^2$ identifies what percentile the value $x$ is ($(x/60)^2$ returns the percentile as a decimal between 0 and 1, e.g., 0.25 corresponds to the 25th percentile).
+1.  30 would go 25% of the way around the spinner axis at the "3 o'clock" position, 42.42 at "6 o'clock", and 51.96 at "9 o'clock".
+1.  If we want to mark the value $x$ on the spinner, compute $(x/60)^2$ to determine what percentile $x$ represents and mark its position on the spinner accordingly.
+For example, 20 minutes after noon is the 11.1th percentile---because $(10/60)^2 = 0.111$---so 20 goes 11.1% of the way around the spinner axis, not quite halfway between the "1 o'clock" and "2 o'clock" positions (since "1 o'clock" is 1/12=8.33% and "2 o'clock" is 2/12=16.67% of the way around).
+See @fig-meeting-nonuniform-spinner-2; only selected values have been filled in, but we could use this method to place any value of $x$ on the spinner axis.
+1.  Consider the [10, 20] bin.
+Using the cdf,
+$$
+\IP(10 \le X \le 20) = \IP(X \le 20) - \IP(X \le 10) = (20/60)^2-(10/60)^2 = 0.1111 - 0.0278 =  0.0833
+$$
+So the histogram bar for the [10, 20] bin has area 0.0833 and hence height 0.0833/10 = 0.0083.
+We can compute for the other bins similarly.
+See @fig-meeting-nonuniform-spinner-histogram.
+The bins have the same width but correspond to different probabilities, so the bars have different areas and heights.
+The areas of the histogram bars correspond to the areas of the sectors in @fig-meeting-nonuniform-spinner-2.
+Values of $X$ are more likely to be near 60 than near 0; compare to @exm-meeting-nonuniform-probspace1.
+
+:::
+::::
+
+
+```{r}
+#| label: fig-meeting-nonuniform-spinner
+#| echo: false
+#| fig-cap: "A spinner representing the distribution in @exm-meeting-nonuniform-cdf and @exm-meeting-nonuniform-quantile. The same spinner is displayed on both sides, with different features highlighted on the left and right. Only selected rounded values are displayed, but in the idealized model the spinner is infinitely precise so that any real number is a possible outcome. Notice that the values on the axis are *not* evenly spaced."
+#| fig-subcap: 
+#|   - "Values at 1 o'clock, 2 o'clock, 3 o'clock, etc, corresponding to the 8.33th, 16.67th, 25th, etc, percentiles"
+#|   - "Spinner axis marked in increments of 10"
+#| layout-ncol: 2
+
+n = 12
+
+xp <- data.frame(
+  x = (0:(n-1))/n,
+  p = rep(1/n, n)
+  )
+
+cdf = c(0, cumsum(xp$p))
+
+plotp = (cdf[-1] + cdf[-length(cdf)]) / 2
+  
+spinner1 <- ggplot(xp, aes(x="", y=p, fill=x))+
+  geom_bar(width = 1, stat = "identity", color="black", fill="white") + 
+  coord_polar("y", start=0) +
+  theme_void() +
+  # plot the possible values on the outside
+  scale_y_continuous(breaks = xp$x, minor_breaks = (0:99)/100, labels=c("60|0  ", round(60 * sqrt((1:(n-1))/n), 2))) +
+  theme(axis.text.x=element_text(size=12, face="bold"))
+
+spinner1
+
+
+xr = seq(10, 60, 10)
+xl = seq(0, 50, 10)
+
+p = (xr / 60) ^ 2 - (xl / 60) ^ 2
+
+xp <- data.frame(xr, p)
+
+cdf = c(0, cumsum(xp$p))
+
+
+
+plotp = (cdf[-1] + cdf[-length(cdf)]) / 2
+  
+spinner2 <- ggplot(xp, aes(x="", y=p, fill=xr))+
+  geom_bar(width = 1, stat = "identity", color="black", fill="white", linetype=1) + 
+  coord_polar("y", start=0) +
+  # coord_curvedpolar("y", start = 0) +
+  theme_void() +
+  # plot the possible values on the outside
+  scale_y_continuous(breaks = cdf[-c(length(cdf))], labels=c("60|0  ", 10, 20, 30, 40, 50)) +
+  theme(axis.text.x=element_text(angle = 0, size=12, face = "bold")) +
+    geom_text(aes(y = plotp,
+                label = percent(p, accuracy = 0.1)), size=4, color=c(NA, rep("black",5)))
+
+spinner2
+
+```
+
+
+
+
+```{r}
+#| label: fig-meeting-nonuniform-spinner-histogram
+#| echo: false
+
+# endpoints
+breaks <- (0:6) * 10
+
+# midpoints
+midpoints <- (breaks[-1] + breaks[-length(breaks)]) / 2
+
+# widths
+widths = 10
+
+# probabilities
+probs = (breaks[-1] / 60) ^ 2 - (breaks[-length(breaks)] / 60) ^ 2
+
+# density height
+densities =  probs / widths
+
+data <- data.frame(midpoints, densities, widths)
+
+ggplot(data,
+       aes(x = midpoints,
+           y = densities)) +
+  geom_bar(stat = "identity",
+           width = widths,
+           fill = "skyblue", color = "black") +
+  scale_x_continuous(breaks = round(breaks, 2)) +
+  scale_y_continuous(expand = c(0, 0),
+                     limits = c(0, 0.035),
+                     breaks = seq(0, 0.035, 0.005)) +
+  labs(x = "x", y = "Density") +
+  theme_classic()
+```
+
+
+
+
+
+
+In @exm-meeting-nonuniform-cdf the function $(x/60)^2$ for $0\le x\le 60$ is (roughly) the "cumulative distribution function" of $X$.
+A cumulative distribution function provides a complete description of a distribution by specifying all its percentiles.
+The cumulative distribution function (cdf) of a random variable fills in the blank
+for any given $x$: $x$ is the (blank) percentile.
+That is, for an input $x$, a value in the measurement units of the variable $X$, the cdf outputs $\IP(X\le x)$.
+
+
+
+
+::: {#def-cdf}
+
+The **cumulative distribution function (cdf)** (of a random variable $X$ defined on a probability space with probability measure $\IP$)
+is the function, $F_X: \mathbb{R}\mapsto[0,1]$, defined by
+$F_X(x) = \IP(X\le x)$.
+:::
+
+Be careful with notation: A cumulative distribution function is typically denoted upper case $F$, while a probability density function is typically denoted lower case $f$ (and the letter "f" is for "function").
+
+The input $x$ to a cdf represents a value in the measurement units of the random variable $X$, e.g., $x$ minutes after noon in @exm-meeting-nonuniform-cdf.
+However, a cdf is defined for all real numbers $x$ regardless of whether $x$ is a possible value of $X$.
+
+In @exm-meeting-nonuniform-cdf, even though the only possible values of $X$ are in [0, 60], the cdf is technically
+$$
+F_X(x) =
+\begin{cases}
+0, & x < 60\\
+(x/60)^2, & 0\le x \le 60,\\
+1, & x > 60.
+\end{cases}
+$$
+For example, $F_X(-10) = \IP(X \le -10) = 0$ since Han can't arrive more than 10 minutes before noon, and $F_X(70) = \IP(X \le 70) = 1$ since Han must arrive at most 60 minutes after noon.
+See @fig-meeting-cdf-quantile-1 for a plot of the cdf.
+Given any value $x$ on the horizontal axis, we can read off the corresponding percentile from the cdf, e.g., 30 is the 25th percentile, 42.42 is the 50th percentile, and 51.96 is the 75th percentile.
+
+A cdf directly provides "$\le$" probabilities, but we can find other probabilities by subtracting.
+For example, in @exm-meeting-nonuniform-cdf,
+$$
+\IP(30 \le X\le 40) = \IP(X \le 40) - \IP(X < 30) = F_X(40) - F_X(30) = (40/60)^2 - (30/60)^2 = 0.194
+$$
+(Remember, for continuous random variables $\IP(X = x) = 0$ so $F_X(x) = \IP(X\le x) = \IP(X < x)$ if $X$ is continuous.)
+
+Cumulative distribution functions are defined the same way for both discrete and continuous random variables, but they are most commonly used and best understood in terms of continuous random variables.
+Remember that for a continuous random variable, probability is represented by *area* under the density curve.
+Imagine plotting a density curve and adding a vertical line at $x$; $\IP(X\le x)$ is the area under the curve to left of this line.
+The cdf is constructed by moving the vertical line from left to right, from smaller to larger values of $x$, and recording  the area under the curve to the left of the line, $F_X(x) = \IP(X\le x)$, as $x$ increases.
+Regarding spinners, imagine a "second hand" on the spinner starts at the smallest possible value (the "12 o'clock" position) and sweeps clockwise around the spinner as the vertical line moves from left to right.
+When the second hand is pointing at $x$ on the spinner axis, the area that it has swept through represents $\IP(X\le x)$.
+The cdf records the values of $F_X(x) = \IP(X\le x)$ as the second hand moves along and points to different values of $x$.
+
+See @fig-normal-cdf-three-panel for an illustration based on the Normal(30, 10) distribution from @sec-histogram-to-density.
+@fig-normal-cdf-three-panel-1 displays the Normal(30, 10) density; the shaded area represents $F_X(23.26)=\IP(X\le 23.26)$, which is about 0.25.
+@fig-normal-cdf-three-panel-2 displays the cdf.
+The dot on the cdf represents the point $(23.26, F_X(23.26) = 0.25)$, which indicates that 23.26 is the 25th percentile, so 23.26 is located 25% of the away around (at "3 o'clock") on the spinner in @fig-normal-cdf-three-panel-3.
+Imagine sliding the vertical bar in @fig-normal-cdf-three-panel-1 from left to right or sweeping the "second hand" clockwise around the spinner in @fig-normal-cdf-three-panel-1; then the dot in @fig-normal-cdf-three-panel-2 would slide up along the cdf.
+
+
+
+
+```{r}
+#| label: fig-normal-cdf-three-panel
+#| echo: false
+#| fig-cap: "Illustration of the 25th percentile  for $X$ with a Normal(30, 10) distribution (restricted to [0, 60])."
+#| fig-subcap: 
+#|   - "pdf; shaded area represents $F_X(23.26) = 0.25$"
+#|   - "cdf; $F_X(23.26) = 0.25$ is highlighted"
+#|   - "spinner; shaded area represents $F_X(23.26) = 0.25$"
+#| layout-ncol: 3
+
+
+zmin = -3
+zmax = 3
+
+mu = 30
+sigma = 10
+
+value = qnorm(0.25, mu, sigma)
+
+z = (value - mu) / sigma
+
+limit_shade = c(zmin, z)
+limit_unshade = c(z, zmax)
+shade_color = "orange"
+
+ggplot(data.frame(x = c(zmin, zmax)),
+       aes(x = x)) +
+  geom_area(stat = "function", fun = dnorm, color = "black", fill = "white", xlim = limit_unshade, linewidth = 1.2) +
+  geom_area(stat = "function", fun = dnorm, color = "black", fill = shade_color, xlim = limit_shade, linewidth = 1.2) + 
+  scale_y_continuous(expand = c(0, 0), limits = c(0, 0.45)) + 
+  scale_x_continuous(breaks = seq(zmin, zmax),
+                     labels = seq(zmin, zmax) * sigma + mu) +
+  labs(x = "x",
+       y = "f(x)") +
+  theme_classic() +
+  theme(
+    axis.text.y = element_blank(),
+    axis.ticks.y = element_blank(),
+    axis.text.x = element_text(size = 12),
+    axis.ticks.length.x = unit(0.25, "cm")
+  )
+
+ggplot() +
+  geom_function(fun = pnorm, args = list(mean = mu, sd = sigma), xlim = c(zmin, zmax) * sigma + mu, linewidth = 1.2) +
+  geom_point(aes(x = value, y = pnorm(z)), col = shade_color, size = 5, shape = 1) + 
+  geom_segment(aes(x = value, y = 0, xend = value, yend = pnorm(z)), col = shade_color, linetype = "dashed", linewidth = 1.2) +
+  geom_segment(aes(x = 0, y = pnorm(z), xend = value, yend = pnorm(z)), col = shade_color, linetype = "dotted", linewidth = 1.2) +
+  scale_x_continuous(breaks = seq(-3, 3) * sigma + mu) +
+  labs(x = "x",
+       y = "F(x)") +
+  theme_classic()
+
+n = 12
+
+xp <- data.frame(
+  x = (0:(n-1))/n,
+  p = rep(1/n, n)
+  )
+
+cdf = c(0, cumsum(xp$p))
+
+plotp = (cdf[-1] + cdf[-length(cdf)]) / 2
+  
+spinner1 <- ggplot(xp |>
+                     mutate(shade_lt = (x < pnorm(z))),
+                   aes(x="", y=p, fill=shade_lt))+
+  geom_bar(width = 1, stat = "identity", color="black") + 
+  scale_fill_manual(values = c("white", shade_color), guide = "none") +
+  coord_polar("y", start=0) +
+  theme_void() +
+  # plot the possible values on the outside
+  scale_y_continuous(breaks = xp$x, minor_breaks = (0:99)/100, labels=c("60|0", round(30 + 10 * qnorm(xp$x[-1]), 2))) +
+  theme(axis.text.x=element_text(size=12, face="bold"))
+
+spinner1
+
+
+```
+
+
+
+In @fig-normal-cdf-three-panel note that for $x$ intervals where the density is highest, probability "accumulates more quickly" and the cdf is steep, while where the density is lowest the cdf is fairly flat.
+The values on the spinner axis are scaled accordingly.
+Intervals corresponding to higher density ("more likely values") are stretched out on the spinner axis; intervals corresponding to lower density ("less likely values") are shrunk.
+We'll investigate the connection between densities and cdfs more closely in the next section.
+
+For named distributions, we can evaluate the `cdf` in Symbulate using code of the form `Distribution(parameters).cdf(value)`.
+For example, here are some cdf calculations for the Normal(30, 10) distribution; compare to earlier examples.
+
+```{python}
+Normal(30, 10).cdf(23.26)
+```
+
+
+
+```{python}
+Normal(30, 10).cdf([10, 20, 30, 40, 50])
+```
+
+
+
+```{python}
+Normal(30, 10).cdf(40) - Normal(30, 10).cdf(20)
+```
+
+We can also plot the cdf of named distributions.
+
+```{python}
+Normal(30, 10).plot(cdf = True) # theoretical cdf
+```
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-meeting-nonuniform-quantile}
+Continuing @exm-meeting-nonuniform-cdf, assume that the probability that Han arrives before time $x$ (minutes after noon) is $(x/60)^2$ for $0\le x\le 60$.
+Let $X$ be the random variable representing Han's arrival time.
+
+1.  Compute and interpret the 10th percentile.
+1.  Compute and interpret the 90th percentile.
+1.  Find an expression for the $p$th percentile, where $0<p<1$, e.g., $p=0.1$ corresponds to the 10th percentile.
+1.  Use the answers to the previous parts to start to construct a spinner for simulating values of $X$.
+How could you fill in more of the spinner?
+
+:::
+::::
+
+:::: {.callout-tip collapse=true}
+::: {#sol-meeting-nonuniform-quantile}
+to @exm-meeting-nonuniform-quantile
+
+1.  The 10th percentile is the value with 10% probability below it, so we want to find $x$ (minutes after noon) such that $\IP(X \le x) = 0.1$.
+Using the cdf, we want to find $x$ such that $(x/60)^2 = 0.1$.
+Solving for $x$ yields $x = 60\sqrt{0.1} = 18.97$.
+Therefore, 18.97 minutes after noon is the 10th percentile.
+Over many days, Han arrives before 12:18:97 on 10% of days.
+Han is 9 times more likely to arrive after 12:18:97 than before.
+1.  Similarly to the previous part, we want to find $x$ such that $(x/60)^2 = 0.9$.
+Solving for $x$ yields $x = 60\sqrt{0.9} = 56.92$.
+Therefore, 56.92 minutes after noon is the 90th percentile.
+Over many days, Han arrives before 12:56:92 on 90% of days.
+Han is 9 times more likely to arrive before 12:56:92 than after.
+1.  We repeat the process from the previous parts with 0.1 and 0.9 replaced by a general $p$.
+We want to find $x$ such that $\IP(X \le x) = p$.
+Using the cdf, we want to find $x$ such that $(x/60)^2 = p$.
+Solving^[We can use algebra or symbolic mathematics software. Technically, $x = -60\sqrt{p}$ is a second solution of the equation $(x/60)^2 = p$, but we also need $x$ to be a possible value of the random variable.] for $x$ to get an expression in terms of $p$ yields $x = 60\sqrt{p}$.
+For example, plug in $p=0.25$ to find that the 25th percentile is $60\sqrt{0.25} = 30$.
+1.  The 10th percentile, 18.97, goes 10% of the way around the spinner (a little after "1 o'clock").
+The 90th percentile, 56.92, goes 90% of the way around (a little before "11 o'clock").
+If we want to know what value to mark at a specific position on the spinner, plug the corresponding percentile $p$ into $60\sqrt{p}$.
+For example, "1 o'clock" corresponds to the 8.33th percentile (since it's 1/12 = 0.083 of the way around), so the value $60\sqrt{1/12} = 17.32$ goes at the "1 o'clock" position.
+See @fig-meeting-nonuniform-spinner; only selected values have been filled in, but we could use this method to fill in the value for any position on the spinner.
+
+:::
+::::
+
+@exm-meeting-nonuniform-cdf and @exm-meeting-nonuniform-quantile involve basically the same process just from different perspectives.
+In @exm-meeting-nonuniform-cdf we start with a value of the variable $x$ and use the cdf $(x/60)^2$ to find what percentile it is.
+$$
+x \rightarrow \text{divide by 60} \rightarrow \text{square} \rightarrow p
+$$
+@exm-meeting-nonuniform-quantile inverts the process: we start with a percent $p$ and use the *quantile function* $60\sqrt{p}$ to find the value of the corresponding percentile.
+$$
+p \rightarrow \text{square root} \rightarrow \text{multiply by 60} \rightarrow x
+$$
+That is, the quantile function $60\sqrt{p}$ is the *inverse* of the cumulative distribution function $(x/60)^2$.
+
+
+
+
+
+::: {#def-quantile}
+For a *continuous* random variable $X$ with cdf $F$, the **quantile function** $Q:[0,1]\mapsto\mathbb{R}$ is the inverse^[The inverse of a cdf might not exist, if the cdf has jumps or flat spots. In particular, the inverse cdf does not exist for discrete random variables for which the cdf is a step function. In general, the quantile function corresponding to cdf $F$ is defined as $Q(p) = \inf\{u:F(u)\ge p\}$, but this is a technicality we don't really need to worry about. Cumulative distribution functions and quantile functions are most useful for continuous random variables, in which case the inverse cdf exists and is the quantile function.] of the cdf: $Q(p) = F^{-1}(p)$.
+:::
+
+
+Both the cdf and the quantile function fully specify a distribution by providing all its percentiles.
+The only difference is the "direction" from input to output.
+
+-   The cdf fills in the following blank for any given $x$: $x$ is the (blank) percentile.
+-   The quantile function fills in the following blank for a given $p$: the $p$th percentile is (blank).
+
+
+
+See @fig-meeting-cdf-quantile-2 for a plot of the quantile function for @exm-meeting-nonuniform-quantile.
+Given any percent $p$ (as a decimal) on the horizontal axis, we can read off the value of the corresponding percentile from the quantile function, e.g., the 25th percentile is 30, the 50th percentile is 42.42, and the 75th percentile is 51.96.
+
+
+Both the cdf or quantile function can be used to create a spinner for a distribution.
+In @exm-meeting-nonuniform-quantile, if we want to place the values 10, 20, 30, 40, 50 on the spinner axis, we can plug them into the cdf to find the corresponding percentiles; see @fig-meeting-nonuniform-spinner-2.
+If we want to mark the 8.33th, 16.67th, 25th, $\ldots$ percentiles---at the "1 o'clock", "2 o'clock", "3 o'clock", $\ldots$ positions---we plug 1/12, 2/12, 3/12, $\ldots$ into the quantile function; see @fig-meeting-nonuniform-spinner-1.
+
+
+
+
+```{r}
+#| label: fig-meeting-cdf-quantile
+#| echo: false
+#| fig-cap: "cdf and quantile function for @exm-meeting-nonuniform-cdf"
+#| fig-subcap: 
+#|   - "cdf"
+#|   - "quantile function"
+#| layout-ncol: 2
+
+meeting_cdf = function(x) {
+  pmin(1, (x / 60) ^ 2) * (x > 0)
+}
+
+meeting_quantile = function(p) {
+  60 * sqrt(p)
+}
+
+p = c(0.25, 0.5, 0.75)
+x = meeting_quantile(p)
+
+x_col = c("skyblue", "orange", "seagreen")
+
+ggplot() +
+  geom_function(fun = meeting_cdf) +
+  geom_point(aes(x = x, y = meeting_cdf(x)), col = x_col, size = 5, shape = 1) + 
+  geom_segment(aes(x = x, y = -Inf, xend = x, yend = meeting_cdf(x)), col = x_col, linetype = "dashed", linewidth = 1.2) +
+  geom_segment(aes(x = -Inf, y = meeting_cdf(x), xend = x, yend = meeting_cdf(x)), col = x_col, linetype = "dotted", linewidth = 1.2) +
+  scale_x_continuous(breaks = seq(0, 60, 10), limits = c(-5, 65)) +
+  scale_y_continuous(breaks = (0:10) * 0.1, limits = c(0, 1)) +
+  labs(x = "x",
+       y = "F(x)") +
+  theme_classic() +
+  theme(axis.title.y = element_text(angle = 0, vjust = 0.5))
+
+
+ggplot() +
+  geom_function(fun = meeting_quantile) +
+  geom_point(aes(x = p, y = meeting_quantile(p)), col = x_col, size = 5, shape = 1) + 
+  geom_segment(aes(x = p, y = -Inf, xend = p, yend = meeting_quantile(p)), col = x_col, linetype = "dotted", linewidth = 1.2) +
+  geom_segment(aes(x = -Inf, y = meeting_quantile(p), xend = p, yend = meeting_quantile(p)), col = x_col, linetype = "dashed", linewidth = 1.2) +
+  scale_y_continuous(breaks = seq(0, 60, 10), limits = c(0, 60)) +
+  scale_x_continuous(breaks = (0:10) * 0.1, limits = c(0, 1)) +
+  labs(x = "p",
+       y = "Q(p)") +
+  theme_classic() +
+  theme(axis.title.y = element_text(angle = 0, vjust = 0.5))
+
+
+```
+
+
+You can think of a cdf or a quantile function as just a really long list of percentiles like in @tbl-quake-percentile-table.
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-quake-percentile-table-quantile}
+Let $X$ be a continuous random variable whose distribution is partially summarized by @tbl-quake-percentile-table.
+
+1.  Let $F$ be the cdf of $X$.
+Evaluate and interpret $F(42.8)$.
+1.  Let $Q$ be the quantile function of $X$.
+Evaluate and interpret $Q(0.9)$.
+
+:::
+::::
+
+
+:::: {.callout-tip collapse=true}
+::: {#sol-quake-percentile-table-quantile}
+
+1.  $F(42.8)=\text{P}(X \le 42.8) = 0.3$, since 42.8 is the 30th percentile.
+For the cdf we find 42.8 in the value column and read off the percentile (0.3 for 30th).
+1.  $Q(0.9) = 276.3$, since the 90th percentile is 276.3.
+For the quantile function we find 0.9 (90th) in the percentile column and read off the value.
+
+:::
+::::
+
+We can use simulation to approximate the cdf of a random a variable.
+For example, suppose $X$ has a Normal(30, 10) distribution and consider @tbl-ecdf-sim which displays ten simulated values, sorted from smallest to largest.
+For any $x$ we can approximate the cdf $F(x) = \IP(X\le x)$ with $\widehat{F}(x)$, the proportion of simulated values that are less than or equal to $x$.
+$$
+\widehat{F}(x) = \text{Proportion of simulated values }\le x
+$$
+For example, since 3 of the simulated values are less than 20, we can approximate $F(20) = \IP(X\le 20)$ as $\widehat{F}(20) = 3/10=0.3$.
+Note that we can approximate $F(x)$ for all values $x$, not simply the simulated values.
+
+
+```{r}
+#| label: tbl-ecdf-sim
+#| tbl-cap: "Ten values simulated from a Normal(30, 10) distribution, sorted from smallest to largest, "
+#| echo: false
+
+n_rep = 10
+
+x = rnorm(n_rep, 30, 10) |> sort()
+
+x_ecdf = data.frame(rank = 1:n_rep,
+                    value = x,
+                    ecdf = (1:n_rep) / n_rep)
+
+x_ecdf |>
+  kbl(digits = 5,
+      col.names = c("Repetition (sorted)",
+                    "Simulated value x",
+                    "Proportion of simulated values <= x")) |>
+  kable_styling()
+
+```
+
+
+
+The function $\widehat{F}$ is called the **empirical cumulative distribution function (ecdf)**.
+The ecdf is  a step function^[An ecdf is a *random function*.] which jumps up at each of the observed simulated values and is flat in between.
+See @fig-ecdf-sim for the ecdf of the values in @tbl-ecdf-sim.
+
+
+```{r}
+#| label: fig-ecdf-sim
+#| fig-cap: "Empirical distribution function of the 10 values in @tbl-ecdf-sim. The simulated values are marked in orange along the variable axis; the ecdf jumps by 1/10 at each simulated value and is flat in between."
+#| echo: false
+
+
+ggplot(x_ecdf, aes(x)) +
+  geom_rug(col = "orange", linewidth = 1.2) +
+  stat_ecdf(geom = "step", col = "black") +
+  theme_classic() +
+  theme(axis.title.y = element_text(angle = 0, vjust = 0.5))
+```
+
+Here is some Symbulate code to plot the ecdf of simulated values (along with a rug plot).
+
+```{python}
+X = RV(Normal(30, 10))
+
+x = X.sim(100)
+
+plt.figure()
+x.plot(['ecdf', 'rug']) # empirical cdf and rug plot of simulated values
+plt.show()
+```
+
+
+As we simulate more values, the ecdf becomes "more continuous".
+The ecdf of 1000 simulated values is pretty close^[Approximating a cdf with an ecdf involves approximating *infinitely many* probabilities since $F(x)$ is a different probability for each $x$. As discussed in @sec-moe-multiple the simulation margin of error needs to be adjusted when approximating multiple probabilities. Fortunately there is an efficient way to simultaneously approximate all probabilities comprising the cdf (based on the Dvoretzky–Kiefer–Wolfowitz inequality). Roughly, the margin of error (for 95% confidence) for an ecdf is $1.36/\sqrt{N}$, where $N$ is the number of independently simulated values used to construct the ecdf (rather than the usual $1/\sqrt{N}$ for estimating a single probability).] to the theoretical Normal(30, 10) cdf.
+
+
+```{python}
+plt.figure()
+X.sim(1000).plot('ecdf') # empirical cdf of simulated values
+
+Normal(30, 10).plot(cdf = True) # theoretical cdf
+plt.show()
+```
+
+Include anything about cdf for discrete RVs here? Or save for math discrete? Whenever I do discuss cdf for discrete, include cdf for Geometric as example.
+
+
+## One ~~ring~~ spinner to rule them all {#sec-univeral-spinner}
+
+We have constructed many different spinners to represent a variety of distributions.
+All spinners shared a common assumption: when spun, the infinitely precise needle pointed uniformly at random to a value on the spinner axis.
+We modeled different distributions simply by relabeling the values on the axis: by appropriately stretching/shrinking the values on the axis corresponding to intervals of larger/smaller probability we can represent the percentiles of any distribution.
+
+The foundation of all spinners is the Uniform(0, 1) spinner, reproduced in @fig-uniform-clock-spinner.
+
+```{r}
+#| label: fig-uniform-clock-spinner
+#| echo: false
+
+n = 12
+
+xp <- data.frame(
+  x = (0:(n-1))/n,
+  p = rep(1/n, n)
+  )
+
+cdf = c(0, cumsum(xp$p))
+
+plotp = (cdf[-1] + cdf[-length(cdf)]) / 2
+  
+spinner <- ggplot(xp, aes(x="", y=p, fill=x))+
+  geom_bar(width = 1, stat = "identity", color="black", fill="white") + 
+  coord_polar("y", start=0) +
+  blank_theme +
+  # plot the possible values on the outside
+  scale_y_continuous(breaks = xp$x, minor_breaks = (0:99)/100, labels=c("1|0", round(xp$x[-1], 4))) +
+  theme(axis.text.x=element_text(size=12, face="bold")) +
+      annotate(geom="segment", y=(0:99)/100, yend = (0:99)/100,
+             x=1.48, xend= 1.52)
+
+spinner
+```
+
+For a Uniform(0, 1) distribution, percents and percentiles are equivalent: the value $x$ is the $x$th percentile; the $p$th percentile is $p$.
+For a Uniform(0, 1) distribution the cdf $F$ and quantile function $Q$ are the same and equal to the identity function (over the [0, 1] range of possible values): if $X$ has a Uniform(0, 1) distribution, $F(x) = x, 0<x<1$ and $Q(p) = p, 0<p<1$.
+For example, for a Uniform(0, 1) distribution 25% of values are less than 0.25.
+Because of this, we can simulate a value from any marginal distribution starting with a spin of the Uniform(0, 1) spinner; we don't actually have to create a new spinner.
+
+
+For example, suppose we want to simulate a value of $X$ from @exm-meeting-nonuniform-cdf and @exm-meeting-nonuniform-quantile.
+Suppose we spin the Uniform(0, 1) spinner and get $u=0.25$, which is the 25th percentile of the Uniform(0, 1) distribution.
+Then we set $x = 30$ minutes after noon, because $30=60\sqrt{0.5}$ is the 25th percentile of $X$.
+We can simulate values of $X$ using this general process:
+
+-   Spin the Uniform(0, 1) spinner to get $u$, which indicates what percentile the simulated value should be (e.g., $u=0.25$ for the 25th percentile)
+-   Set $x = 60\sqrt{u}$ to find the corresponding value of the percentile in the scale of $X$ (e.q., $x = 60\sqrt{0.25} = 30$ minutes after noon is the 25th percentile).
+
+In the long run, 25% of simulated values of $U$ will be less than 0.25, so 25% of simulated values of $X$ will be less than 30.
+That is, 30 will correctly correspond to the 25th percentile of $X$.
+
+The simulation below carries out this process.
+Compare the results to the examples in @sec-cdf-quantile; the simulated distribution of $X$ has all the appropriate properties (approximately).
+
+
+```{python}
+U = RV(Uniform(0, 1))
+
+X = 60 * sqrt(U)
+
+(U & X).sim(10)
+```
+
+```{python}
+x = X.sim(10000)
+
+x.count_lt(30) / x.count()
+
+x.quantile(0.25)
+```
+
+```{python}
+x.count_lt(42.42) / x.count()
+
+x.count_lt(51.96) / x.count()
+
+x.quantile(0.1)
+
+x.quantile(0.9)
+```
+
+
+
+```{python}
+#| label: fig-meeting-nonuminform-histogram-sim
+#| fig-cap: "Histogram of simulated values of $X$ from @exm-meeting-nonuniform-cdf and @exm-meeting-nonuniform-quantile."
+
+plt.figure()
+X.sim(10000).plot()
+plt.show()
+```
+
+
+
+
+These ideas are known as:
+
+::: {#thm-universality}
+### Universality of the Uniform ("one spinner to rule them all")
+
+To simulate a value of a random variable $X$ with quantile function $Q$:
+
+-   Spin the Uniform(0, 1) spinner to get $u$, which indicates what percentile the simulated value should be
+-   Set $x = Q(u)$ to find the corresponding value of the percentile in the scale of the variable
+
+:::
+
+
+
+
+Universality of the Uniform[^universality] might look complicated but all it basically says is that we can construct a spinner for any marginal distribution by putting the 25th percentile 25% of the way around, the 75th percentile 75% of the way around, etc.
+Actually, universality of the Uniform says we don't have to create a new spinner: we can just spin the Uniform(0, 1) spinner and plug the resulting value into the quantile function of $X$.
+Remember that we can think of a cdf or a quantile function of $X$ as just a really long list of percentiles like in @tbl-quake-percentile-table.
+So we can basically just simulate a value from Uniform(0, 1) to determine the percentile and then look up the value of $X$ from the list (using the quantile function instead of the cdf because we're going in the direction "percent to value").
+
+
+[^universality]: Mathematically, universality of the uniform can be stated as follows. Let $F$ be a cdf and $Q=F^{-1}$ its corresponding quantile function.
+Let $U$ have a Uniform(0, 1) distribution and define the random variable $X=Q(U)$.
+Then the cdf of $X$ is $F$.
+
+
+Universality of the Uniform is more useful for continuous random variables, but it works for discrete random variables too (though the definition of the quantile function is more complicated).
+For example, to obtain the discrete spinner in @fig-die-three-spinners-2 corresponding to a weighted four-sided die, start with the Uniform(0, 1) spinner and map
+
+-   The range (0, 0.1] to 1,
+-   The range (0.1, 0.3] to 2,
+-   The range (0.3, 0.6] to 3,
+-   The range (0.6, 1] to 4
+
+Then the probability that the Uniform(0, 1) spinner lands in the range (0.3, 0.6] is 0.3, so the spinner resulting from this mapping would return a value of 3 with probability 0.3.
+(The probability of the infinitely precise needle landing on a specific value like 0.3 (that is, $0.300000000\ldots$) is 0, so it doesn't really matter what we do with the endpoints of the intervals.)
+

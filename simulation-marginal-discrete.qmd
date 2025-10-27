@@ -1999,7 +1999,7 @@ data.frame(x, px) |>
 ```
 
 ```{r}
-#| label: fig-nb-ball
+#| label: fig-nb-bball
 #| echo: false
 #| fig-cap: "Plot and spinner representing the the NegativeBinomial(5, 0.86) distribution, the theoretical distribution of $X$ in @exm-nb-bball."
 #| fig-subcap: 
