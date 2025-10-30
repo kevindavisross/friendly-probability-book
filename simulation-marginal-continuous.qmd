@@ -49,8 +49,8 @@ For example, the parameters 0 and 60 mean something different for the Uniform(0,
 Distributions of random variables can be thought of as collections of probabilities of events involving the random variables.
 As for probabilities, we can interpret probability distributions of random variables as:
 
-- *long run relative frequency distributions*: what pattern of values would emerge if we repeated the random process many times and observed many values of the random variables?  
-- *subjective probability distributions*: which potential values of these uncertain numerical quantities are relatively more plausible than others?
+-   *long run relative frequency distributions*: what pattern of values would emerge if we repeated the random process many times and observed many values of the random variables?  
+-   *subjective probability distributions*: which potential values of these uncertain numerical quantities are relatively more plausible than others?
 
 Regardless of the interpretation, we can use simulation to investigate distributions of random variables: simulate many values of the random variables and summarize them in various ways to describe the pattern of variability.
 We will often represent distributions as spinners (or a collection of spinners) which when spun many times achieve the appropriate long run pattern of values of the random variables.
@@ -1578,7 +1578,9 @@ Normal(30, 10).plot(cdf = True) # theoretical cdf
 plt.show()
 ```
 
-Include anything about cdf for discrete RVs here? Or save for math discrete? Whenever I do discuss cdf for discrete, include cdf for Geometric as example.
+
+
+<!-- Include anything about cdf for discrete RVs here? Or save for math discrete? Whenever I do discuss cdf for discrete, include cdf for Geometric as example. -->
 
 
 ## One ~~ring~~ spinner to rule them all {#sec-univeral-spinner}
@@ -1715,3 +1717,667 @@ For example, to obtain the discrete spinner in @fig-die-three-spinners-2 corresp
 Then the probability that the Uniform(0, 1) spinner lands in the range (0.3, 0.6] is 0.3, so the spinner resulting from this mapping would return a value of 3 with probability 0.3.
 (The probability of the infinitely precise needle landing on a specific value like 0.3 (that is, $0.300000000\ldots$) is 0, so it doesn't really matter what we do with the endpoints of the intervals.)
 
+
+
+## Probability density functions
+
+A marginal distribution of a random variable is a description of its possible values and their relative likelihoods. 
+For a discrete random variable $X$, we often describe its marginal distribution via the probability mass function (pmf) $p_X$ which specify the probability of each possible value of $X$: $p_X(x)= \IP(X = x)$.
+The continuous analog of a probability mass function (pmf) is a probability density function (pdf). 
+However, while pmfs and pdfs play analogous roles, they are different in one fundamental way; namely, a pmf outputs probabilities directly, while a pdf does not.
+Remember that for a continuous random variable $X$, $\IP(X = x) = 0$ for any $x$, so "equal to" probabilities don't make sense (like they did for discrete random variables). 
+Rather, the probability density function of a continuous random variable $X$ determines the probability that $X$ takes a value in any *interval*.
+
+
+
+::: {#def-pdf}
+
+The **probability density function (pdf)** of a *continuous* RV $X$, defined on a probability space with probability measure $\IP$, is a function $f_X:\mathbb{R}\mapsto[0,\infty)$ which satisfies:
+
+:::
+
+$$
+\IP(a < X < b) = \text{Area under the pdf } f_X \text{ over the region } (a, b)
+$$
+
+The axioms of probability imply that any pdf $f$ can't be negative ($f(x)\ge 0$ for all $x$), since otherwise the density could yield negative probabilities.
+Also, the total area under the pdf must be 1 to account for 100% probability.
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-meeting-pdf1}
+Continuing @exm-meeting-nonuniform-cdf and @exm-meeting-nonuniform-quantile.
+
+1.  Recall @fig-meeting-nonuniform-spinner-histogram and @fig-meeting-nonuminform-histogram-sim.
+Based on these plots, sketch a probability density function for $X$.
+1.  Based on the previous part, it seems reasonable to assume that the pdf $f_X$ is linear as a function of possible $x$ values, with an intercept of 0 and positive slope; that is,
+$$
+f_X(x) = 
+\begin{cases}
+cx, & 0<x<60,\\
+0 & \text{otherwise.}
+\end{cases}
+$$
+Compute the value of $c$.
+Note: this involves more than just reading off a value from a plot.
+What is the key principle that will determine the value of $c$?
+1.  Use the pdf (and geometry) to compute $\IP(X < 15)$.
+(Compare to part 1 of @exm-meeting-nonuniform-probspace1.)
+1.  Use the pdf (and geometry) to compute $\IP(X > 45)$.
+(Compare to part 3 of @exm-meeting-nonuniform-probspace1.)
+1.  Use the pdf (and geometry) to find an expression for the cdf of $X$.
+(Compare to the cdf from @exm-meeting-nonuniform-cdf.)
+
+:::
+::::
+
+:::: {.callout-tip collapse="true"}
+::: {#sol-meeting-pdf1}
+
+1.  From the previous plots, it seems that the pdf is lowest at 0, highest at 60, and increases linearly.
+We can sketch this general shape like in @fig-meeting-nonuniform-pdf-shade-1 but without the values on the vertical density axis yet. 
+The general form of the pdf is linear with positive slope, say $c$, and an intercept of 0. 
+That is, the pdf has general form $f_X(x) = cx, 0<x<60$. 
+The possible values are [0, 60], so the pdf is 0 outside this interval. 
+1.  Since the area under the curve represents probability, we need the total area under the pdf over the range of possible values to be 1 (for 100% probability).
+The total area is the area of a triangle with base (60-0) and height equal to the density at 60, $f(60) = 60c$.
+This area is $(1/2)(60 -0)(60c)$, which we set equal to 1 and solve to get $c = 2/3600$.
+That is, $f(x) = (2/3600)x, 0 < x < 60$.
+See the vertical axis on @fig-meeting-nonuniform-pdf-shade-1; the height at $x=60$ is $f(60) = (2/3600)(60) = 1/ 30 \approx 0.033$.  
+1.  See @fig-meeting-nonuniform-pdf-shade-2. 
+The area under the pdf over the interval [0, 15] is a triangle with base (15-0) and height equal to the density at 15, $f(15) = (2/3600)(15)$.
+This area is $(1/2)(15 -0)(2/3600)(15) = 0.0625$. 
+(This is the same value as in part 1 of @exm-meeting-nonuniform-probspace1.)
+1.  See @fig-meeting-nonuniform-pdf-shade-3. 
+It's easier to first compute $\IP(X < 45)$, represented by the unshaded area in @fig-meeting-nonuniform-pdf-shade-3.
+The area under the pdf over the interval [0, 45] is a triangle with base (45-0) and height equal to the density at 15, $f(45) = (2/3600)(45)$.
+This area is $(1/2)(45 -0)(2/3600)(45) = 0.5625$. 
+So $\IP(X > 45) = 1 - \IP(X < 45) = 1 - 0.5625 = 0.4375$.  
+(This is the same value as in part 3 of @exm-meeting-nonuniform-probspace1.) 
+1.  The calculation is similar to the previous parts but with values like 15 and 45 replaced by a generic $x$ between 0 and 60. 
+See @fig-meeting-nonuniform-pdf-shade-4, where the shaded area represents $F_X(x) = \IP(X \le x)$. 
+The area under the pdf over the interval $[0, x]$ is a triangle with base $(x-0)$ and height equal to the density at $x$, $f(x) = (2/3600)x$.
+This area is $(1/2)(x -0)(2/3600)(x) = x^2/3600 = (x/60)^2$. 
+Therefore, the cdf of $X$ if $F_x(x) = (x/60)^2, 0<x<60$. 
+(This is the same cdf as in @exm-meeting-nonuniform-cdf.)
+:::
+::::
+
+```{r}
+#| label: fig-meeting-nonuniform-pdf-shade
+#| echo: false
+#| fig-cap: "Illustrations of @exm-meeting-pdf1"
+#| fig-subcap: 
+#|   - "Probability density function of $X$"
+#|   - "Shaded area represents $\\IP(X < 15)$"
+#|   - "Shaded area represents $\\IP(X > 45)$"
+#|   - "For a generic $x$ between 0 and 60, the shaded area represents $F_X(x) = \\IP(X \\le x)$, where $F_X$ is the cdf of $X$"
+#| layout-ncol: 2
+
+
+meeting_pdf <- function(x) {
+  (2 / 3600) * x
+}
+
+meeting_pdf_plot <- ggplot(data.frame(x = c(0, 60)), aes(x = x)) +
+  stat_function(fun = meeting_pdf,
+                color = "orange",
+                linewidth = 1.5,
+                xlim = c(0, 60)) +
+  scale_x_continuous(limits = c(-1, 61), expand = c(0, 0), breaks = seq(0, 60, 15)) +
+  scale_y_continuous(limits = c(0, 0.035), expand = c(0, 0)) +
+  labs(x = "x, meeting time (minutes)",
+       y = "f(x), probability density") +
+  theme_classic()
+
+meeting_pdf_plot
+
+x1 = 15
+
+meeting_pdf_plot +
+  geom_area(stat = "function", fun = meeting_pdf,
+            fill = "skyblue", xlim = c(0, x1)) +
+  geom_area(stat = "function", fun = meeting_pdf,
+            fill = "white", xlim = c(x1, 60))
+
+x2 = 45
+
+meeting_pdf_plot +
+  geom_area(stat = "function", fun = meeting_pdf,
+            fill = "white", xlim = c(0, x2)) +
+  geom_area(stat = "function", fun = meeting_pdf,
+            fill = "skyblue", xlim = c(x2, 60))
+
+x3 = 0.67 * 60
+
+ggplot(data.frame(x = c(0, 60)), aes(x = x)) +
+  stat_function(fun = meeting_pdf,
+                color = "orange",
+                linewidth = 1.5,
+                xlim = c(0, 60)) +
+  scale_x_continuous(limits = c(-1, 61), expand = c(0, 0), breaks = c(0, x3, 60), labels = c(0, "x", 60)) +
+  scale_y_continuous(limits = c(0, 0.035), expand = c(0, 0)) +
+  theme_classic() +
+  geom_area(stat = "function", fun = meeting_pdf,
+            fill = "skyblue", xlim = c(0, x3)) +
+  geom_area(stat = "function", fun = meeting_pdf,
+            fill = "white", xlim = c(x3, 60)) +
+  labs(x = "x, meeting time (minutes)",
+       y = "f(x), probability density")
+
+
+
+```
+
+
+
+The "compute $c$" part of @exm-meeting-pdf1 is a continuous analog of normalizing.
+We specify the general shape of the pdf (e.g., linear, $cx$ for $0<x<60$), then scale the density axis so that the total area under the density curve equal to 1.
+In general, a pdf is often defined only up to some multiplicative constant $c$, for example $f_X(x) = c\times(\text{some function of x})$, or $f_X(x) \propto \text{some function of x}$.
+The constant $c$ does not affect the shape of the distribution as a function of $x$, only the scale on the density axis.
+The absolute scaling on the density axis is somewhat irrelevant; it is whatever it needs to be to provide the proper *area* of 1.
+What's important is the *relative* heights of the density at different $x$ values.
+
+
+
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-meeting-pdf-ratio}
+Continuing @exm-meeting-pdf1. 
+Han's meeting time $X$ (minutes after noon) has pdf
+$$
+f_X(x) = 
+\begin{cases}
+(2/3600)x, & 0<x<60,\\
+0 & \text{otherwise.}
+\end{cases}
+$$
+The corresponding cdf satisfies $F_X(x) = (x/60)^2, 0<x<60$.
+
+1.  Compute the probability that $X$, truncated^[We could round to the nearest minute in which case some of the approximations would become exact, e.g., $\IP(14.5<X<15.5) = f(15)(1)$ for this example. But in general the pdf will only provide approximations like the ones we get when we truncate in this example. In practice, we would approximate the same way regardless of whether we're considering "within one minute *after* 12:15" or "within one minute *of* 12:15".] to the nearest minute, is 15 minutes after noon; that is, compute $\IP(15 \le X<16)$. 
+How does this probability compare to $f(15)$?
+
+1.  Compute the probability that $X$, truncated to the nearest minute, is 45 minutes after noon; that is, compute $\IP(45 \le X<46)$. 
+How does this probability compare to $f(45)$?
+
+1.  Compute and interpret the ratio of the probabilities from the two previous parts. 
+How does this ratio compare to $f(45)/f(15)$? 
+
+1.  Compute the probability that $X$, truncated to the nearest *second*, is 15 minutes after noon; that is, compute $\IP(15 \le X<15+1/60)$. 
+How does this probability compare to $f(15)$? 
+Hint: try $f(15)(1/60)$.
+
+1.  Compute the probability that $X$, truncated to the nearest *second*, is 45 minutes after noon; that is, compute $\IP(45 \le X<45+1/60)$. 
+How does this probability compare to $f(45)$? 
+Hint: try $f(45)(1/60)$.
+
+1.  Compute and interpret the ratio of the probabilities from the two previous parts. 
+How does this ratio compare to $f(45)/f(15)$? 
+
+1.  Without actually computing probabilities, approximate the probability than Han arrives within one millisecond (1/60000 minutes) of 12:15.
+
+1.  Without actually computing probabilities, approximate the probability than Han arrives within one millisecond (1/60000 minutes) of 12:45.
+
+1.  Without actually computing probabilities, approximately how much more likely is it for Han to arrive within one millisecond of 12:45 than within one millisecond of 12:15?
+
+1.  How is $f(x)$ related to the probability that $X$ is "close to" $x$?
+:::
+::::
+
+:::: {.callout-tip collapse="true"}
+::: {#sol-meeting-pdf-ratio}
+
+1.  $\IP(15 \le X<16) = F_X(16) - F_X(15) = (16/60)^2 - (15/60)^2 = 0.00861$, which is fairly close to $f(15) = (2/3600)(15) = 0.00833$. 
+This probability is represented by the blue shaded area in @fig-meeting-nonuniform-pdf-ratio-1.
+
+    With a little algebra we can write $(16/60)^2 - (15/60)^2 = ((15+1)/60)^2 - (15/60)^2 = (2/3600)(15) + 1/3600 = f(15) + 1/3600\approx f(15)$. 
+This approximate probability is represented by the blue shaded area in @fig-meeting-nonuniform-pdf-ratio-2.
+The approximation is fairly accurate since $1/3600 = 0.000278$ is much smaller (30 times smaller) than $(2/3600)(15)=0.00833$.
+
+1.  $\IP(45 \le X<46) = F_X(46) - F_X(45) = (46/60)^2 - (45/60)^2 = 0.02528$, which is fairly close to $f(45) = (2/3600)(45) = 0.02500$. 
+This probability is represented by the green shaded area in @fig-meeting-nonuniform-pdf-ratio-1.
+
+    With a little algebra we can write $(46/60)^2 - (45/60)^2 = ((45+1)/60)^2 - (45/60)^2 = (2/3600)(45) + 1/3600 = f(45) + 1/3600\approx f(45)$.
+This approximate probability is represented by the green shaded area in @fig-meeting-nonuniform-pdf-ratio-2.
+
+
+1.  It is 2.9355 times more likely for Han to arrive within 1 minute after 12:45 than within 1 minute after 12:15.
+$$
+\frac{\IP(45 \le X<46)}{\IP(15 \le X<16)} = \frac{0.02528}{0.00861} = 2.9355
+$$
+This ratio is represented by the ratio of green and blue shaded areas in @fig-meeting-nonuniform-pdf-ratio-1.
+
+    Using the approximations from the previous parts,
+$$
+\frac{\IP(45 \le X<46)}{\IP(15 \le X<16)} = \frac{f(45) + 1/3600}{f(15) + 1/3600} \approx \frac{f(45)}{f(15)} = \frac{(2/3600(45))}{(2/3600)(15)} = \frac{45}{15} = 3 
+$$
+It is approximately 3 times more likely for Han to arrive within 1 minute after 12:45 than within 1 minute after 12:15.
+This ratio is represented by the ratio of green and blue heights in @fig-meeting-nonuniform-pdf-ratio-3.
+
+
+1.  $\IP(15 \le X<15 + 1/60) = F_X(15+1/60) - F_X(15) = ((15+1/60)/60)^2 - (15/60)^2 = 0.00013897$, which is fairly close to $f(15)(1/60) = (2/3600)(15)(1/60) = 0.00013889$. 
+With a little algebra we can write $((15+1)/60)^2 - (15/60)^2 = (2/3600)(15)(1/60) + 1/3600^2 = f(15)(1/60) + 1/3600^2\approx f(15)(1/60)$. 
+The approximation is since $1/3600^2 = 0.00000008$ is much smaller than $(2/3600)(15)(1/60)=0.000139$.
+
+1.  $\IP(45 \le X<45 + 1/60) = F_X(45+1/60) - F_X(45) = ((45+1/60)/60)^2 - (45/60)^2 = 0.00041674$, which is fairly close to $f(45)(1/60) = (2/3600)(45)(1/60) = 0.00041667$. 
+With a little algebra we can write $((45+1)/60)^2 - (45/60)^2 = (2/3600)(45)(1/60) + 1/3600^2 = f(45)(1/60) + 1/3600^2\approx f(45)(1/60)$. 
+The approximation is fairly accurate since $1/3600^2 = 0.00000008$ is much smaller than $(2/3600)(45)(1/60)=0.000417$.
+
+1.  It is 2.99889 times more likely for Han to arrive within 1 second after 12:45 than within 1 second after 12:15.
+$$
+\frac{\IP(45\le X<45+1/60)}{\IP(15 \le X<15+1/60)} = \frac{0.00041667}{0.00013889} = 2.99889
+$$
+Using the approximations from the previous parts,
+$$
+\frac{\IP(45 \le X<45+1/60)}{\IP(15 \le X<15+1/60)} = \frac{f(45)(1/60) + 1/3600^2}{f(15)(1/60) + 1/3600^2} \approx \frac{f(45)(1/60)}{f(15)(1/60)} = \frac{f(45)}{f(15)}= \frac{(2/3600(45))}{(2/3600)(15)} = \frac{45}{15} = 3 
+$$
+It is approximately 3 times more likely for Han to arrive within 1 second after 12:45 than within 1 second after 12:15.
+This ratio is represented by the ratio of green and blue heights in @fig-meeting-nonuniform-pdf-ratio-3.
+
+1.  The previous parts suggest that the probability of arriving within one minute of 12:15 is approximately $f(15)(1)$ and the probability of arriving within one second (1/60 minutes) of 12:15 is approximately $f(15)(1/60)$, so it seems reasonable that the probability of arriving within one millisecond (1/60000 minutes) of 12:15 is approximately $f(15)(1/60000) = (2/3600)(15)(1/6000) = 0.0000001388889$. 
+(This is essentially the same value we get when we actually compute $\IP(15 < X < 15 + 1/60000)$.)
+
+1.  The previous parts suggest that the probability of arriving within one minute of 12:45 is approximately $f(45)(1)$ and the probability of arriving within one second (1/60 minutes) of 12:45 is approximately $f(45)(1/60)$, so it seems reasonable that the probability of arriving within one millisecond (1/60000 minutes) of 12:45 is approximately $f(45)(1/60000) = (2/3600)(45)(1/6000) = 0.0000004166667$. 
+(This is essentially the same value we get when we actually compute $\IP(15 < X < 15 + 1/60000)$.)
+
+1.  The previous parts suggest that the ratio of the probabilities is approximately
+$$
+\frac{f(45)(1/60000)}{f(15)(1/60000)} = \frac{f(45)}{f(15)}= \frac{(2/3600(45))}{(2/3600)(15)} = \frac{45}{15} = 3 
+$$
+It is approximately 3 times more likely for Han to arrive within 1 millisecond after 12:45 than within 1 millisecond after 12:15. 
+This ratio is represented by the ratio of green and blue heights in @fig-meeting-nonuniform-pdf-ratio-3.
+
+1.  See discussion below.
+:::
+::::
+
+
+```{r}
+#| label: fig-meeting-nonuniform-pdf-ratio
+#| echo: false
+#| fig-cap: "Illustrations of @exm-meeting-pdf-ratio"
+#| fig-subcap: 
+#|   - "Shaded areas represent exact probabilities $\\IP(15<X<16)$ and $\\IP(45<X<46)$"
+#|   - "Shaded areas represent approximate probabilities $\\IP(15<X<16)\\approx f(15)(1)$ and $\\IP(45<X<46)\\approx f(45)(1)$"
+#|   - "Comparison of $f(15)$ and $f(45)$"
+#| layout-ncol: 3
+
+
+meeting_pdf <- function(x) {
+  (2 / 3600) * x
+}
+
+meeting_pdf_plot <- ggplot(data.frame(x = c(0, 60)), aes(x = x)) +
+  stat_function(fun = meeting_pdf,
+                color = "orange",
+                linewidth = 1.5,
+                xlim = c(0, 60)) +
+  scale_x_continuous(limits = c(-1, 61), expand = c(0, 0), breaks = seq(0, 60, 15)) +
+  scale_y_continuous(limits = c(0, 0.035), expand = c(0, 0)) +
+  labs(x = "x, meeting time (minutes)",
+       y = "f(x), probability density") +
+  theme_classic()
+
+
+x1 = 15
+
+x2 = 45
+
+meeting_pdf_plot +
+  geom_area(stat = "function", fun = meeting_pdf,
+            fill = "skyblue", xlim = c(x1, x1 + 1)) +
+  geom_area(stat = "function", fun = meeting_pdf,
+            fill = "seagreen", xlim = c(x2, x2 + 1))
+
+meeting_pdf_plot +
+  annotate("rect",
+           xmin = x1, xmax = x1 + 1,
+           ymin = 0, ymax = meeting_pdf(x1),
+           fill = "skyblue", alpha = 1) +
+  annotate("rect",
+           xmin = x2, xmax = x2 + 1,
+           ymin = 0, ymax = meeting_pdf(x2),
+           fill = "seagreen", alpha = 1)
+
+
+meeting_pdf_plot +
+  annotate("segment",
+           x = x1, xend = x1,
+           y = 0, yend = meeting_pdf(x1),
+           colour = "skyblue", linewidth = 1.0) +
+  annotate("segment",
+           x = x2, xend = x2,
+           y = 0, yend = meeting_pdf(x2),
+           colour = "seagreen", linewidth = 1.0)
+
+
+
+
+```
+
+
+
+Be careful: density is not probability!
+If a continuous random variable $X$ has pdf $f_X$, $f_X(x)$ by itself does not provide the probability of anything. 
+However, @exm-meeting-pdf-ratio illustrates that $f_X(x)$ is *related to* the probability that $X$ is "close to " $x$. 
+
+For example, suppose we're interested in the probability that Han arrives close to 12:15. 
+If "close to" is defined as "within 1 minute after 12:15", this probability is represented by the shaded blue area in @fig-meeting-nonuniform-pdf-ratio-1; we showed that this probability is equal to $f(15) + 1/3600$. 
+The blue area is a trapezoid, which we can think of as the area of a tall rectangle with base 1 and height $f(15)$ plus the area of the tiny triangle on top (which is pretty hard to see and has area 1/3600).
+If we ignore the tiny triangle, we can approximate the probability by the area of the rectangle, $f(15)(1)$; this area is represented by the shaded blue area in @fig-meeting-nonuniform-pdf-ratio-2, which is virtually identical to the one in  @fig-meeting-nonuniform-pdf-ratio-1.
+Similarly we can approximate the probability that Han arrives within 1 minute after 12:45 (represented by the shaded green area in @fig-meeting-nonuniform-pdf-ratio-1) as $f(45)(1)$ (represented by the shaded green area in @fig-meeting-nonuniform-pdf-ratio-1).
+
+If "close to" 12:15 is defined as "within 1 second (1/60 minute) after 12:15", we could approximate the area under the pdf which defines the probability as the area of a rectangle with base $1/60$ and height $f(45)$; the probability is approximately $f(15)(1/60)$. 
+If "close to" 12:15 is defined as "within 1 millisecond (1/60000 minute) after 12:15", we could approximate the area under the pdf which defines the probability as the area of a rectangle with base $1/60000$ and height $f(45)$; the probability is approximately $f(15)(1/60000)$. 
+In general, we can approximate the probability that $X$ is close to 15 as the product of $f(15)$ and what counts as "close to" in the measurement units of the variable (e.g., 1 minute, 1/60 minute, 1/60000 minute).
+
+
+The following result states the general principle. 
+When we think of "close to", we usually think of *rounding* as opposed to truncating (as in @exm-meeting-pdf-ratio), so the following lemma is stated with rounding in mind. 
+In @exm-meeting-pdf-ratio, the probability that $X$ (minutes) rounded to the nearest minute is $\IP(14.5<X<15.5) = \IP(15 - 0.5(1)<X<15 + 0.5(1)$, the probability that $X$ rounded to the nearest second (1/60 minute) is $\IP(15 - 0.5(1/60)<X<15 + 0.5(1/60))$, and , the probability that $X$ rounded to the nearest millisecond (1/60000 minute) is $\IP(15 - 0.5(1/60000)<X<15 + 0.5(1/60000))$.
+
+
+::: {#lem-pdf-approximation}
+Suppose that $X$ is a continuous random variable with pdf $f_X$. 
+For a possible value $x$, the height of the pdf $f_X(x)$ is related to $\IP(X \text{ is close to } x)$ in the following sense.
+Let $\epsilon$ be a small number in the measurement units of $X$. 
+Then
+$$
+\IP(x - 0.5\epsilon < X< x + 0.5\epsilon) \approx f_X(x)\epsilon
+$$
+:::
+
+In @lem-pdf-approximation $\epsilon$ represents what counts as "close to" in the measurement units of the variable. 
+In @exm-meeting-pdf-ratio, $\epsilon=1$ represents rounding to the nearest minute, $\epsilon=1/60$ minute represents rounding to the nearest second, and $\epsilon=1/60000$ minute represents rounding to the nearest millisecond. 
+In general, $\epsilon = 1$ represents rounding to the nearest measurement unit, $\epsilon = 0.1$ represents rounding to one decimal place, $\epsilon = 0.01$ represents rounding to one decimal places, etc. 
+Note that what counts as "small" depends on the measurement units and context. 
+If $U$ has a Uniform(0, 1) distribution then all the possible values range from 0 to 1, so $\epsilon=1$ would not be considered small in this case. 
+On the other hand, if $X$ represents annual household income measured in US dollars, ranging over hundreds of thousands, then $\epsilon=1000$ US dollars would be reasonably small and would represent "close to" as rounding to the nearest 1000 US dollars.
+
+For a continuous random variable $X$ any particular $x$ has probability 0, so technically it doesn't make sense to say that some values are more likely than others in the "equal to" sense. 
+However, $X$ is more likely to take values *close to* those $x$ values that have greater density.  
+In @exm-meeting-pdf-ratio, $X$ is approximately $\frac{f(45)}{f(15)} = 3$ times more likely to be close to 45 than 15, regardless of how "close to" is defined.
+
+The relative heights of a pdf provide information about the relative likelihoods of possible values in the "close to" sense.
+
+::: {#lem-pdf-approximation-ratio}
+Suppose that $X$ is a continuous random variable with pdf $f_X$. 
+For any two possible values $x_1$ and $x_2$
+$$
+\frac{\IP(X \text{ is close to } x_1)}{\IP(X \text{ is close to } x_2)} \approx \frac{f_X(x_1)}{f_X(x_2)}
+$$
+regardless of how "close to" is defined.
+:::
+
+
+For example, if $f_X(x_1) = 2f_X(x_2)$ then $X$ is approximately 2 times more likely to be close to $x_1$ than to $x_2$.
+
+
+<!-- 
+We have seen how to sketch density from histogram, but how to describe a probability density function.
+example - start with pdf; find particular probability; then find cdf
+
+triangular - exam score? why might we assume density looks like this? Go from pdf to cdf
+example - triangular pdf; draw sketch; find c; find probability for specific x on either side; find cdf; find quantile?; sketch spinner; simulate
+
+We have seen idea of histogram letting bins get smaller, let's see the math.
+Start with numerical x value, area of histogram bin width small width, what is height.
+Then for general x
+
+
+$$
+F(x+\epsilon) - F(x) = ((x+\epsilon)/60)^2 - (x/60)^2 = (2/3600)x\epsilon + \epsilon^2/3600
+$$
+
+This gives the area of the bar; divide by $\epsilon$ to find the height.
+
+$$
+\frac{F(x+\epsilon) - F(x)}{\epsilon} = (2/3600)x + \epsilon/3600 \approx (2/3600)x
+$$
+
+
+
+
+
+For $x$ where the pdf is high probability accumulates more quickly and the cdf is steep.
+Therefore, pdf at $x$ is related to the slope of the pdf near $x$; if the cdf is steep at $x$ then the density is high, and vice versa
+
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-match-beta-pdf-cdf}
+@fig-match-beta-pdf displays eight different pdfs.
+In case, the horizontal axis represents values of the variable, which are between 0 and 1.
+Match each pdf in @fig-match-beta-pdf to its corresponding cdf in @fig-match-beta-cdf.
+Explain your reasoning without doing any calculations.
+:::
+::::
+
+:::: {.callout-tip collapse="true"}
+::: {#sol-match-beta-pdf-cdf}
+See @fig-match-beta-pdf-cdf.
+:::
+::::
+
+```{r}
+#| label: fig-match-beta-pdf
+#| echo: false
+#| fig-cap: "pdf"
+#| fig-subcap: 
+#|   - "pdf"
+#|   - "pdf with shaded area"
+#|   - "pdf with shaded area"
+#|   - "pdf with shaded area"
+#|   - "pdf with shaded area"
+#|   - "pdf with shaded area"
+#| layout-nrow: 2
+
+
+plot_beta_pdf <- function(shape1 = 1, shape2 = 1) {
+
+    ggplot(data.frame(x = c(0, 1)), aes(x = x)) +
+    stat_function(fun = dbeta,
+                  args = list(shape1 = shape1, shape2 = shape2),
+                  color = "orange",
+                  linewidth = 1.5,
+                  xlim = c(0, 1)) +
+    labs(x = "x, variable",
+         y = "f(x), probability density") +
+    theme_classic()
+}
+
+plot_beta_pdf(shape1 = 3, shape2 = 1)
+plot_beta_pdf(shape1 = 5, shape2 = 3)
+plot_beta_pdf(shape1 = 20, shape2 = 12)
+plot_beta_pdf(shape1 = 1, shape2 = 1)
+plot_beta_pdf(shape1 = 3, shape2 = 5)
+plot_beta_pdf(shape1 = 12, shape2 = 20)
+plot_beta_pdf(shape1 = 1, shape2 = 3)
+plot_beta_pdf(shape1 = 0.3, shape2 = 0.3)
+```
+
+```{r}
+#| label: fig-match-beta-cdf
+#| echo: false
+#| fig-cap: "cdf"
+#| fig-subcap: 
+#|   - "pdf"
+#|   - "pdf with shaded area"
+#|   - "pdf with shaded area"
+#|   - "pdf with shaded area"
+#|   - "pdf with shaded area"
+#|   - "pdf with shaded area"
+#| layout-nrow: 2
+
+
+plot_beta_cdf <- function(shape1 = 1, shape2 = 1) {
+
+    ggplot(data.frame(x = c(0, 1)), aes(x = x)) +
+    stat_function(fun = pbeta,
+                  args = list(shape1 = shape1, shape2 = shape2),
+                  color = "skyblue",
+                  linewidth = 1.5,
+                  xlim = c(0, 1)) +
+    labs(x = "x, variable",
+         y = "F(x), cumulative probability") +
+    theme_classic()
+}
+
+plot_beta_cdf(shape1 = 3, shape2 = 1)
+plot_beta_cdf(shape1 = 5, shape2 = 3)
+plot_beta_cdf(shape1 = 20, shape2 = 12)
+plot_beta_cdf(shape1 = 1, shape2 = 1)
+plot_beta_cdf(shape1 = 3, shape2 = 5)
+plot_beta_cdf(shape1 = 12, shape2 = 20)
+plot_beta_cdf(shape1 = 1, shape2 = 3)
+plot_beta_cdf(shape1 = 0.3, shape2 = 0.3)
+
+```
+
+
+
+```{r}
+#| label: fig-match-beta-pdf-cdf
+#| fig-cap: "cdf"
+#| fig-subcap: 
+#|   - "pdf"
+#|   - "pdf with shaded area"
+#|   - "pdf with shaded area"
+#|   - "pdf with shaded area"
+#|   - "pdf with shaded area"
+#|   - "pdf with shaded area"
+#| layout-nrow: 2
+
+
+
+
+plot_beta_pdf(shape1 = 3, shape2 = 1)
+plot_beta_pdf(shape1 = 5, shape2 = 3)
+plot_beta_pdf(shape1 = 20, shape2 = 12)
+plot_beta_pdf(shape1 = 1, shape2 = 1)
+plot_beta_pdf(shape1 = 3, shape2 = 5)
+plot_beta_pdf(shape1 = 12, shape2 = 20)
+plot_beta_pdf(shape1 = 1, shape2 = 3)
+plot_beta_pdf(shape1 = 0.3, shape2 = 0.3)
+plot_beta_cdf(shape1 = 3, shape2 = 1)
+plot_beta_cdf(shape1 = 5, shape2 = 3)
+plot_beta_cdf(shape1 = 20, shape2 = 12)
+plot_beta_cdf(shape1 = 1, shape2 = 1)
+plot_beta_cdf(shape1 = 3, shape2 = 5)
+plot_beta_cdf(shape1 = 12, shape2 = 20)
+plot_beta_cdf(shape1 = 1, shape2 = 3)
+plot_beta_cdf(shape1 = 0.3, shape2 = 0.3)
+
+
+
+```
+
+
+
+
+
+Give pdf and plot and compare to dot plot and histogram???
+
+
+
+
+How to simulate from density - beyond scope or will see later?
+
+In general, going from pdf to cdf involves calculus/integrating.
+Can do small interval probability - in density is not probability?
+
+Do Han example here - construct spinner and histogram and sketch density curve and compare with earlier discrete example
+
+
+Plot Han spinner and Han histogram with density overlay
+
+
+
+For $x$ intervals where the density is highest, probability accumulates more quickly and the cdf is steep.
+
+
+Symbulate can approximate density.
+Can basically create a histogram with many bins and connect the dots of the bin heights; however this can be too jagged since with many bins there won't be many simulated values in each bin.
+There are more sophisticated ways to "smooth"; beyond scope
+
+Note the difference between `x.plot('density')` and `Distribution(parameters).plot()`: the former estimates density based on simulated values, and the latter plots a theoretical probability density function.
+
+```{python}
+X = RV(Normal(30, 10))
+
+x = X.sim(10000)
+
+plt.figure()
+x.plot(['hist', 'density'])
+plt.show()
+```
+
+
+Be careful when estimating density for random variables with bounds on the range of possible values.
+
+
+```{python}
+U = RV(Uniform(0, 1))
+
+X = 60 * sqrt(U)
+
+x = X.sim(10000)
+
+plt.figure()
+x.plot(['hist', 'density'])
+plt.show()
+```
+
+
+
+## Density is not probability
+
+ON which plot do y values go from 0 to 1? pdf only, cdf only, both pdf and cdf, neither pdf nor cdf
+
+-  Density is not probability: which example? Han?
+-  Somewhere in density is not probability: we have discussed how to construct a spinner given percentiles and cdfs (and quantile functions). But what if we give density? How to construct spinner from density? To do this continuouslu we will need to integrate, but we will see that later. But we can discretize and do rough construction of spinner like in World series example. Start with Han, density of x is proportional to x (it's 2x but the 2 won't matter); start with smallest interval, call this 1 unit of spinner sector area, the next smallest will be blank units of spinner sector area, since same radius areas and lengths will have same proportions, sum to get total length then rescale. Construct table and spinner. Compare to cdf spinner. Compare cumulative probability to cdf.
+
+Maybe not here, but somewhere - how to estimate density from simulated values
+Crude way: simulation lots of values and compute frequency of small bins but this is "jagged"; want way to smooth - kernel density beyond scope; can do in Symbulate; do Normal first; then do Han; looks weird? careful with endpoints
+
+also construct the spinner - split spinner into 100 equal area sectors, area is approximately area of rectangle with density heigth, find length of interval and go from there. Also/only? the other direction: lots of small x intervals, area is approximately rectangle, use density to find area, then accumulate.
+
+
+```{r}
+#| echo: false
+
+x = 1:60
+
+density_x = 2 * x
+
+density_sum = sum(density_x)
+
+cdf_approx_x = cumsum(density_x) / density_sum
+
+cdf_x = (x / 60) ^ 2
+
+df = data.frame(x,
+           density_x,
+           cdf_approx_x = round(cdf_approx_x, 5),
+           cdf_x = round(cdf_x, 5)) |>
+  mutate(across(everything(), as.character))
+
+
+bind_rows(df |> slice(1:10),
+          c(x = "...", density_x = "...", cdf_approx_x = "...", cdf_x = "..."),
+          df |> slice(51:60)) |>
+  kbl() |> kable_styling()
+
+
+```
+
+
+pdf/cdf/quantile function are all ways of describing the distribution of a continuous random variable
+
+Summary
+
+-   The cdf can be obtained from the area under the pdf
+-   The quantile function is the inverse of the cdf
+-   The cdf and quantile function provide the percentiles
+-   The pdf can be obtained by "subtracting" the cdf
+
+
+ -->

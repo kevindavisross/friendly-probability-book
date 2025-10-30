@@ -1344,3 +1344,63 @@ Regarding the possible values
 Often $N_0$ and $N_1$ are large relative to $n$ in which case $X$ takes
 values $0, 1,\ldots, n$.
 
+
+## Probability density functions of continuous random variables
+
+For a continuous random variable $X$ with pdf $f_X$, the probability that $X$ takes a value in the interval $[a, b]$ is the *area under the pdf over the region* $[a,b]$.
+
+
+::: {#def-pdf-integral}
+
+The **probability density function (pdf)** (a.k.a., density) of a *continuous* RV $X$, defined on a probability space with probability measure $\IP$, is a function $f_X:\mathbb{R}\mapsto[0,\infty)$ which satisfies
+$$
+\IP(a \le X \le b)  =\int_a^b f_X(x) dx, \qquad \text{for all } -\infty \le a \le b \le \infty
+$$
+
+:::
+
+
+A pdf assigns zero probability to intervals where the density is 0.
+A pdf is usually defined for all real values, but is often nonzero only for some subset of values, the possible values of the random variable.
+We often write the pdf as
+$$
+f_X(x) =
+\begin{cases}
+\text{some function of $x$}, & \text{possible values of $x$}\\
+0, & \text{otherwise.}
+\end{cases}
+$$
+The "0 otherwise" part is often omitted, but be sure to specify the range of values where $f$ is positive.
+
+The axioms of probability imply that a valid pdf must satisfy
+\begin{align*}
+f_X(x) & \ge 0 \qquad \text{for all } x,\\
+\int_{-\infty}^\infty f_X(x) dx & = 1 
+\end{align*}
+
+The first condition above ensures that probabilities can't be negative, and the second condition required that the total area under the pdf must be 1 to represent 100% probability.
+
+::: {.callout-warning}
+A pdf is 0 outside the range of possible values. 
+Given a specific pdf, the generic bounds $(-\infty, \infty)$ in integrals should be replaced by the range of possible values, that is, those values for which $f_X(x)>0$.
+
+:::
+
+
+::: {#lem-pdf-to-cdf}
+If $X$ is a continuous random variable with pdf $f_X$, its cdf $F_X$ satisfies
+$$
+F_X(x) = \int_{-\infty}^x f_X(u) du
+$$
+:::
+
+::: {#lem-cdf-to-pdf}
+If $X$ is a continuous random variable with cdf $F_X$, its pdf $f_X$ satisfies
+$$
+f_X(x) = \frac{d}{dx} F_X(x)
+$$
+:::
+
+
+## Expected values of continuous random variables
+
