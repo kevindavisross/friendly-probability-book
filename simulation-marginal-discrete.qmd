@@ -3691,6 +3691,13 @@ Note that Poisson distributions require the weakest assumptions.
 1.  Poisson -->
 
 
+
+
+<!-- In each of the following Symbulate commands like `Binomial(10, 0.5).pmf(3)` or `.cdf` or `.mean` define an appropriate random variable in a context and interpret the value the code produces in that context. -->
+
+<!-- For each distribution (Binomial, etc) write your own problem. Provide the context and assumptions. Define an appropriate random variable. Then write three questions, one which requires `.pmf`, `.cdf`, `.mean`. Intepret values in context. -->
+
+
 <!-- ## Benford???
 
 Many commonly encountered discrete distributions are models for random variables that count, but not always the case.

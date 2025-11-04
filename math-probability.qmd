@@ -1344,6 +1344,13 @@ Regarding the possible values
 Often $N_0$ and $N_1$ are large relative to $n$ in which case $X$ takes
 values $0, 1,\ldots, n$.
 
+<!-- ## Comparison of common discrete distributions for modeling counting random variables
+
+Provide scenarios; identify the distribution of $X$; write the mathematical expresion you would evaluate to sovle the problem.
+
+In each of the following, evaluate the mathematical expression by defining a random variable with an appropriate distribution and representing the expression in terms of some probability or expected value involving that random variable. 
+Also, invent a context for your situation. -->
+
 
 ## Probability density functions of continuous random variables
 
@@ -1386,6 +1393,230 @@ Given a specific pdf, the generic bounds $(-\infty, \infty)$ in integrals should
 
 :::
 
+:::: {.callout-note appearance="simple"}
+::: {#exm-exponential-quakes-pdf}
+This example is related to @exm-quake-percentile-table. 
+@fig-percentile-table-histograms suggests a form for the pdf.
+
+Let $X$ be the time (minutes) until the next earthquake occurs (of any magnitude in a certain region). 
+Assume that the pdf of $X$ is 
+$$
+f_X(x) = (1/120) e^{-x/120}, \qquad x \ge0
+$$
+
+1.  Sketch the pdf of $X$ and verify that it resembles the orange curve in @fig-percentile-table-histograms.
+
+1.  Verify that $f_X$ is a valid pdf.
+
+1.  Without doing any integration, approximate the probability that $X$ rounded to the nearest second is 30 minutes.
+
+1.  Without doing any integration determine how much more likely that $X$ rounded to the nearest second is to be 30 than 60 minutes.
+
+1.  Compute and interpret $\text{P}(X < 30)$.
+
+1.  Compute and interpret $\text{P}(X > 360)$.
+
+1.  Find the cdf of $X$. 
+
+1.  Find the 25th percentile of $X$.
+
+1.  Find the quantile function of $X$.
+
+1.  Verify that the cdf and quantile function are consistent with @tbl-quake-percentile-table and the spinner in @fig-percentile-table-spinner
+
+:::
+::::
+
+
+
+:::: {.callout-tip collapse="true"}
+::: {#sol-exponential-quakes-pdf}
+
+1.  See @fig-exponential-quakes-pdf-1. 
+This is the same curve as in @fig-percentile-table-histograms.
+
+1.  We need to check that the total area under the curve, over the entire range of possible values $x>0$, is 1
+$$
+\int_0^\infty (1/120) e^{-x/120} dx = 1
+$$
+
+1.  We can approximate the probability with the area of a rectangle with base 1/60 minute (1 second) and height $f(30)$. 
+The approximate probability is $(1/60)f(60) = (1/60)(1/120 e^{-30/120}) = 0.000108$.
+
+1.  See @fig-exponential-quakes-pdf-6. 
+The ratio of the density heights is $\frac{f(30)}{f(60)} = \frac{(1/120)e^{-30/120}}{(1/120)e^{-60/120}} =1.28$, so $X$ rounded to the nearest second is 1.28 times more likely to be 30 than 60 minutes. 
+Note that this ratio does not depend on how closely we're rounding, as long as it's small in the scale of the variable.
+
+1.  This probability is represented by the shaded area in @fig-exponential-quakes-pdf-1. 
+Integrate the pdf over [0, 30]
+$$
+F(30) = \IP(X \le 30) = \int_0^{30} (1/120) e^{-x/120} dx = 1 - e^{-30/120} = 0.221
+$$
+Over many earthquakes, less than 30 minutes elapse until the next earthquake for 22.1% of earthquakes.
+
+1.  Even though there is technically no upper bound on the possible values of $X$, the probability that $X$ exceeds 360 minutes is fairly small.
+$$
+\int_{360}^\infty (1/120) e^{-x/120} dx = e^{-360/120} = 0.0498
+$$
+Over many earthquakes, the elapses until the next earthquake exceeds 360 minutes for only about 5% of earthquakes.
+
+1.  Repeat the calculation two parts above  with 30 replaced by a generic $x>0$. 
+(Be careful with notation; since $x$ is in the bounds we need a different dummy variable.)
+$$
+F(x) = \IP(X \le x) = \int_0^{x} (1/120) e^{-u/120} du = 1 - e^{-x/120}
+$$
+For a given $x>0$ this probability is represented by the area in @fig-exponential-quakes-pdf-3. 
+Technically the cdf is defined for all real values, so
+$$
+F(x) = 
+\begin{cases}
+1-e^{-x/120}, & x>0,\\
+0, & x\le 0
+\end{cases}
+$$
+See @fig-exponential-quakes-pdf-4. 
+Notice that the cdf is steepest, so probability accumulates more quickly, when the pdf is highest.
+
+
+1.  Set $0.25 = F(x) = \IP(X \le x) = 1-e^{-x/120}$ and solve for $x=-120\ln(1-0.25) = 34.5$ minutes.
+
+1.  Repeat the previous part with 0.25 replaced by a generic $p$ between 0 and 1. 
+Set $p = F(x) = \IP(X \le x) = 1-e^{-x/120}$ and solve for $x=-120\ln(1-p)$. 
+The quantile function is $Q(p) = -120\ln(1-p), 0<p<1$.
+See @fig-exponential-quakes-pdf-5. 
+
+
+1.  Plugging in a few values to $F(x)$ shows that the cdf is consistent with @tbl-quake-percentile-table; for example, $F(42.8) = 1-e^{-42.8/120} = 0.3$, so 42.8 minutes is the 30th percentile. 
+Plugging in a few values to $Q(p)$ shows that the quantile funciton is consistent with @tbl-quake-percentile-table; for example, $Q(0.7) = -120\ln(1-0.7) = 144.5$, so 144.5 minutes is the 70th percentile. 
+The spinner in @fig-percentile-table-spinner can be used to simulate values of a random variable with this pdf.
+
+
+
+:::
+::::
+
+
+```{r}
+#| label: fig-exponential-quakes-pdf
+#| echo: false
+#| warning: false
+#| fig-cap: "Illustrations of @exm-exponential-quakes-pdf"
+#| fig-subcap: 
+#|   - "Probability density function"
+#|   - "Shaded area represents $F(30)= \\IP(X\\le 30)$"
+#|   - "Shaded area represents $F(x)= \\IP(X\\le x)$"
+#|   - "Cumulative distribution function"
+#|   - "Quantile function"
+#|   - "Comparison of $f(30)$ and $f(60)$"
+#| layout-ncol: 3
+
+
+meeting_pdf <- function(x) {
+  dexp(x, rate = 1 / 120)
+}
+
+xmax = 420
+
+# pdf plot
+meeting_pdf_plot <- ggplot(data.frame(x = seq(0, xmax, 1000)), aes(x = x)) +
+  stat_function(fun = meeting_pdf,
+                color = "orange",
+                linewidth = 1.5,
+                xlim = c(0, xmax)) +
+  scale_x_continuous(limits = c(-1, xmax), expand = c(0, 0), breaks = seq(0, xmax, 30)) +
+  scale_y_continuous(expand = c(0, 0)) +
+  labs(x = "x, time (minutes)",
+       y = "f(x), probability density") +
+  theme_classic()
+
+meeting_pdf_plot
+
+x1 = 30
+x2 = 60
+
+# shaded area
+meeting_pdf_plot +
+  geom_area(stat = "function", fun = meeting_pdf,
+            fill = "skyblue", xlim = c(0, x1)) +
+  geom_area(stat = "function", fun = meeting_pdf,
+            fill = "white", xlim = c(x1, xmax))
+
+
+
+x3 = 127
+
+# generic shaded area
+ggplot(data.frame(x = seq(0, xmax, 1000)), aes(x = x)) +
+  stat_function(fun = meeting_pdf,
+                color = "orange",
+                linewidth = 1.5,
+                xlim = c(0, xmax)) +
+  scale_x_continuous(limits = c(-1, 360), expand = c(0, 0), breaks = c(0, x3, xmax), labels = c(0, "x", xmax)) +
+  scale_y_continuous(expand = c(0, 0)) +
+  theme_classic() +
+  geom_area(stat = "function", fun = meeting_pdf,
+            fill = "skyblue", xlim = c(0, x3)) +
+  geom_area(stat = "function", fun = meeting_pdf,
+            fill = "white", xlim = c(x3, xmax)) +
+  labs(x = "x, time (minutes)",
+       y = "f(x), probability density") +
+  theme_classic()
+
+
+
+# cdf plot
+
+meeting_cdf <- function(x) {
+  pexp(x, rate = 1 / 120)
+}
+
+ggplot(data.frame(x = seq(0, 6000, 1000)), aes(x = x)) +
+  stat_function(fun = meeting_cdf,
+                color = "skyblue",
+                linewidth = 1.5,
+                xlim = c(0, xmax)) +
+  scale_x_continuous(limits = c(-1, xmax), expand = c(0, 0), breaks = seq(0, xmax, 30)) +
+  scale_y_continuous(limits = c(0, 1), expand = c(0, 0)) +
+  labs(x = "x, time (minutes)",
+       y = "cdf F(x), probability") +
+  theme_classic()
+
+# quantile plot
+
+meeting_quantile <- function(x) {
+  qexp(x, rate = 1 / 120)
+}
+
+ggplot(data.frame(x = seq(0.0001, 1, 1000)), aes(x = x)) +
+  stat_function(fun = meeting_quantile,
+                color = "#CC79A7",
+                linewidth = 1.5,
+                xlim = c(0, 1)) +
+  scale_y_continuous(limits = c(0, xmax), expand = c(0, 0), breaks = seq(0, xmax, 30)) +
+  scale_x_continuous(limits = c(0, 1), expand = c(0, 0)) +
+  labs(x = "Percentile as probability (e.g., 0.25 for 25th percentile)",
+       y = "x, time (minutes)") +
+  theme_classic()
+
+# pdf height plot
+
+meeting_pdf_plot +
+  annotate("rect",
+           xmin = x1 - 0.5, xmax = x1 + 0.5,
+           ymin = 0, ymax = meeting_pdf(x1),
+           fill = "skyblue", alpha = 1) +
+  annotate("rect",
+           xmin = x2 - 0.5, xmax = x2 + 0.5,
+           ymin = 0, ymax = meeting_pdf(x2),
+           fill = "seagreen", alpha = 1)
+
+
+
+
+
+```
+
+Starting with a pdf, we integrate to get the cdf.
 
 ::: {#lem-pdf-to-cdf}
 If $X$ is a continuous random variable with pdf $f_X$, its cdf $F_X$ satisfies
@@ -1393,6 +1624,45 @@ $$
 F_X(x) = \int_{-\infty}^x f_X(u) du
 $$
 :::
+
+A pdf must be integrated to compute probabilities. 
+Think of the cdf as a generic integral. 
+Rather than integrating separately to find $F(30)$, $F(60)$, etc, we integrate once with a generic $x$ to find the general expression of the cdf $F(x)$, then we can simplify plug in values to the cdf to compute probabilities.
+
+
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-exponential-meeting-pdf-math}
+Recall @exm-meeting-nonuniform-probspace1. 
+We started by assuming the cdf of $X$ is $F(x) = (x/60)^2, 0<x<60$.
+Use calculus to find the pdf. 
+Compare to @exm-meeting-pdf-ratio.
+
+:::
+::::
+
+:::: {.callout-tip collapse="true"}
+::: {#sol-exponential-meeting-pdf-math}
+Since we integrate the pdf to get the cdf, we differentiate the cdf to get the pdf. 
+For $0<x<60$
+$$
+f(x)  = \frac{d}{dx} (x/60)^2 = (2/3600) x, 
+$$
+For $x<0$, the cdf is constant (0), so the derivative is 0. 
+For $x>60$, the cdf is constant (1), so the derivative is 0. 
+So the pdf of $X$ is
+$$
+f_X(x) = 
+\begin{cases}
+(2/3600)x, & 0<x<60,\\
+0 & \text{otherwise.}
+\end{cases}
+$$
+which is the same as in @exm-meeting-pdf-ratio.
+:::
+::::
+
+
 
 ::: {#lem-cdf-to-pdf}
 If $X$ is a continuous random variable with cdf $F_X$, its pdf $f_X$ satisfies
@@ -1403,4 +1673,275 @@ $$
 
 
 ## Expected values of continuous random variables
+
+An expected value is a *probability-weighted average value*.
+For a discrete random variable we multiply each possible value by its corresponding probability, determined by the pmf, and then sum. 
+We can find the probability-weighted average value for continuous random variables analogously: multiply each possible value by its corresponding *density*, determined by the *pdf*, and then *integrate*.
+
+
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-exponential-discrete-ev}
+Suppose that $X$ is a random variable with pdf
+$$
+f_X(x) = e^{-x}, \qquad x \ge0
+$$
+
+
+
+1.  Explain how you could use simulation to approximate $\E(X)$.
+
+1.  Suppose the values of $X$ are truncated^[We could also round to the nearest integer.  Whether we truncate or round won't matter as we consider what happens in the limit.] to integers. 
+That is, 0.738 is recorded as 0, 1.154 is recorded as 1, 2.999 is recorded as 2, 3.001 is recorded as 3, etc. 
+@tbl-exponential-discrete-sim summarizes 10000 simulated values of $X$, truncated. 
+Using just these values, approximate $\E(X)$.
+
+1.  How could you *approximate* the probability that the truncated value of $X$ is 0? 1? 2?
+Suggest a formula for the approximate $\E(X)$. 
+(Don't worry if the approximation isn't great; we'll see how to improve it.)
+
+1.  Truncating to the nearest integer turns out not to yield a great approximation of the long run average value of $X$. 
+How could we get a better approximation?
+
+1.  Suppose instead of truncating to an integer, we truncate to the first decimal. 
+For example 0.738 is recorded as 0.7, 1.154 is recorded as 1.1, 2.999 is recorded as 2.9, 3.001 is recorded as 3.0, etc. 
+Suggest a formula for the approximate $\E(X)$. 
+
+1.  Suppose instead of truncating to an integer, we truncate to the second decimal. 
+For example 0.738 is recorded as 0.73, 1.154 is recorded as 1.15, 2.999 is recorded as 2.99, 3.001 is recorded as 3.00, etc. 
+Suggest a formula for the approximate $\E(X)$. 
+
+1.  We can continue in this way, truncating to the second decimal place, then the third, and so on. 
+Considering what happens in the limit, suggest a formula for the theoretical $\E(X)$.
+
+1.  Donny Dont says $\text{E}(X) = \int_0^\infty e^{-x}dx = 1$. 
+Do you agree?
+
+:::
+::::
+
+```{r}
+#| label: tbl-exponential-discrete-sim
+#| echo: false
+
+ff = c(6302, 2327, 915, 287, 94, 43, 22, 5, 4, 1)
+
+kbl(
+  data.frame(0:9, ff),
+  booktabs = TRUE,
+  col.names = c("Truncated value of X", "Number of repetitions"),
+  caption = '10000 simulated values of X, truncated, for X with an Exponential(1) distribution'
+) |>
+kable_styling(fixed_thead = TRUE)
+
+```
+
+
+
+:::: {.callout-tip collapse="true"}
+::: {#exm-exponential-discrete-ev}
+
+1.  Simulate many values of $X$ and average: sum the simulated values and divide by the number of simulated values. 
+You can always approximate $\E(X)$ by simulating many values and averaging; it doesn't matter if the random variable is discrete or continuous.
+
+1.  The truncated random variable is a discrete random variable, so we can compute the probability-weighted average as usual
+$$
+0\left(\frac{6302}{10000}\right)+ 1\left(\frac{2327}{10000}\right)+2\left(\frac{915}{10000}\right) + 3\left(\frac{287}{10000}\right)+ \cdots + 9\left(\frac{1}{10000}\right)
+$$
+
+1. If $X$ is between 0 and 1 then the truncated value is 1. 
+We could find the probability that $X$ is between 0 and 1 by integrating the pdf over this range. 
+But we can *approximate* the probability by multiplying the pdf evaluated at 0.5 (the midpoint^[In the limit, any value in (0, 1) would work.  We use the midpoint mostly because just using using 0 results in an approximate probability of $e^{-0}(1)=1$, an egregious approximation of the true probability $1-e^{-1}\approx 0.632$]) by the length of the (0, 1) interval: $f(0.5)(1-0) = e^{-0.5}(1)\approx 0.607$. 
+Technically, the approximation is not great unless the interval is short, but it's the idea that is important for now. 
+Similarly the approximate probability that the truncated value is 1 is $f(1.5)(2-1) = e^{-1.5}(1)\approx 0.223$, and the approximate probability that the truncated value is 2 is $f(2.5)(3-2) = e^{-2.5}(1)\approx 0.082$. 
+Following this pattern, a reasonable formula for the truncated-to-nearest-integer discrete approximation of $\E(X)$ seems to be
+\begin{align*}
+& \qquad 0\left(f(0+ 0.5)(1)\right)+ 1\left(f(1 + 0.5)(1)\right)+2\left(f(2+0.5)(1)\right) + 3\left(f(3 + 0.5)(1)\right) + \cdots
+\\
+& = \sum_{x=0}^\infty x f(x + 0.5) (1)\\
+& = \sum_{x=0}^\infty x e^{-(x + 0.5)} (1)
+\end{align*}
+where the sum is over values $x = 0, 1, 2, \ldots$. 
+Plugging in $f(x + 0.5) = e^{-(x+0.5)}$ to the above yields 0.558.
+This turns out to be a bad approximation, but the following part refine it.
+
+1.  Rather than truncating to integers, truncate to the first decimal, or the second, or the third. 
+Or better yet don't truncate; $X$ is continuous after all. 
+But it helps to consider what would happen if $X$ were discrete first.  
+
+1.  Now the possible values would be 0, 0.1, 0.2, etc. 
+The truncated value would be 0 if $X$ lies in the interval (0, 0.1). 
+We could approximate this probability with $f(0.05)(0.1-0) = e^{-0.05}(0.1)$. 
+We could approximate the probability that $X$ lies in the interval (0.1, 0.2), so the truncated value is 0.1, with $f(0.15)(0.2-0.1) = e^{-0.15}(0.1)$. 
+Following this pattern, a reasonable formula for the truncated-to-nearest-tenth discrete approximation of $\E(X)$ seems to be
+\begin{align*}
+& \qquad 0\left(f(0+ 0.05)(0.1)\right)+ 0.1\left(f(0.1 + 0.05)(0.1)\right)+0.2\left(f(0.2+0.05)(0.1)\right) + 0.3\left(f(0.3 + 0.05)(0.1)\right) + \cdots
+\\
+& = \sum_{x=0}^\infty x f(x + 0.05) (0.1)\\
+& = \sum_{x=0}^\infty x e^{-(x + 0.05)} (0.1)
+\end{align*}
+where the sum is over values $x = 0, 0.1, 0.2, \ldots$.  Plugging in $f(x + 0.5) = e^{-(x+0.5)}$ to the above yields 0.950. 
+
+1.  Truncating to the second decimal place suggests a formula for the long run average of
+\begin{align*}
+& \qquad 0\left(f(0+ 0.005)(0.01)\right)+ 0.01\left(f(0.01 + 0.005)(0.01)\right)+0.02\left(f(0.02+0.005)(0.01)\right) + 0.03\left(f(0.03 + 0.005)(0.01)\right) + \cdots
+\\
+& = \sum_{x=0}^\infty x f(x + 0.005) (0.01)\\
+& = \sum_{x=0}^\infty x e^{-(x + 0.005)} (0.01)
+\end{align*}
+where the sum is over values $x = 0, 0.01, 0.02, \ldots$.  
+Plugging in $f(x) = e^{-x}$ to the above yields 0.995.  
+
+1.  If $\Delta x$ represents the level of truncation, e.g., $\Delta x = 0.01$ for truncating to the second decimal place, then a general formula is
+\begin{align*}
+& \qquad \sum_{x=0}^\infty x f(x + \Delta x / 2) \Delta x\\
+& = \sum_{x=0}^\infty x e^{-x + \Delta x / 2} \Delta x\\
+& \approx \sum_{x=0}^\infty x e^{-x} \Delta x
+\end{align*}
+In the limit as $\Delta x$ approaches 0, $f(x + \Delta x /2)$ approaches $f(x)=e^{-x}$, there are more and more terms in the sum, and the sum approaches an integral over $x$ values, 
+\begin{align*}
+  & \qquad \int_0^\infty x f(x) dx\\
+  & = \int_0^\infty x e^{-x} dx
+\end{align*}
+
+1.  Donny happened to get the correct value, but that's just coincidence. 
+His method is wrong. 
+Donny integrated the pdf over the range of all possible values, $\int_0^\infty f_X(x)dx$, which will always be 1. 
+To get the expected value, you need to find the probability weighted average value of $x$: $\int_0^\infty x f_X(x)dx$.
+:::
+::::
+
+
+::: {#def-ev-continuous}
+Let $X$ be a continuous random variable with pdf $f_X$. 
+The expected value of $X$ is
+$$
+\E(X) = \int_{-\infty}^\infty x f_X(x) dx
+$$
+:::
+
+Remember to replace the generic bounds $(\infty, \infty)$ with the range of possible values of $X$.
+
+
+::: {.callout-warning}
+Remember that an expected value is a probaility-weighted average: take each possible value of the variable and multiply by its probability. 
+For a continuous random variable $X$ with pdf $f_X$ the calculation is $\int_{-\infty}^\infty x f_X(x)dx$.
+In $x f_X(x)$ the first $x$ plays the role of "value" and $f_X(x)$ plays the role of "probability".
+The pdf $f_X(x)$ might be a fairly complicated function of $x$, so it's easy to lose the $x$ out front.
+But don't forget that $x$! 
+Omitting the $x$ gives $\int_{-\infty}^\infty f_X(x)dx$ which will always be 1 since it's the integral of a pdf. 
+Anytime you compute an expected value and it turns out to be 1, be a little suspicious and double check that you didn't forget the $x$ that multiplies $f_X(x)$.
+:::
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-exponential-quakes-ev}
+Continuing @exm-exponential-quakes-pdf. 
+Let $X$ be the times (minutes) until the next earthquake occurs (of any magnitude in a certain region). 
+Assume that the pdf of $X$ is 
+$$
+f_X(x) = (1/120) e^{-x/120}, \qquad x \ge0
+$$
+
+1.  Donny Dont says $\text{E}(X) = \int_0^\infty (1/120)e^{-x/120}dx = 1$. 
+Do you agree? 
+
+1.  Compute and interpret $\text{E}(X)$.
+
+1.  Compute and interpret $\text{P}(X \le \text{E}(X))$.
+
+
+:::
+::::
+
+
+:::: {.callout-tip collapse="true"}
+::: {#sol-exponential-quakes-ev}
+
+1.  Donny didn't heed the previous warning; he forgot to multiply the pdf by $x$ so he is just integrating the pdf which yields 1. 
+
+1.  $\text{E}(X) = \int_0^\infty x f_X(x)dx = \int_0^\infty x (1/120)e^{-x/120} = 120$ minutes. 
+Over many earthquakes, the elapsed time between earthquakes is 120 minutes on average.
+
+1.  The cdf is $F(x)  = 1 - e^{-x/120}$, so
+$$
+\IP(X \le \E(X)) = \IP(X \le 120) = F(120) = 1-e^{-120/120} = 1-e^{-1} = 0.632
+$$
+In this case, the mean 120 is greater that the median of 83 minutes. 
+The distribution is skewed to the right, so the longer tail representing the distribution of larger values pulls the mean up.
+
+:::
+::::
+
+
+
+
+::: {#lem-lotus}
+## Law of the unconscious statistician (LOTUS)
+If $X$ is a continuous random variable with pdf $f_X$ and $g$ is any function,
+$$
+\E[g(X)] =\int_{-\infty}^\infty g(x) f_X(x) dx
+$$
+:::
+
+LOTUS says we don't have to first find the distribution of $Y=g(X)$ to find $\E[g(X)]$; rather, we just simply apply the transformation $g$ to each possible value $x$ of $X$ and then apply the corresponding weight for $x$ to $g(x)$.
+
+Recall that whether in the short run or the long run, in general
+\begin{align*}
+\text{Average of $g(X)$} & \neq g(\text{Average of $X$})
+\end{align*}
+In terms of expected values, in general
+\begin{align*}
+\text{E}(g(X)) & \neq g(\text{E}(X))
+\end{align*}
+The left side $\text{E}(g(X))$ represents first transforming the $X$ values and then averaging the transformed values. 
+The right side $g(\text{E}(X))$ represents first averaging the $X$ values and then plugging the average (a single number) into the transformation formula. 
+
+ 
+:::: {.callout-note appearance="simple"}
+::: {#exm-exponential-quakes-ev-lotus}
+Continuing @exm-exponential-quakes-ev. 
+Let $X$ be the times (minutes) until the next earthquake occurs (of any magnitude in a certain region). 
+Assume that the pdf of $X$ is 
+$$
+f_X(x) = (1/120) e^{-x/120}, \qquad x \ge0
+$$
+We're interested in $\E(X^2)$ and $\Var(X)$.
+
+
+1.  Donny Dont says: "I can just use LOTUS and replace $x$ with $x^2$, so $\text{E}(X^2)$ is $\int_{-\infty}^{\infty} (1/120)x^2 e^{-x^2/120} dx$".
+Do you agree? 
+
+1.  Compute $\text{E}(X^2)$.
+
+1.  Compute $\text{Var}(X)$.
+
+1.  Compute $\text{SD}(X)$.
+
+:::
+::::
+
+
+:::: {.callout-tip collapse="true"}
+::: {#exm-exponential-quakes-ev-lotus}
+Continuing @exm-exponential-quakes-ev. 
+Let $X$ be the times (minutes) until the next earthquake occurs (of any magnitude in a certain region). 
+Assume that the pdf of $X$ is 
+$$
+f_X(x) = (1/120) e^{-x/120}, \qquad x \ge0
+$$
+We're interested in $\E(X^2)$ and $\Var(X)$.
+
+1.  The point of LOTUS is that we transform the values of $X$ *but not the probabilities*. 
+That is, the pdf of $X$, $f_X(x) = (1/120)e^{-x/120}$ is unchanged.
+
+1.  $\E(X^2) = \int_0^\infty x^2 f_X(x) dx = \int_0^\infty x^2 (1/120)e^{-x/120} dx = 28800$ squared-minutes.
+
+1.  $\text{Var}(X) = \E(X^2) - (\E(X))^2 = 28800 - 120^2 = 14400$ squared-minutes.
+
+1.  $\text{SD}(X)=\sqrt{\Var(X)} = \sqrt{14400} = 120$ minutes.
+
+:::
+::::
+
+
 

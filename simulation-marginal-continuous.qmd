@@ -2381,3 +2381,243 @@ Summary
 
 
  -->
+
+
+## Expected values
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-meeting-pdf-ev}
+Continuing @exm-meeting-pdf1. 
+Han's arrival time $X$ (minutes after noon) has pdf
+$$
+f_X(x) = 
+\begin{cases}
+(2/3600)x, & 0<x<60,\\
+0 & \text{otherwise.}
+\end{cases}
+$$
+
+
+1.  Explain how you could use simulation to approximate $\E(X)$. 
+Then conduct a simulation and approximate $\E(X)$.
+1.  Explain how you could approximate $\E(X)$ as a sum (as if $X$ were a discrete random variable). 
+1.  How could you obtain a better approximation than the sum in the previous part? 
+1.  It can be shown that $\E(X) = 40$ minutes. 
+Compare to the approximations. 
+Then interpret $\E(X)$ in context.
+1.  Compute and interpret $\IP(X \le \E(X))$. 
+Is it 0.5? 
+Explain.
+
+
+:::
+::::
+
+
+:::: {.callout-tip collapse="true"}
+::: {#sol-meeting-pdf-ev}
+
+1.  As usual, we can simulate many values of $X$ and average them. 
+For example, if we simulate 10000 values of $X$ we would sum the 10000 values and divide by 10000.
+We can simulate values of $X$ using a spinner like in @fig-meeting-nonuniform-spinner, via the method in @sec-univeral-spinner. 
+See Symbulate code below. 
+Simulation results suggest $\E(X)$ is about 40 minutes.
+1.  Any value in [0, 60] is possible, but we can obtain an approximation by truncating (or rounding) to the nearest minute. 
+We'll truncate to be consistent with @exm-meeting-pdf-ratio. 
+The probability that $X$ truncated to the nearest minute is $x$ is approximately $(1)f(x) = (2/3600)x$; see @exm-meeting-pdf-ratio for examples.
+Therefore, we can treat $X$ like it's a discrete random variable which takes value $x = 0, 1, 2, 3, \ldots, 57, 58, 59$ with probability $(2/3600)x$. 
+Then we can compute the expected value of this discrete random variable in the usual way as a probability-weighted average value.
+$$
+{\scriptsize
+(0)((2/3600)0) + (1)((2/3600)1) + (2)((2/3600)2) + (3)((2/3600)3) + \cdots + (57)((2/3600)57) + (58)((2/3600)58)+ (59)((2/3600)59)
+}
+$$
+There are 60 terms in the sum, so use software (see below) or a spreadsheet to compute, arriving at an approximation^[In this case, the approximation is better if we use the midpoint of each of the truncated intervals instead of the left endpoint, so that the possible values are $0.5, 1.5, 2.5, \ldots 59.5$. Also, rounding instead of truncating yields the actual value of 40 minutes.] of 39 minutes.
+1.  $X$ is a continuous random variable but in the previous part we treated it as if were discrete, thus losing some information. 
+The "more continuous" our discrete approximation is, the better it is should be.
+Thus, we can get a better approximation by truncating (or rounding) to the nearest *second*.  
+The probability that $X$ truncated to the nearest *second*---that is, 1/60 minute---is $x$ is approximately $(1/60)f(x) = (1/60)(2/3600)x$. 
+Therefore, we can treat $X$ like it's a discrete random variable which takes values, in minutes, $x = 0, \frac{1}{60}, \frac{2}{60}, \frac{3}{60}, \ldots, 59\frac{57}{60}, 59\frac{58}{60}, 59\frac{59}{60}$ with probability $(1/60)(2/3600)x$; see @exm-meeting-pdf-ratio for examples.
+Then we can compute the expected value of this discrete random variable in the usual way as a probability-weighted average value.
+$$
+{\scriptsize
+(0)((1/60)(2/3600)0) + (1/60)((1/60)((2/3600)(1/60))) + (2/60)((1/60)((2/3600)(2/60))) + (3/60)((1/60)((2/3600)(3/60))) + \cdots
+}
+$$
+Now there are 3600 terms in the sum, one for each second between 0 and 60 minutes, so we use software (see below) or a spreadsheet to compute, arriving at an approximation of 39.98 minutes.
+1.  The simulation yields an approximate expected value close to 40 minutes. 
+The nearest-minute discretion approximate yields a reasonably close value (39), and the nearest-second discrete approximation is even closer (39.98). 
+If we imagine Han's arrive times over many days follow this pattern, we expect him to arrive 40 minutes after noon on average per day.
+1.  We have already seen that the cdf is $F(x) = (x/60)^2$, so
+$$
+\IP(X \le \E(X)) = \IP(X \le 40) = F(40) = (40/60)^2 = 4/9 = 0.444
+$$
+On 44.4% of days Han's arrival time is below average. 
+This is not 0.5 because Han is more likely to arrive late than early. 
+The mean is not necessarily the median.
+:::
+::::
+
+Here is a simulation of $X$ values for @exm-meeting-pdf1.
+
+```{python}
+U = RV(Uniform(0, 1))
+
+X = 60 * sqrt(U)
+
+x = X.sim(10000)
+
+x.plot()
+```
+
+We can approximate $\E(X)$ in the usual way by averaging the simulated values.
+
+```{python}
+x.mean()
+```
+
+
+The code below approximate $\E(X)$ as if $X$ were a discrete random variable with pmf $p(x) = (2/3600)x, x = 0, 1, 2, \ldots, 59$.
+
+
+```{python}
+sum([x * (1 * ((2 / 3600) * x)) for x in np.arange(0, 60, 1)])
+```
+
+Now we revise to truncate to the nearest second, treating $X$ as if were a discrete random variable with pmf $p(x) = (1/60)((2/3600)x), x = 0, \frac{1}{60}, \frac{2}{60}, \frac{3}{60}, \ldots, 59\frac{57}{60}, 59\frac{58}{60}, 59\frac{59}{60}$.
+
+```{python}
+sum([x * ((1 / 60) * ((2 / 3600) * x)) for x in np.arange(0, 60, 1 / 60)])
+```
+
+In general, we need calculus to compute expected values for continuous random variables. 
+However, we can approximate $\E(X)$ for a continuous random variable $X$ by treating $X$ as a discrete random variable. 
+Create a "grid" of "close to" values for $X$ (e.g., rounding to the nearest minute, rounding to 2 decimal places, etc), use the pdf of $X$ to approximate the probability that $X$ is close to each of the values in the grid, then multiply the values in the grid by their approximate probability and sum.
+
+Regardless of the type of the random variable (discrete or continuous), its expected value can be interpreted as the long-run average value. 
+Furthermore, $\E(X)$ can be approximated via simulation in the same way for discrete and continuous random variables: simulate many values of $X$ and average. 
+The average is a "usual" average; just sum all the simulated values and divide by the number of simulated values.
+
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-meeting-pdf-ev-lotus}
+Continuing @exm-meeting-pdf-ev. 
+Han's arrival time $X$ (minutes after noon) has pdf
+$$
+f_X(x) = 
+\begin{cases}
+(2/3600)x, & 0<x<60,\\
+0 & \text{otherwise.}
+\end{cases}
+$$
+
+
+1.  Explain how you could use simulation to approximate $\text{E}(X^2)$.
+
+1.  Explain how you could approximate $\text{E}(X^2)$ as a sum (like a discrete random variable). 
+
+1.  How could you obtain a better approximation than the sum in the previous part? 
+
+1.  It can be shown that $\E(X^2) = 1800$ squared-minutes. 
+Compare to the approximations.
+
+1.  Compute $\text{Var}(X)$.
+
+1.  Compute $\text{SD}(X)$.
+
+:::
+::::
+
+
+:::: {.callout-tip collapse="true"}
+::: {#sol-meeting-pdf-ev-lotus}
+
+1.  As usual, we can simulate many values of $X$, square simulated value to get $X^2$, and average the squared values. 
+See Symbulate code below. 
+Simulation results suggest $\E(X^2)$ is about 1800 squared-minutes.
+1.  Any value in [0, 60] is possible, but we can obtain an approximation by truncating (or rounding) to the nearest minute. 
+We'll truncate to be consistent with @exm-meeting-pdf-ratio. 
+The probability that $X$ truncated to the nearest minute is $x$ is approximately $(1)f(x) = (2/3600)x$; see @exm-meeting-pdf-ratio for examples.
+Therefore, we can treat $X$ like it's a discrete random variable which takes value $x = 0, 1, 2, 3, \ldots, 57, 58, 59$ with probability $(2/3600)x$. 
+Then we can compute $\E(X^2)$ for this discrete random variable in the usual way by squaring each of the possible values before multiplying by its probability.
+$$
+{\scriptsize
+(0^2)((2/3600)0) + (1^2)((2/3600)1) + (2^2)((2/3600)2) + (3^2)((2/3600)3) + \cdots + (57^2)((2/3600)57) + (58^2)((2/3600)58)+ (59^2)((2/3600)59)
+}
+$$
+There are 60 terms in the sum, so use software (see below) or a spreadsheet to compute, arriving at an approximation of 1740.5 squared-minutes.
+1.  $X$ is a continuous random variable but in the previous part we treated it as if were discrete, thus losing some information. 
+The "more continuous" our discrete approximation is, the better it is should be.
+Thus, we can get a better approximation by truncating (or rounding) to the nearest *second*.  
+The probability that $X$ truncated to the nearest *second*---that is, 1/60 minute---is $x$ is approximately $(1/60)f(x) = (1/60)(2/3600)x$. 
+Therefore, we can treat $X$ like it's a discrete random variable which takes values, in minutes, $x = 0, \frac{1}{60}, \frac{2}{60}, \frac{3}{60}, \ldots, 59\frac{57}{60}, 59\frac{58}{60}, 59\frac{59}{60}$ with probability $(1/60)(2/3600)x$; see @exm-meeting-pdf-ratio for examples.
+Then we can compute $\E(X^2)$ for this discrete random variable in the usual way by squaring each of the possible values before multiplying by its probability.
+$$
+{\scriptsize
+(0)^2((1/60)(2/3600)0) + (1/60)^2((1/60)((2/3600)(1/60))) + (2/60)^2((1/60)((2/3600)(2/60))) + (3/60)^2((1/60)((2/3600)(3/60))) + \cdots
+}
+$$
+Now there are 3600 terms in the sum, one for each second between 0 and 60 minutes, so we use software (see below) or a spreadsheet to compute, arriving at an approximation of 1799 minutes.
+1.  The simulation yields an approximate expected value close to 1800 squared-minutes. 
+The nearest-minute discretion approximate yields a reasonably close value (1740), and the nearest-second discrete approximation is even closer (1799). 
+1.  $\Var(X) = E(X^2) = (\E(X))^2 = 1800 - 40^2 = 200$ squared-minutes.
+1.  $\SD(X) = \sqrt{\Var(X)} = \sqrt{200} = 14.1$ minutes. 
+Roughly, Han's arrival times vary by about 14 minutes on average from day to day.
+
+:::
+::::
+
+We continue the simulation from before.
+
+```{python}
+U = RV(Uniform(0, 1))
+
+X = 60 * sqrt(U)
+
+x = X.sim(10000)
+
+
+```
+
+We can approximate $\E(X^2)$ by averaging the squares of the simulated $X$ values.
+
+```{python}
+(x**2).mean()
+```
+
+Then the approximate variance is
+
+```{python}
+(x**2).mean() - x.mean()**2
+```
+
+```{python}
+x.var()
+```
+
+```{python}
+x.sd()
+```
+
+The code below approximates $\E(X^2)$ as if $X$ were a discrete random variable with pmf $p(x) = (2/3600)x, x = 0, 1, 2, \ldots, 59$. 
+Notice that the probabilities have not changed; we are just multiplying them by the $x^2$ values instead of the $x^2$ values.
+
+
+```{python}
+sum([(x**2) * (1 * ((2 / 3600) * x)) for x in np.arange(0, 60, 1)])
+```
+
+Now we revise to truncate to the nearest second, treating $X$ as if were a discrete random variable with pmf $p(x) = (1/60)((2/3600)x), x = 0, \frac{1}{60}, \frac{2}{60}, \frac{3}{60}, \ldots, 59\frac{57}{60}, 59\frac{58}{60}, 59\frac{59}{60}$. 
+Again, notice that the probabilities have not changed; we are just multiplying them by the $x^2$ values instead of the $x^2$ values.
+
+
+```{python}
+sum([(x**2) * ((1 / 60) * ((2 / 3600) * x)) for x in np.arange(0, 60, 1 / 60)])
+```
+Variance is defined in the same for all random variables regardless of type: $\Var(X) = \E((X-\E(X))^2)$, which is equivalently $\Var(X) = \E(X^2)-\E(X)^2$. 
+Simulation can be used to approximate variance in the same way for discrete and continuous random variables.
+
+
+
+ 
+
