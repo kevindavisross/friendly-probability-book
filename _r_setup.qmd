@@ -6,7 +6,7 @@
 library(tidyverse)
 library(knitr)
 library(janitor)
-library(waffle)
+# library(waffle)
 library(viridis)
 library(gtools)
 library(ggpubr)

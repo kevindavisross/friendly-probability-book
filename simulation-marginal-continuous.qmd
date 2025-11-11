@@ -2385,6 +2385,14 @@ Summary
 
 ## Expected values
 
+
+<!-- - Expand on the approximation
+- start with just rounding to nearest 10 minutes for concept.
+- Rounding to nearest minutes, give table with selected rows link to Google sheet
+- Repeat above for nearest second, and nearest millisecond?
+- Discuss how there are more and more terms in sum and the probability of each term gets smaller and smaller -->
+
+
 :::: {.callout-note appearance="simple"}
 ::: {#exm-meeting-pdf-ev}
 Continuing @exm-meeting-pdf1. 
@@ -2619,5 +2627,501 @@ Simulation can be used to approximate variance in the same way for discrete and 
 
 
 
- 
+## Exponential Distributions
+
+
+
+Exponential distributions are often used to model the waiting times between events in a random process that occurs continuously over time. 
+@exm-quake-percentile-table is one example of an Exponential distribution. 
+Let's take a closer look at this example.
+
+Let $X$ be the random variable measuring the time, in minutes, between earthquakes in @exm-quake-percentile-table. 
+We assume that $X$ has an "Exponential distribution with rate parameter 1/120"; our goal is to see what this means.
+@tbl-quake-percentile-table contains only certain percentiles of this distribution; these percentiles are displayed in @fig-quake-percentile-table-cdf-1.
+@fig-quake-percentile-table-cdf-2 fills in the gaps and displays the corresponding cdf^[We will see the mathematical formula in a later chapter. For now just notice how the smooth curve representing the cdf is consistent with the percentiles in @exm-quake-percentile-table.]. 
+For example, 240 minutes is a little over the 85th percentile (it's about the 86.5th percentile) and the 65th percentile is a little over 120 minutes (it's about 126.0 minutes).
+
+
+
+
+```{r}
+#| label: fig-quake-percentile-table-cdf
+#| echo: false
+#| fig-cap: "Percentiles for @@exm-quake-percentile-table corresponding to an Exponential distribution with rate parameter 1/120."
+#| fig-subcap: 
+#|   - "Select percentiles from @tbl-quake-percentile-table"
+#|   - "Cumulative distribution function"
+#| layout-ncol: 2
+
+
+exponential_spinner <- data.frame(p = 0.1 * (0:9)) |>
+  mutate(x = round(qexp(p, rate = 1 / 120), 1))
+
+plot1 <- ggplot(exponential_spinner, aes(x = x, y = p)) +
+  geom_point(shape = 1, size = 3) +  # open circles, larger
+  scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, 0.1)) +
+  scale_x_continuous(limits = c(0, 360), breaks = seq(0, 360, 60)) +
+  theme_minimal() +  # removes gray background, keeps gridlines
+  theme(panel.grid.major = element_line(color = "gray80"),
+        panel.grid.minor = element_line(color = "gray90")) +
+  labs(x = "x (minutes)",
+       y = "cdf(x)")
+
+plot1
+
+x1 <- 240
+y1 <- pexp(x1, rate = 1/120)
+y2 <- 0.65
+x2 <- qexp(y2, rate = 1/120)
+
+
+plot1 + 
+  stat_function(fun = function(x) pexp(x, rate = 1/120),
+                color = "skyblue", linewidth = 1.2) +
+  annotate("segment", x = x1, xend = x1, y = 0, yend = y1,
+           linetype = "dashed", color = "gray40") +
+  annotate("segment", x = 0, xend = x1, y = y1, yend = y1,
+           linetype = "dashed", color = "gray40") +
+  annotate("segment", x = x2, xend = x2, y = 0, yend = y2,
+           linetype = "dashed", color = "gray40") +
+  annotate("segment", x = 0, xend = x2, y = y2, yend = y2,
+           linetype = "dashed", color = "gray40")
+
+```
+
+
+
+We can use Symbulate to evaluate the `Exponential(rate = 1 / 120)` cdf and the corresponding quantile function. 
+The results are consistent with @tbl-quake-percentile-table and @fig-quake-percentile-table-cdf.
+
+```{python}
+Exponential(rate = 1 / 120).cdf(240)
+```
+
+```{python}
+Exponential(rate = 1 / 120).cdf([60, 120, 180, 240, 300, 360])
+```
+
+```{python}
+Exponential(rate = 1 / 120).quantile(0.65)
+```
+
+```{python}
+Exponential(rate = 1 / 120).quantile([0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9])
+```
+
+We can use the cdf in @fig-quake-percentile-table-cdf-2 to fill in the gaps in the spinner in @fig-percentile-table-spinner to create an "Exponential(rate = 1/120) spinner".
+Then we can use the spinner to simulate many values of $X$. 
+Below we use Symbulate to define an `RV` `X` with the `Exponential(rate = 1 / 120)` distribution and simulate many values of it. 
+The simulation results seem consistent with what we have seen so far.
+
+
+```{python}
+X = RV(Exponential(rate = 1 / 120))
+
+x = X.sim(10000)
+
+x
+```
+
+
+```{python}
+x.count_lt(240) / x.count()
+```
+
+```{python}
+x.quantile(0.65)
+```
+
+The histogram below summarizes the simulated values of $X$. 
+The orange curve represents the theoretical pdf for the Exponential distribution with rate 1/120. 
+Compare to @fig-percentile-table-histograms
+
+
+```{python}
+plt.figure()
+
+x.plot()
+Exponential(rate = 1 / 120).plot(); # overlay theoretical pdf
+plt.show(); 
+
+```
+
+
+We hope the above convinces you that @exm-quake-percentile-table involves an Exponential distribution with rate parameter 1/120. 
+Now let's investigate some more properties.
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-exponential-quake-ev-discrete}
+Continuing @exm-quake-percentile-table, let $X$ be the random variable measuring the time, in minutes, between earthquakes and assume that $X$ has an Exponential distribution with rate parameter 1/120. 
+
+1.  Without doing a simulation, approximate the probability that $X$ rounded to the nearest *second* is 30 minutes. 
+
+1.  Without doing a simulation, approximate how much more likely that $X$ rounded to the nearest *second* is to be 30 than 60 minutes.
+
+1.  Explain how you could approximate $\E(X)$ as a sum (like a discrete random variable) without doing a simulation, then do it.
+
+1.  Explain how you could use simulation to approximate $\E(X)$, then do it.
+
+1.  It can be shown that $\E(X) =120$ minutes. 
+Interpret this value in context.
+
+1.  Interpret the rate parameter 1/120 in context.  
+:::
+::::
+
+:::: {.callout-tip collapse="true"}
+::: {#sol-exponential-quake-ev-discrete}
+
+1.  A *one second*, that is a 1/60 minute interval, is small in the scale of our variable whose values range over hundreds of minutes. 
+So we can approximate the probability of interest---represented by the area under the pdf over a one second interval centered on $x=30$---by a rectangle with base (1/60) minutes and height equal to the Exponential(rate = 1/120) pdf evaluated at 30. 
+We can use Symbulate to evaluate the Exponential pdf. 
+Thus the approximate probability is `(1 / 60) * Exponential(rate = 1 / 120).pdf(30)` which yields 0.00011. 
+This is a small probability because "within 1 second of 30 minutes" is a very specific event. 
+
+1.  Compute the ratio of pdf heights at 30 and 60: `Exponential(rate = 1 / 120).pdf(30) / Exponential(rate = 1 / 120).pdf(60)` which yields 1.28. 
+$X$ rounded to the nearest second is 1.28 times more likely to be 30 minutes than 60 minutes.
+
+1.  We could round $X$ to the nearest second, compute the probability that $X$ is close to each rounded value `x`, then multiply each rounded value by its "close to" probability (`(1 / 60) * Exponential(rate = 1 / 120).pdf(x)`) and sum. 
+Each term in the sum would be of the form `x * (1 / 60) * Exponential(rate = 1 / 120).pdf(x)`; the first `x` represents the value, the rest represents its (close to) probability.
+For example, one term in the sum would be 30 multiplied by `(1 / 60) * Exponential(rate = 1 / 120).pdf(30)` (0.00011 from two parts ago).
+Technically, there is no upper bound on $X$, but we would need to cut the sum off at some point. 
+In particular, 1200 minutes is the 99.995th percentile (`Exponential(rate = 1/120).cdf(1200)` is 0.99995) so we'll cut the sum off after 1200 minutes. 
+That is, we sum `x * (1 / 60) * Exponential(rate = 1 / 120).pdf(x)` for `x` ranging from 0 to 1200 minutes in increments of 1/60 minutes. 
+See Symbulate code below, which results in a value close to 120 minutes.
+
+1.  Approximate $\E(X)$ in the usual way: simulate many values of $X$ and average the simulated values. 
+We already simulated many values above, so we just need to call `x.mean()`. 
+The simulated average is around 120 minutes.
+
+1.  Over many earthquakes, the time between earthquakes is 120 minutes on average.
+
+1.  The previous part shows that, roughly, earthquakes occur every 120 minutes on average. 
+In other words, on average there is 1 earthquake per every 120 minutes. 
+Roughly, earthquakes occur at rate 1 earthquake per 120 minutes on average.
+
+:::
+::::
+
+
+
+The following Symbulate code uses the Exponential(rate = 1/120) pdf to compute "close to" probabilities.
+
+```{python}
+(1 / 60) * Exponential(rate = 1 / 120).pdf(30)
+```
+
+```{python}
+Exponential(rate = 1 / 120).pdf(30) / Exponential(rate = 1 / 120).pdf(60)
+```
+
+The following Symbulate code approximates the expected value of $X$ as if $X$ were a discrete random variable after rounding to the nearest second.
+
+```{python}
+sum([x * (1 / 60) * Exponential(rate = 1 / 120).pdf(x) for x in np.arange(0, 1200, 1 / 60)])
+```
+
+Exponential distributions are often used to model the *waiting time* in a random process until some event occurs.
+If $X$ has an Exponential distribution its measurement units are usually units of time (e.g., seconds, minutes, hours, days, weeks, etc).
+An Exponential distribution has a single parameter denoted $\lambda>0$ which represents the *rate*, per unit time, at which events occur.
+If $X$ has an Exponential distribution with rate parameter $\lambda$ then $\E(X) = 1/\lambda$. 
+Don't confuse the rate and the mean.
+
+-   $\lambda$ is the average *rate* at which events occur over time (e.g., if $X$ is measured in hours and $\lambda = 2$ then the rate is 2 per hour)
+-   $1/\lambda$ is the mean time between events (e.g., 1/2 hour)
+
+::: {.callout-warning}
+The parameter $\lambda$ in our definition of Exponential distributions is the *rate* parameter, so that the mean is $1/\lambda$. 
+Other references might parameterize Exponential distributions in terms of their mean. 
+When dealing with problems involving Exponential distributions pay close attention to whether the rate ($\lambda$) or the mean ($1/\lambda$) is specified. 
+:::
+
+
+We have looked at an example of an Exponential distribution, but we haven't really defined what an Exponential distribution is yet. 
+The next example sheds some light on where the definition comes from.
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-exponential-mean-table}
+Continuing @exm-quake-percentile-table. 
+
+1.  We have seen that the mean is 120 minutes. 
+Express each of the percentiles in @tbl-quake-percentile-table as a multiple of the mean.
+
+1.  Now suppose that $M$ has an Exponential(1) distribution. 
+What is $\E(M)$? 
+Use Symbulate to compute the 10th, 20th, through 90th percentiles of $M$. 
+Compare to part 1.
+:::
+::::
+
+:::: {.callout-tip collapse="true"}
+::: {#sol-exponential-mean-table}
+1.  Just divide each Value (minutes) in @tbl-quake-percentile-table by 120 minutes. 
+For example, the 10th percentile is $12.6/120= 0.105$ times the mean, and the 90th percentile is $276.3/120= 2.303$ times the mean. 
+See @tbl-quake-percentile-table-mean.
+
+1.  If $M$ has an Exponential(1) distribution then $\E(M) = 1$. 
+See Symbulate code below. 
+We see that evaluating the Exponential(1) quantile function tells us the percentile for an Exponential distribution in terms of multiples of the mean.
+:::
+::::
+
+
+
+```{r}
+#| label: tbl-quake-percentile-table-mean
+#| echo: false
+#| tbl-cap: "Percentiles for the Exponential distribution with rate 1/120 as multiples of the mean (120)"
+
+
+exponential_spinner = data.frame(p = 0.1 * (1:9)) |>
+  mutate(x = round(qexp(p, rate = 1 / 120), 1)) |>
+  mutate(mean_multiple = round(x / 120, 3))
+
+exponential_spinner |>
+  mutate(p = paste(100 * p, "th", sep = "")) |>
+  kbl(col.names = c("Percentile", "Value (minutes)", "Multiple of mean")) |>
+  kable_styling()
+  
+```
+
+The Symbulate code below evaluates select percentiles for the Exponential(1) distribution. 
+Since the mean of this distribution is 1, these percentiles are expressed directly in terms of multiples of the mean.
+
+```{python}
+Exponential(rate = 1).quantile([0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9])
+```
+
+Any Exponential distribution has the same basic shape. 
+Percentiles of an Exponential distribution follow a particular pattern in terms of mutliples of the mean.
+
+::: {#def-exponential-rule}
+## Exponential percentile pattern
+
+A continuous random variable $X$ has an Exponential distribution if its cdf is given by @fig-exponential-cdf-def. 
+If $X$ has an Exponential distribution with rate parameter $\lambda>0$, its mean is $\E(X)= 1/\lambda$ and @fig-exponential-cdf-def specifies the cdf of $X$ in terms of multiples of the mean.
+@tbl-exponential-cdf-def displays select percentiles for Exponential distributions (in terms of multiples of the mean).
+
+:::
+
+
+
+
+```{r}
+#| label: fig-exponential-cdf-def
+#| echo: false
+#| fig-cap: "The Exponential(1) cdf. Provides the cdf for any Exponential distribution if the variable is measured in *multiples of the mean*. It's the same cdf in both figures just with different values highlighted."
+#| fig-subcap: 
+#|   - "Percentiles highlighted in 0.5 increments of multiples of the mean"
+#|   - "Deciles highligted in terms of multiples of the mean"
+#| layout-ncol: 2
+
+exponential_m_increments = data.frame(x = seq(0, 5, 0.5)) |>
+  mutate(p = pexp(x))
+
+ggplot(exponential_m_increments,
+  aes(x = x, y = p)) +
+  stat_function(fun = function(x) pexp(x, rate = 1),
+                color = "skyblue", linewidth = 1.2) +
+  # vertical dashed lines
+  geom_segment(
+    data = exponential_m_increments,
+    aes(x = x, xend = x, y = 0, yend = p),
+    linetype = "dashed", color = "gray40", inherit.aes = FALSE
+  ) +
+  # horizontal dashed lines
+  geom_segment(
+    data = exponential_m_increments,
+    aes(x = 0, xend = x, y = p, yend = p),
+    linetype = "dashed", color = "gray40", inherit.aes = FALSE
+  ) +
+  scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, 0.1)) +
+  scale_x_continuous(limits = c(0, 5.5), breaks = seq(0, 5.5, 0.5)) +
+  theme_minimal() +  # removes gray background, keeps gridlines
+  theme(panel.grid.major = element_line(color = "gray80"),
+        panel.grid.minor = element_line(color = "gray90")) +
+  labs(x = "m (multiple of mean)",
+       y = "cdf(m)")
+
+exponential_p_increments = data.frame(p = seq(0.1, 0.9, 0.1)) |>
+  mutate(x = qexp(p))
+
+ggplot(exponential_p_increments,
+  aes(x = x, y = p)) +
+  stat_function(fun = function(x) pexp(x, rate = 1),
+                color = "skyblue", linewidth = 1.2) +
+  # vertical dashed lines
+  geom_segment(
+    data = exponential_p_increments,
+    aes(x = x, xend = x, y = 0, yend = p),
+    linetype = "dashed", color = "gray40", inherit.aes = FALSE
+  ) +
+  # horizontal dashed lines
+  geom_segment(
+    data = exponential_p_increments,
+    aes(x = 0, xend = x, y = p, yend = p),
+    linetype = "dashed", color = "gray40", inherit.aes = FALSE
+  ) +
+  scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, 0.1)) +
+  scale_x_continuous(limits = c(0, 5.5), breaks = seq(0, 5.5, 0.5)) +
+  theme_minimal() +  # removes gray background, keeps gridlines
+  theme(panel.grid.major = element_line(color = "gray80"),
+        panel.grid.minor = element_line(color = "gray90")) +
+  labs(x = "m (multiple of mean)",
+       y = "cdf(m)")
+
+```
+
+
+
+
+
+```{r}
+#| label: tbl-exponential-cdf-def
+#| echo: false
+#| warning: false
+#| tbl-cap: "Select percentiles for an Exponential distribution in terms of multiples of the mean"
+#| tbl-subcap: 
+#|   - "In 0.5 increments of multiples of the mean"
+#|   - "Deciles and quantiles as multiples of the mean"
+#| layout-ncol: 2
+
+z = seq(0, 5, 0.5)
+
+p = pexp(z, 1)
+
+data.frame(p = paste(round(100 * p, 1), "%", sep = ""),
+           z = paste(format(z, digits = 2), "times the mean")) |>
+  kbl(col.names = c("Percentile", "Relative to mean"),
+      align = c('r', 'l')) |>
+  kable_styling(fixed_thead = TRUE)
+
+
+p = sort(c(0.25, 0.75, seq(0.1, 0.9, 0.1)))
+
+z = qexp(p, 1)
+
+data.frame(p = paste(round(100 * p, 1), "%", sep = ""),
+           z = paste(format(z, digits = 2), "times the mean")) |>
+  kbl(col.names = c("Percentile", "Relative to mean"),
+      align = c('r', 'l')) |>
+  kable_styling(fixed_thead = TRUE)
+
+```
+
+
+
+
+
+
+<!-- Simulation for memoryless. Simulation for exponential race - should this be in multiple RV chapter? PP is multiple rv chapter -->
+
+
+
+## Normal distributions
+
+
+
+```{r}
+#| label: fig-normal-cdf-def
+#| echo: false
+#| fig-cap: "The Normal(0, 1) cdf. Provides the cdf for any Normal distribution if the variable is measured in *standard deviations from the mean*. It's the same cdf in both figures just with different values highlighted."
+#| fig-subcap: 
+#|   - "Percentiles highlighted in 0.5 increments of standard deviations from the mean"
+#|   - "Deciles highligted in terms of standard deviations from the mean"
+#| layout-ncol: 2
+
+normal_m_increments = data.frame(x = seq(-3, 3, 0.5)) |>
+  mutate(p = pnorm(x))
+
+ggplot(normal_m_increments,
+  aes(x = x, y = p)) +
+  stat_function(fun = function(x) pnorm(x),
+                color = "skyblue", linewidth = 1.2) +
+  # vertical dashed lines
+  geom_segment(
+    data = normal_m_increments,
+    aes(x = x, xend = x, y = 0, yend = p),
+    linetype = "dashed", color = "gray40", inherit.aes = FALSE
+  ) +
+  # horizontal dashed lines
+  geom_segment(
+    data = normal_m_increments,
+    aes(x = -Inf, xend = x, y = p, yend = p),
+    linetype = "dashed", color = "gray40", inherit.aes = FALSE
+  ) +
+  scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, 0.1)) +
+  scale_x_continuous(limits = c(-3.5, 3.5), breaks = seq(-3.5, 3.5, 0.5)) +
+  theme_minimal() +  # removes gray background, keeps gridlines
+  theme(panel.grid.major = element_line(color = "gray80"),
+        panel.grid.minor = element_line(color = "gray90")) +
+  labs(x = "z (standard deviations from mean)",
+       y = "cdf(z)")
+
+
+normal_p_increments = data.frame(p = seq(0.1, 0.9, 0.1)) |>
+  mutate(x = qnorm(p))
+
+ggplot(normal_p_increments,
+  aes(x = x, y = p)) +
+  stat_function(fun = function(x) pnorm(x),
+                color = "skyblue", linewidth = 1.2) +
+  # vertical dashed lines
+  geom_segment(
+    data = normal_p_increments,
+    aes(x = x, xend = x, y = 0, yend = p),
+    linetype = "dashed", color = "gray40", inherit.aes = FALSE
+  ) +
+  # horizontal dashed lines
+  geom_segment(
+    data = normal_p_increments,
+    aes(x = -Inf, xend = x, y = p, yend = p),
+    linetype = "dashed", color = "gray40", inherit.aes = FALSE
+  ) +
+  scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, 0.1)) +
+  scale_x_continuous(limits = c(-3.5, 3.5), breaks = seq(-3.5, 3.5, 0.5)) +
+  theme_minimal() +  # removes gray background, keeps gridlines
+  theme(panel.grid.major = element_line(color = "gray80"),
+        panel.grid.minor = element_line(color = "gray90")) +
+  labs(x = "z (standard deviations from mean)",
+       y = "cdf(z)")
+
+```
+
+
+
+
+
+```{r}
+#| label: tbl-normal-cdf-def
+#| echo: false
+#| warning: false
+#| tbl-cap: "Select percentiles for a Normal distribution in terms of standard deviations from the mean"
+#| tbl-subcap: 
+#|   - "In 0.5 increments of standard deviations from the mean"
+#|   - "Deciles and quantiles as standard deviations from the mean"
+#| layout-ncol: 2
+
+z = seq(-3.5, 3.5, 0.5)
+
+p = pnorm(z)
+
+data.frame(p = paste(round(100 * p, 1), "%", sep = ""),
+           z = paste(format(z, digits = 2), "")) |>
+  kbl(col.names = c("Percentile", "Standard deviations from the mean"),
+      align = c('r', 'r')) |>
+  kable_styling(fixed_thead = TRUE)
+
+
+p = sort(c(0.01, 0.05, 0.95, 0.99, 0.25, 0.75, seq(0.1, 0.9, 0.1)))
+
+z = qnorm(p)
+
+data.frame(p = paste(round(100 * p, 1), "%", sep = ""),
+           z = paste(format(z, digits = 2), "")) |>
+  kbl(col.names = c("Percentile", "Standard deviations from the mean"),
+      align = c('r', 'r')) |>
+  kable_styling(fixed_thead = TRUE)
+
+```
 

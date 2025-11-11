@@ -14,6 +14,7 @@ $$
 We have already encountered many important concepts in probability.
 In this chapter, we'll explore further the mathematics of probability.
 
+<!-- Need to add EV for discrete, given EV formula for pmf -->
 
 ## Equally likely outcomes {#sec-equally-likely}
 
@@ -1922,14 +1923,7 @@ Do you agree?
 
 
 :::: {.callout-tip collapse="true"}
-::: {#exm-exponential-quakes-ev-lotus}
-Continuing @exm-exponential-quakes-ev. 
-Let $X$ be the times (minutes) until the next earthquake occurs (of any magnitude in a certain region). 
-Assume that the pdf of $X$ is 
-$$
-f_X(x) = (1/120) e^{-x/120}, \qquad x \ge0
-$$
-We're interested in $\E(X^2)$ and $\Var(X)$.
+::: {#sol-exponential-quakes-ev-lotus}
 
 1.  The point of LOTUS is that we transform the values of $X$ *but not the probabilities*. 
 That is, the pdf of $X$, $f_X(x) = (1/120)e^{-x/120}$ is unchanged.
@@ -1945,3 +1939,60 @@ That is, the pdf of $X$, $f_X(x) = (1/120)e^{-x/120}$ is unchanged.
 
 
 
+## Exponential distributions
+
+
+Exponential distributions are often used as models for random variables which measure the times between events in the random process that happens over time. 
+We have already seen several examples of Exponential distributions, including @exm-exponential-quakes-pdf and @exm-exponential-discrete-ev.
+
+
+
+::: {#def-exponential-pdf}
+A continuous random variable $X$ has an **Exponential distribution** with *rate* parameter $\lambda>0$ if and only if its probability density function $f_X$ satisfies
+$$
+f_X(x) =
+\begin{cases}
+\lambda e^{-\lambda x}, & x \ge 0,\\
+0, & \text{otherwise}
+\end{cases}
+$$
+Equivalently, a continuous random variable $X$ has an Exponential distribution with rate parameter $\lambda>0$ if and only if its cumulative distribution function $F_X$ satisfies
+$$
+F_X(x) =
+\begin{cases}
+1- e^{-\lambda x}, & x \ge 0,\\
+0, & \text{otherwise}
+\end{cases}
+$$
+:::
+
+
+::: {#lem-exponential-ev}
+If $X$ has an Exponential distribution with rate parameter $\lambda>0$ then
+\begin{align*}
+ \text{P}(X>x)  & = e^{-\lambda x}, \quad x\ge 0\\
+ \text{quantile:} \quad Q(p) & = -(1/\lambda) \ln(1-p),\quad 0<p<1\\
+\text{E}(X) & = \frac{1}{\lambda}\\
+\text{Var}(X) & = \frac{1}{\lambda^2}\\
+\text{SD}(X) & = \frac{1}{\lambda}
+\end{align*}
+:::
+
+
+::: {.callout-warning}
+The parameter $\lambda$ in our definition of Exponential distributions is the *rate* parameter, so that the mean is $1/\lambda$. 
+Other references might parameterize Exponential distributions in terms of their mean. 
+When dealing with problems involving Exponential distributions pay close attention to whether the rate ($\lambda$) or the mean ($1/\lambda$) is specified. 
+:::
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-exponential-quakes-ev-lotus}
+
+:::
+::::
+
+:::: {.callout-tip collapse="true"}
+::: {#sol-exponential-quakes-ev-lotus}
+
+:::
+::::
