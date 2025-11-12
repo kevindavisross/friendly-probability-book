@@ -1985,14 +1985,3 @@ Other references might parameterize Exponential distributions in terms of their 
 When dealing with problems involving Exponential distributions pay close attention to whether the rate ($\lambda$) or the mean ($1/\lambda$) is specified. 
 :::
 
-:::: {.callout-note appearance="simple"}
-::: {#exm-exponential-quakes-ev-lotus}
-
-:::
-::::
-
-:::: {.callout-tip collapse="true"}
-::: {#sol-exponential-quakes-ev-lotus}
-
-:::
-::::

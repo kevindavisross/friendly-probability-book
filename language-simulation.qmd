@@ -4519,7 +4519,7 @@ We will see later than when comparing distributions with different shapes, it is
 Any random variable can be standardized, but keep in mind that just how extreme any particular standardized value is depends on the shape of the distribution.
 We will see that standardization is most natural for random variables that follow a Normal distribution.
 
-### Normal distributions (briefly)
+### Normal distributions (briefly) {#sec-normal-briefly}
 
 Standardization is most natural for random variables that follow a Normal distribution.
 The Normal(30, 10) model that we assumed for arrival times in the meeting problem is an example of a *Normal distribution*.

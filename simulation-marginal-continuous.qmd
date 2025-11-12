@@ -2937,9 +2937,9 @@ ggplot(exponential_m_increments,
   ) +
   scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, 0.1)) +
   scale_x_continuous(limits = c(0, 5.5), breaks = seq(0, 5.5, 0.5)) +
-  theme_minimal() +  # removes gray background, keeps gridlines
-  theme(panel.grid.major = element_line(color = "gray80"),
-        panel.grid.minor = element_line(color = "gray90")) +
+  theme_bw() +  # removes gray background, keeps gridlines
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank()) +
   labs(x = "m (multiple of mean)",
        y = "cdf(m)")
 
@@ -2964,9 +2964,9 @@ ggplot(exponential_p_increments,
   ) +
   scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, 0.1)) +
   scale_x_continuous(limits = c(0, 5.5), breaks = seq(0, 5.5, 0.5)) +
-  theme_minimal() +  # removes gray background, keeps gridlines
-  theme(panel.grid.major = element_line(color = "gray80"),
-        panel.grid.minor = element_line(color = "gray90")) +
+  theme_bw() +  # removes gray background, keeps gridlines
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank()) +
   labs(x = "m (multiple of mean)",
        y = "cdf(m)")
 
@@ -3022,6 +3022,36 @@ data.frame(p = paste(round(100 * p, 1), "%", sep = ""),
 
 
 
+Normal distributions are probably the most important distributions in probability and statistics.
+We have already seen Normal distributions in many previous examples.
+In this section we'll explore properties of Normal distributions in a little more depth.
+
+
+A Normal($\mu$, $\sigma$) distribution has two parameters: its mean, typically denoted $\mu$, and its standard deviation, typically denoted $\sigma>0$.
+Any Normal distribution follows the "empirical rule" which determines the percentiles that give a Normal distribution its particular bell shape. 
+We introduced this empirical rule briefly in @sec-normal-briefly.
+For example, for any Normal distribution about 68% of values lie within 1 standard deviation of the mean.
+This implies that 32% of values are more than 1 standard deviation away from the mean, either above or below the mean.
+By symmetry 16% of values are more than 1 standard deviation above the mean. 
+In other words, 1 standard deviation above the mean is the 84th percentile: 16% of values are greater so 84% of values are less.
+Similarly 1 standard devation below the mean is the 16th percentile.
+
+The key to working with Normal distributions is to work in terms of standard deviations from the mean (that is, standardized values). 
+The following definition fills in the rest of the empirical rule.
+
+::: {#def-normal-empirical-cdf}
+## Normal empirical rule
+
+A continuous random variable $Z$ has a standard Normal distribution, a.k.a., a Normal(0, 1) distribution, if its cdf is given by @fig-normal-cdf-def. 
+If $X$ has a Normal($\mu$, $\sigma$) distribution with mean $\mu$ and standard deviation $\sigma>0$, @fig-normal-cdf-def specifies the cdf of $X$ in terms of standard deviations from the mean $Z=\frac{X-\mu}{\sigma}$.
+@tbl-normal-cdf-def displays select percentiles for Normal distributions (in terms of standard deviations from the mean).
+
+:::
+
+
+
+
+
 ```{r}
 #| label: fig-normal-cdf-def
 #| echo: false
@@ -3041,7 +3071,7 @@ ggplot(normal_m_increments,
   # vertical dashed lines
   geom_segment(
     data = normal_m_increments,
-    aes(x = x, xend = x, y = 0, yend = p),
+    aes(x = x, xend = x, y = -Inf, yend = p),
     linetype = "dashed", color = "gray40", inherit.aes = FALSE
   ) +
   # horizontal dashed lines
@@ -3052,9 +3082,9 @@ ggplot(normal_m_increments,
   ) +
   scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, 0.1)) +
   scale_x_continuous(limits = c(-3.5, 3.5), breaks = seq(-3.5, 3.5, 0.5)) +
-  theme_minimal() +  # removes gray background, keeps gridlines
-  theme(panel.grid.major = element_line(color = "gray80"),
-        panel.grid.minor = element_line(color = "gray90")) +
+  theme_bw() +  # removes gray background, keeps gridlines
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank()) +
   labs(x = "z (standard deviations from mean)",
        y = "cdf(z)")
 
@@ -3069,7 +3099,7 @@ ggplot(normal_p_increments,
   # vertical dashed lines
   geom_segment(
     data = normal_p_increments,
-    aes(x = x, xend = x, y = 0, yend = p),
+    aes(x = x, xend = x, y = -Inf, yend = p),
     linetype = "dashed", color = "gray40", inherit.aes = FALSE
   ) +
   # horizontal dashed lines
@@ -3080,13 +3110,15 @@ ggplot(normal_p_increments,
   ) +
   scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, 0.1)) +
   scale_x_continuous(limits = c(-3.5, 3.5), breaks = seq(-3.5, 3.5, 0.5)) +
-  theme_minimal() +  # removes gray background, keeps gridlines
-  theme(panel.grid.major = element_line(color = "gray80"),
-        panel.grid.minor = element_line(color = "gray90")) +
+  theme_bw() +  # removes gray background, keeps gridlines
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank()) +
   labs(x = "z (standard deviations from mean)",
        y = "cdf(z)")
 
 ```
+
+
 
 
 
@@ -3106,8 +3138,8 @@ z = seq(-3.5, 3.5, 0.5)
 
 p = pnorm(z)
 
-data.frame(p = paste(round(100 * p, 1), "%", sep = ""),
-           z = paste(format(z, digits = 2), "")) |>
+data.frame(p = paste(pmax(0.02, pmin(round(100 * p, 1), 99.98)), "%", sep = ""),
+           z = paste(format(z, digits = 1), "")) |>
   kbl(col.names = c("Percentile", "Standard deviations from the mean"),
       align = c('r', 'r')) |>
   kable_styling(fixed_thead = TRUE)
@@ -3123,5 +3155,334 @@ data.frame(p = paste(round(100 * p, 1), "%", sep = ""),
       align = c('r', 'r')) |>
   kable_styling(fixed_thead = TRUE)
 
+
 ```
 
+@fig-normal-cdf-def defines a Normal distribution by specifying all of its percentiles. 
+The empirical rule is often described in terms of "within [blank] standard deviations of the mean" as in the the following:
+
+-   38% of values are within 0.5 standard deviations of the mean
+-   68% of values are within 1 standard deviation of the mean
+-   87% of values are within 1.5 standard deviations of the mean
+-   95% of values are within 2 standard deviations of the mean
+-   99% of values are within 2.6 standard deviations of the mean
+-   99.7% of values are within 3 standard deviations of the mean
+-   99.99% of values are within 4 standard deviations of the mean
+
+
+The standard Normal cdf can be used to construct a spinner, like @fig-normal-cdf-spinner which fills in the gaps in @fig-standard-normal-spinner, for simulating values from any Normal distribution. 
+The spinner simulates values in terms of standard deviations from the mean, which can then be converted to measurement units of the variable.
+
+
+```{r}
+#| label: fig-normal-cdf-spinner
+#| echo: false
+#| warning: false
+#| fig-cap: "A continuous *Normal(0, 1)* spinner. The same spinner is displayed in all figures, with different features highlighted. Only selected rounded values are displayed, but in the idealized model the spinner is infinitely precise so that any real number is a possible outcome. Notice that the values on the axis are *not* evenly spaced. This spinner can be used to simulate values from any Normal distribution by simulating values in terms of standard deviations from the mean."
+#| fig-subcap: 
+#|   - "Each sector represents an interval with 5% probability"
+#|   - "Each sector represents an interval with 1% probability"
+#|   - "Values labeled in increments of 0.5 standard deviations from the mean"
+#| layout-ncol: 3
+
+mu = 0
+sigma = 1
+min_x = -3.0
+max_x = 3.0
+
+n = 20
+
+xp <- data.frame(
+  x = (0:(n-1))/n,
+  p = rep(1/n, n)
+  )
+
+cdf = c(0, cumsum(xp$p))
+
+plotp = (cdf[-1] + cdf[-length(cdf)]) / 2
+  
+spinner1 <- ggplot(xp, aes(x="", y=p, fill=x))+
+  geom_bar(width = 1, stat = "identity", color="black", fill="white") + 
+  coord_polar("y", start=0) +
+  theme_void() +
+  # plot the possible values on the outside
+  scale_y_continuous(breaks = xp$x, labels=c("...|...", round(mu + sigma * qnorm(xp$x[-1]), 2))) +
+  # theme(axis.text.x=element_text(size=12, face="bold"))
+    theme(axis.text.x=element_text(size=10, face = "bold", angle=c(0, 90-180/10*(1:9), -90-180/10*(10:19))))
+
+spinner1
+
+
+n = 100
+
+xp <- data.frame(
+  x = (0:(n-1))/n,
+  p = rep(1/n, n)
+  )
+
+cdf = c(0, cumsum(xp$p))
+
+plotp = (cdf[-1] + cdf[-length(cdf)]) / 2
+  
+spinner2 <- ggplot(xp, aes(x="", y=p, fill=x))+
+  geom_bar(width = 1, stat = "identity", color="black", fill="white") + 
+  coord_polar("y", start=0) +
+  theme_void() +
+  # plot the possible values on the outside
+  scale_y_continuous(breaks = xp$x, minor_breaks = (0:99)/100, labels=c("...|...", round(mu+ sigma * qnorm(xp$x[-1]), 2))) +
+  theme(axis.text.x=element_text(size=7, angle=c(0, 90-180/50*(1:49), -90-180/50*(50:99))))
+
+spinner2
+
+
+
+x = c("","<-2", seq(-1.5, 1.5, 0.5), ">2")
+p = c(pnorm(-2), pnorm(seq(-1.5, 2.0, 0.5)) - pnorm(seq(-2.0, 1.5, 0.5)), 1-pnorm(2))
+
+xp <- data.frame(x, p)
+
+cdf = c(0, cumsum(xp$p))
+
+
+
+plotp = (cdf[-1] + cdf[-length(cdf)]) / 2
+  
+spinner3 <- ggplot(xp, aes(x="", y=p, fill=x))+
+  geom_bar(width = 1, stat = "identity", color="black", fill="white", linetype=1) + 
+  # coord_polar("y", start=0) +
+  coord_curvedpolar("y", start = 0) +
+  theme_void() +
+  # plot the possible values on the outside
+  scale_y_continuous(breaks = cdf[-c(1, length(cdf))], labels=seq(-2, 2, 0.5)) +
+  # theme(axis.text.x=element_text(angle=c(90-180/50*(0:49), -90-180/50*(50:99)), size=8)) +
+  theme(axis.text.x=element_text(angle = 0, size=12)) +
+  # annotate(geom="segment", y=(0:19)/20+0.000, yend = (0:19)/20+0.000,
+  #          x=1.48, xend= 1.52) +
+  # plot the probabilities as percents inside
+    geom_text(aes(y = plotp,
+                label = percent(p, accuracy = 0.1)), size=4, color=c(NA, rep("black",8), rep(NA, 1)))
+
+spinner3
+
+
+```
+
+
+```{python}
+Z = RV(Normal(0, 1))
+
+z = Z.sim(10000)
+
+z
+```
+
+
+
+```{python}
+z.mean()
+```
+
+```{python}
+z.sd()
+```
+
+
+```{python}
+plt.figure()
+z.plot()
+Normal(0, 1).plot();
+plt.show()
+```
+
+Consider the meeting problem where the arrival time, measured in minutes after noon, followed a Normal(30, 10) distribution. 
+Then, for example,
+
+-   1 standard deviation above the mean corresponds to $30 + 1 \times 10 = 40$ minutes,
+-   2 standard deviations above the mean corresponds to $30 + 2 \times 10 = 50$ minutes,
+-   2.5 standard deviations above the mean corresponds to $30 + 2.5 \times 10 = 55$ minutes,
+-   1 standard deviation below the mean corresponds to $30 + (-1) \times 10 = 20$ minutes
+-   2 standard deviations below the mean corresponds to $30 + (-2) \times 10 = 10$ minutes
+-   2.5 standard deviations below the mean corresponds to $30 + (-2.5) \times 10 = 5$ minutes
+
+and so on. 
+In general, $Z$ standard deviations from the mean corresponds to $X = 30 + 10Z$ minutes.
+Thus we can either simulate $X$ values from a Normal(30, 10) distribution directly, or simulate values of $Z$ from a Normal(0, 1) distribution and let $X = 30 + 10Z$.
+
+```{python}
+Z = RV(Normal(0, 1))
+
+X_from_Z = 30 + 10 * Z
+
+X = RV(Normal(30, 10))
+
+plt.figure()
+X_from_Z.sim(10000).plot()
+X.sim(10000).plot()
+Normal(30, 10).plot();
+plt.show()
+
+```
+
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-normal-weight}
+
+The wrapper of a package of candy lists a weight of 47.9 grams. 
+Naturally, the weights of individual packages vary somewhat. 
+Suppose package weights have an approximate Normal distribution with a mean of 49.8 grams and a standard deviation of 1.3 grams.
+
+1.  Sketch the distribution of package weights. 
+Carefully label the variable axis. 
+It is helpful to draw two axes: one in the measurement units of the variable, and one in standardized units.
+1.  Why wouldn't the company print the mean weight of 49.8 grams as the weight on the package?
+1.  Estimate the probability that a package weighs less than the printed weight of 47.9 grams.
+1.  Estimate the probability that a package weighs between 47.9 and 53.0 grams.
+1.  Suppose that the company only wants 1% of packages to be underweight.  Find the weight that must be printed on the packages. 
+1.  Find the 99th percentile of package weights. How can you use the work you did in the previous part?
+
+:::
+::::
+
+:::: {.callout-tip collapse="true"}
+::: {#sol-normal-weight}
+
+1.  See @fig-normal-weight.
+Be sure to label the variable axis so that the inflection points are 1 SD away from the mean.
+1.  If the company prints the mean weight of 49.8 grams on the package then 50% of the packages would weigh less than the printed weight, which is probably a much higher percentage than desired.
+1.  The standardized value for a weight of 47.9 grams is $(47.9 - 49.8) /1.3=-1.46$. 
+That is, a package weight of 47.9 grams is 1.46 SDs below the mean. 
+From the empirical rule, the 6.5th percentile is 1.5 SDs below the mean. 
+Therefore, we estimate that the probability is a little larger than 6.5%. 
+Software (below) shows that the probability is 0.072.
+1.  The standardized value for a weight of 53.0 grams is $(53.0 - 49.8) /1.3=2.46$. 
+That is, a package weight of 53.0 grams is 2.46 SDs above the mean.  From the empirical rule, the 99.4rd percentile is 2.5 SDs above the mean. 
+So about $99.4 - 6.5 = 92.5$ percent of packages weight between 47.9 and 53.0 grams. 
+Software shows that the probability is 0.921.
+1.  From the empirical rule, the first percentile is 2.33 SDs below the mean. 
+Therefore, the 1st percentile of package weights is $49.8 - 2.33\times 1.3 =    46.8$ grams.
+1.  By symmetry, if the 1st percentile is 2.33 SDs below the mean, then the 99th percentile is 2.33 SDs above the mean. 
+Therefore, the 99th percentile of package weights is $49.8 + 2.33\times 1.3 =    52.9$ grams.
+
+:::
+::::
+
+```{r}
+#| label: fig-normal-weight
+#| echo: false
+#| fig-cap: "The Normal(49.8, 1.3) distribution of package weights (grams) in @exm-normal-weight."
+
+
+mu = 49.8
+sig = 1.3
+
+z = seq(-3, 3, 0.0001)
+za = -3:3
+xa = mu + za * sig
+
+
+plot(z, dnorm(z), xlim=range(z),
+     type = "l",
+     yaxt='n', xaxt='n', ylab = "", xlab = "", lwd = 2) 
+axis(1, at = za, labels = xa, line=0.5,cex.axis=1.0)
+axis(1, at = za, labels = za, line=2.7,cex.axis=1.0)
+# axis(1, at = xa, labels = seq(-4, 4, 1), line=2.7,cex.axis=1.0)
+mtext("standard units",cex=0.80, side=1, line=3.5, at=-3.7)
+mtext("grams",cex=0.80,side=1,line=1.3,at=-3.7)
+
+```
+
+In Symbulate, we can standardize first and use the Normal(0, 1) cdf.
+
+```{python}
+
+Normal(0, 1).cdf((47.9 - 49.8) / 1.3)
+
+```
+
+```{python}
+
+Normal(0, 1).cdf((53.0 - 49.8) / 1.3)
+
+```
+
+```{python}
+
+Normal(0, 1).quantile(0.01), Normal(0, 1).quantile(0.99)
+
+```
+
+```{python}
+
+49.8 + 1.3 * Normal(0, 1).quantile(0.01), 49.8 + 1.3 * Normal(0, 1).quantile(0.99)
+
+
+```
+
+
+Or we can work in the measurement units of the variable using the appropriate mean and standard deviation.
+
+```{python}
+
+Normal(49.8, 1.3).cdf(47.9)
+
+```
+
+
+```{python}
+
+Normal(49.8, 1.3).cdf(53.0)
+
+```
+
+
+```{python}
+
+Normal(49.8, 1.3).quantile(0.01)
+
+```
+
+```{python}
+
+Normal(49.8, 1.3).quantile(0.99)
+
+```
+
+
+### Exercises
+
+
+::: {#exr-normal-femur}
+For many animal species, the lengths of particular bones follow a Normal distribution.
+For adult male humans, the length of the femur (thigh bone, the longest bone in humans) has an approximate Normal distribution with mean 48.2 cm and standard deviation of 4.5 cm.  
+Complete each of the following parts by standardizing, drawing appropriate plots, and then providing an educated ballpark estimate based on the empirical rule. 
+Then you can use software to get more precise values. 
+But software should be your last step, not the first.
+
+1.  What percent of adult male humans have a femur length above 50cm?
+1.  What percent of adult male humans have a femur length between 40cm and 50cm?
+1.  What is the 99th percentile of femur lengths for adult male humans?
+:::
+
+::: {#exr-normal-temp}
+Daily high temperatures (degrees Fahrenheit) in San Luis Obispo in August follow (approximately) A Normal distribution with a mean of 76.9 degrees F.
+The temperature exceeds 100 degrees Fahrenheit on about 1.5% of August days.
+
+1.  Compute the standard deviation.
+1.  Suppose the mean increases by 2 degrees Fahrenheit. 
+On what percentage of August days will the daily high temperature exceed 100 degrees Fahrenheit? (Assume the standard deviation does not change.)
+1.  A mean of 78.9 is 1.02 times greater than a mean of 76.9. 
+By what (multiplicative) factor has the percentage of 100-degree days increased? What do you notice?
+
+:::
+
+::: {#exr-effect-size}
+In a large class, scores on midterm 1 follow (approximately) a Normal$(\mu_1, \sigma)$ distribution and scores on midterm 2 follow (approximately) a Normal$(\mu_2, \sigma)$ distribution.
+Note that the SD $\sigma$ is the same on both exams.
+The 40th percentile of midterm 1 scores is equal to the 70th percentile of midterm 2 scores.
+Compute and interpret
+$$
+\frac{\mu_1-\mu_2}{\sigma}
+$$
+This is one statistical measure of *effect size*.
+Hint: do not try to solve for $\mu_1, \mu_2,\sigma$ individually.
+:::
