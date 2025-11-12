@@ -2647,7 +2647,7 @@ For example, 240 minutes is a little over the 85th percentile (it's about the 86
 ```{r}
 #| label: fig-quake-percentile-table-cdf
 #| echo: false
-#| fig-cap: "Percentiles for @@exm-quake-percentile-table corresponding to an Exponential distribution with rate parameter 1/120."
+#| fig-cap: "Percentiles for @exm-quake-percentile-table corresponding to an Exponential distribution with rate parameter 1/120."
 #| fig-subcap: 
 #|   - "Select percentiles from @tbl-quake-percentile-table"
 #|   - "Cumulative distribution function"
@@ -3018,7 +3018,7 @@ data.frame(p = paste(round(100 * p, 1), "%", sep = ""),
 
 
 
-## Normal distributions
+## Normal distributions {#sec-sim-continuous-normal}
 
 
 

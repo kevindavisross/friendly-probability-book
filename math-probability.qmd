@@ -1985,3 +1985,483 @@ Other references might parameterize Exponential distributions in terms of their 
 When dealing with problems involving Exponential distributions pay close attention to whether the rate ($\lambda$) or the mean ($1/\lambda$) is specified. 
 :::
 
+
+
+## Normal distributions
+
+
+Normal distributions are probably the most important distributions in probability and statistics.
+We have already seen Normal distributions in many previous examples.
+In this section we'll explore mathematical properties of Normal distributions in a little more depth.
+
+
+
+Recall @sec-sim-continuous-normal, @fig-normal-cdf-def, and @tbl-normal-cdf-def. 
+Any Normal distribution follows the "empirical rule" which specifies a specific pattern of percentiles in terms of standard deviations from the mean and gives a Normal pdf its particular bell-shape.
+Now we'll look more closely at the mathematical expression of a Normal pdf.
+
+
+
+
+
+A Normal density is a continuous density on the real line with a particular symmetric "bell" shape. 
+The heart of a Normal pdf is the function
+$$
+e^{-z^2/2}, \qquad -\infty < z< \infty,
+$$
+which defines the general shape of a Normal density. 
+[It can be shown that](https://en.wikipedia.org/wiki/Gaussian_integral#By_polar_coordinates)
+$$
+\int_{-\infty}^\infty e^{-z^2/2}dz = \sqrt{2\pi} 
+$$
+Therefore the function $e^{-z^2/2}/\sqrt{2\pi}$ integrates to 1.
+
+::: {#def-standard-normal-pdf-math}
+A continuous random variable $Z$ has a **Standard Normal** distribution if its pdf^[The Standard Normal pdf is typically denoted $\phi(\cdot)$, the lowercase Greek letter "phi", and the cdf is denoted $\Phi(\cdot)$, the uppercase Greek letter "phi".] is
+$$
+\phi(z) = \frac{1}{\sqrt{2\pi}}\,e^{-z^2/2}, \quad -\infty<z<\infty
+$$
+
+:::
+
+
+
+```{python}
+
+Z = RV(Normal())
+
+Z.sim(100).plot('rug')
+plt.show()
+
+```
+
+
+```{python}
+
+z = Z.sim(10000)
+
+z.plot()
+
+Normal().plot()
+plt.show()
+
+```
+
+```{python}
+
+z.mean(), z.sd()
+
+```
+
+
+If $Z$ has a Standard Normal distribution then
+
+\begin{align*}
+\E(Z) & = 0\\
+\SD(Z) & = 1 
+\end{align*}
+
+The Standard Normal pdf is symmetric about its mean of 0, and the peak of the density occurs at 0. 
+The standard deviation is 1, and 1 also indicates the distance from the mean to where the concavity of the density changes. 
+That is, there are inflection points at $\pm1$.
+
+A random variable with a Standard Normal distribution is in standardized units; the mean is 0 and the standard deviation is 1. 
+We can obtain Normal distribution with other means and standard deviations via linear rescaling. 
+If $Z$ has a Standard Normal distribution then $X=\mu + \sigma Z$ has a Normal distribution with mean $\mu$ and standard deviation $\sigma$. 
+The linear transformation does not change the shape; $X$ will have a Normal distribution.
+Adding the constant $\mu$ shifts the center so that $\E(X)=\mu$.
+Multiplying by the constant $\sigma$ changes the scale so that $\SD(X)=\sigma$.
+Since the scale is changed, the density heights must also be revised so that the total area under the curve remains 1.
+
+::: {#def-normal-pdf-math}
+
+A continuous random variable $X$ has a **Normal** (a.k.a., Gaussian) distribution with mean $\mu\in (-\infty,\infty)$ and standard deviation $\sigma>0$ if its pdf is
+$$
+f_X(x) = \frac{1}{\sigma\sqrt{2\pi}}\,\exp\left(-\frac{1}{2}\left(\frac{x-\mu}{\sigma}\right)^2\right), \quad -\infty<x<\infty.
+$$
+
+:::
+
+![A generic Normal pdf.](_graphics/normal-pdf-generic.png){#fig-normal-pdf-generic}
+
+If $X$ has a Normal($\mu$, $\sigma$) distribution then^[If we write $N(0, 4)$ we mean a Normal distribution with mean 0 and standard deviation 4.  Be aware that some references refer to a Normal distribution by its mean and variance, in which case $N(0, 4)$ would refer to a Normal distribution with mean 0 and variance 4.]
+\begin{align*}
+\E(X) & = \mu\\
+\SD(X) & = \sigma
+\end{align*}
+
+A Normal density is a particular "bell-shaped" curve which is symmetric about its mean $\mu$. 
+The mean $\mu$ is a *location* parameter: $\mu$ indicates where the center and peak of the distribution is.
+
+The standard deviation $\sigma$ is a *scale* parameter: $\sigma$ indicates the distance from the mean to where the concavity of the density changes. 
+That is, there are inflection points at $\mu\pm \sigma$.
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-normal-pdf-matching}
+The pdfs in the plot below represent the distribution of hypothetical test scores in three classes. 
+The test scores in each class follow a Normal distribution. 
+Identify the mean and standard deviation for each class.
+
+:::
+::::
+
+
+```{python}
+#| echo: false
+
+plt.figure()
+Normal(60, 10).plot()
+Normal(70, 10).plot()
+Normal(70, 5).plot()
+plt.show()
+
+```
+
+
+
+:::: {.callout-tip collapse="true"}
+::: {#sol-normal-pdf-matching}
+
+The blue curve corresponds to a mean of 60; the others to a mean of 70. 
+The green curve corresponds to a standard deviation of 5. 
+Notice that the concavity changes around 65 and 75, so 5 is the distance from the mean to the inflection points. 
+The standard deviation is 10 in the other plots. 
+The total area under each curve is 1.
+
+:::
+::::
+
+
+If $Z$ has a Standard Normal distribution its cdf is
+$$
+\Phi(z) = \IP(Z \le z) = \int_{-\infty}^z \frac{1}{\sqrt{2\pi}}\,e^{-u^2/2}du, \quad -\infty<z<\infty.
+$$
+However, there is no closed-form expression for the above integral. 
+The above integral, hence probabilities for a Standard Normal distribution, must be computed through numerical methods. 
+See @fig-normal-cdf-def and @tbl-normal-cdf-def. 
+
+
+
+```{r}
+#| label: fig-standard-normal-cdf-three-panel
+#| echo: false
+#| fig-cap: "Standard Normal distribution."
+#| fig-subcap: 
+#|   - "Normal(0, 1) pdf $\\phi(z)$; shaded *area* represents $\\Phi(-0.67) = 0.25$"
+#|   - "Normal(0, 1) cdf $\\Phi(z)$; $\\Phi(-0.67) = 0.25$ is highlighted"
+#|   - "spinner; shaded area represents $\\Phi(-0.67) = 0.25$"
+#| layout-ncol: 3
+
+
+zmin = -3.5
+zmax = 3.5
+
+mu = 0
+sigma = 1
+
+value = qnorm(0.25, mu, sigma)
+
+z = (value - mu) / sigma
+
+limit_shade = c(zmin, z)
+limit_unshade = c(z, zmax)
+shade_color = "skyblue"
+
+ggplot(data.frame(x = c(zmin, zmax)),
+       aes(x = x)) +
+  geom_area(stat = "function", fun = dnorm, color = "black", fill = "white", xlim = limit_unshade, linewidth = 1.2) +
+  geom_area(stat = "function", fun = dnorm, color = "black", fill = shade_color, xlim = limit_shade, linewidth = 1.2) + 
+  scale_y_continuous(expand = c(0, 0), limits = c(0, 0.45)) + 
+  scale_x_continuous(breaks = seq(zmin, zmax, 0.5)) +
+  labs(x = "z",
+       y = expression(phi(z))) +
+  theme_classic() +
+  theme(
+    axis.text.y = element_blank(),
+    axis.ticks.y = element_blank(),
+    axis.text.x = element_text(size = 12),
+    axis.ticks.length.x = unit(0.25, "cm")
+  )
+
+ggplot() +
+  geom_function(fun = pnorm, args = list(mean = mu, sd = sigma), xlim = c(zmin, zmax) * sigma + mu, linewidth = 1.2) +
+  geom_point(aes(x = value, y = pnorm(z)), col = shade_color, size = 5, shape = 1) + 
+  geom_segment(aes(x = value, y = 0, xend = value, yend = pnorm(z)), col = shade_color, linetype = "dashed", linewidth = 1.2) +
+  geom_segment(aes(x = -Inf, y = pnorm(z), xend = value, yend = pnorm(z)), col = shade_color, linetype = "dotted", linewidth = 1.2) +
+  scale_x_continuous(breaks = seq(zmin, zmax, 0.5)) +
+  labs(x = "z",
+       y = expression(Phi(z))) +
+  theme_classic()
+
+n = 12
+
+xp <- data.frame(
+  x = (0:(n-1))/n,
+  p = rep(1/n, n)
+  )
+
+cdf = c(0, cumsum(xp$p))
+
+plotp = (cdf[-1] + cdf[-length(cdf)]) / 2
+  
+spinner1 <- ggplot(xp |>
+                     mutate(shade_lt = (x < pnorm(z))),
+                   aes(x="", y=p, fill=shade_lt))+
+  geom_bar(width = 1, stat = "identity", color="black") + 
+  scale_fill_manual(values = c("white", shade_color), guide = "none") +
+  coord_polar("y", start=0) +
+  theme_void() +
+  # plot the possible values on the outside
+  scale_y_continuous(breaks = xp$x, minor_breaks = (0:99)/100, labels=c("...|...", round(mu + sigma * qnorm(xp$x[-1]), 2))) +
+  theme(axis.text.x=element_text(size=12, face="bold"))
+
+spinner1
+
+
+```
+
+
+
+If $X$ has a Normal($\mu$, $\sigma$) distribution then $X$ has the same distribution as $\mu + \sigma Z$ where $Z$ has a Standard Normal distribution, so its cdf is
+$$
+F_X(x) = \IP(X \le x) = \IP(\mu + \sigma Z \le x) = \IP\left(Z \le \frac{x-\mu}{\sigma}\right) = \Phi\left(\frac{x-\mu}{\sigma}\right)
+$$
+Therefore, probabilities for any Normal distribution can be found by standardizing and using the Standard Normal cdf, which is basically what we do when we use the "empirical rule". 
+See @fig-normal-cdf-def and @tbl-normal-cdf-def. 
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-normal-cdf}
+
+Use the empirical rule to evaluate the following.
+
+1.  $\Phi(-1)$
+1.  $\Phi(1.5)$
+1.  $\Phi^{-1}(0.31)$
+1.  $\Phi^{-1}(0.975)$
+
+:::
+::::
+
+
+:::: {.callout-tip collapse="true"}
+::: {#sol-normal-cdf}
+
+We could use a Normal distribution calculator, or we could just use @tbl-normal-cdf-def.
+
+1.  $\Phi(-1)\approx 0.16$.
+1.  $\Phi(1.5)\approx 0.935$. 
+1.  $\Phi^{-1}(0.31)\approx -0.5$. The inverse of the cdf is the quantile function; $\Phi^{-1}(0.31)$ represents the 31st percentile.
+1.  $\Phi^{-1}(0.975)\approx 2$. The inverse of the cdf is the quantile function; $\Phi^{-1}(0.975)$ represents the 97.5th percentile. 
+
+:::
+::::
+
+
+```{python}
+
+Normal().cdf(-1), Normal().cdf(1.5)
+
+```
+
+
+```{python}
+
+Normal().quantile(0.31), Normal().quantile(0.975)
+
+```
+
+
+Probabilities and quantiles for Normal distributions can be computed with software. 
+However, you should practice making ballpark estimates without software, by standardizing and using the empirical rule.
+
+
+
+Standardization is a specific linear rescaling. 
+If $X$ has a Normal distribution then any linear rescaling of $X$ also has a Normal distribution.  
+Namely, if $X$ has a  Normal$\left(\mu,\sigma\right)$ distribution and $Y=aX+b$ for constants $a,b$ with $a\neq 0$, then $Y$ has a Normal$\left(a\mu+b, |a|\sigma\right)$ distribution.
+
+Any linear combination of independent Normal random variables has a Normal distribution.
+If $X$ and $Y$ are independent, each with a marginal Normal distribution, and $a, b$ are non-random constants then $aX + bY$ has a Normal distribution.
+(We will see a more general result when we discuss Bivariate Normal distributions.)
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-normal-meeting-linear-combo}
+
+Two people are meeting. 
+(Who? You decide!)
+Arrival time are measured in minutes after noon, with negative times representing arrivals before noon.
+Each arrival time follows a Normal distribution with mean 30 and SD 17 minutes, independently of each other. 
+
+1.  Compute the probability that the first person to arrive has to wait more than 15 minutes for the second person to arrive.
+
+1.  Compute the probability that the first person to arrive arrives before 12:15.
+
+:::
+::::
+
+:::: {.callout-tip collapse="true"}
+::: {#sol-normal-meeting-linear-combo}
+1.  Let $X, Y$ be the two arrival times, so that $W=|X-Y|$ is the waiting time. 
+We want $\text{P}(|X - Y| >15) = \text{P}(X - Y > 15) + \text{P}(X - Y < -15)$. Since $X$ and $Y$ are independent each with a Normal distribution, then $X - Y$ has a Normal distribution; the mean is $30-30 = 0$, and since $X$ and $Y$ are independent
+$$
+\text{Var}(X - Y) = \text{Var}(X) + \text{Var}(V) - 2\text{Cov}(X, Y) = 17^2 + 17^2 - 0 = 578
+$$
+So $\text{SD}(X - Y) = \sqrt{578} = 24.0$. 
+The standardized value for 15 is $(15 - 0)/24.0=0.624$; that is, 15 is 0.624 SDs above the mean, so $\IP(X - Y>15) = 0.266$. Since the distribution of $X - Y$ is symmetric about 0,
+$$
+\IP(W > 15) = \IP(|X-Y|>15) = \IP(X - Y > 15) + \IP(X - Y < - 15) = 2(0.266) = 0.53.
+$$
+On about 53% of days the first person to arrive has to wait more than 15 minutes for the second to arrive.
+
+1.  $T = \min(X, Y)$ is the time at which the first person arrives. 
+The first person arrives before 12:15 if either $X<15$ or $Y < 15$, so $\IP(T < 15) = \IP(\{X < 15\}\cup\{Y < 15\})$. 
+It's easier to compute the probability of the complement. Note that 15 is 0.88 SDs below the mean of $X$ ($(15 - 30)/17 = -0.88$) so $\IP(X>15) = 0.811$; similarly, $\IP(Y > 15) = 0.811$. 
+We want
+\begin{align*}
+\IP(T < 15) & = 1 - \IP(X > 15, Y > 15) && \text{Complement rule}\\
+& = 1 - \IP(X>15)\IP(Y > 15) && \text{independence of $X, Y$}\\
+& = 1- (0.811)(0.811) & & \text{Normal distributions}\\
+& = 0.342
+\end{align*}
+On about 34% of days the first person arrives before 12:15.
+
+:::
+::::
+
+
+```{python}
+X, Y = RV(Normal(mean = 30, sd = 17) * Normal(mean = 30, sd = 17))
+
+W = abs(X - Y)
+
+T = (X & Y).apply(min)
+```
+
+
+```{python}
+w = W.sim(10000)
+
+plt.figure()
+w.plot()
+plt.show()
+
+w.mean(), w.sd(), w.count_gt(15) / w.count()
+```
+
+
+```{python}
+t = T.sim(10000)
+
+plt.figure()
+t.plot()
+plt.show()
+
+t.mean(), t.sd(), t.count_lt(15) / w.count()
+```
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-normal-temp}
+Daily high temperatures (degrees Fahrenheit) in San Luis Obispo in August follow (approximately) a Normal distribution with a mean of 76.9 degrees F.
+The temperature exceeds 100 degrees Fahrenheit on about 1.5% of August days.
+
+
+1.  Compute the standard deviation.
+
+1.  Suppose the mean increases by 2 degrees Fahrenheit. 
+On what percentage of August days will the daily high temperature exceed 100 degrees Fahrenheit?
+(Assume the standard deviation does not change.)
+
+1.  A mean of 78.9 is 1.02 times greater than a mean of 76.9.
+By what (multiplicative) factor has the percentage of 100-degree days increased?
+What do you notice?
+
+:::
+::::
+
+:::: {.callout-tip collapse="true"}
+::: {#sol-normal-temp}
+
+1.  We are given that 100 is the 98.5th percentile.
+Software (`Normal(0, 1).quantile(0.985)`) shows that for a Normal distribution the 98.5th percentile is 2.17 standard deviations above the mean.
+Set $100 = 76.9 + 2.17\sigma$ and solve for the standard deviation $\sigma = 10.65$ degrees F.
+
+1.  The mean is now 78.9. Now the value 100 is $(100-78.9)/10.65 = 1.98$ standard deviations above the mean.
+Software (`1 - Normal(0, 1).cdf(1.98)`) shows that for a Normal distribution the probability of a value more than 1.98 standard deviations above the mean is 0.023.
+On 2.3% of August days the daily high temperature will exceed 100 degrees F.
+
+1.  $0.023/0.015 = 1.53$. A 2 percent increase in the mean results in a 53 percent increase in the probability that a day has a daily high temperature above 100 degrees F.
+Relative small changes in the mean can have relative large impacts on tail probabilities.
+
+:::
+::::
+
+
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-normal-effect-size}
+In a large class, scores on midterm 1 follow (approximately) a Normal$(\mu_1, \sigma)$ distribution and scores on midterm 2 follow (approximately) a Normal$(\mu_2, \sigma)$ distribution.  Note that the SD $\sigma$ is the same on both exams. The 40th percentile of midterm 1 scores is equal to the 70th percentile of midterm 2 scores. 
+Compute and interpret
+$$
+\frac{\mu_1-\mu_2}{\sigma}
+$$
+(This is one statistical measure of *effect size*.)
+
+:::
+::::
+
+:::: {.callout-tip collapse="true"}
+::: {#exm-normal-effect-size}
+
+Software shows that for a Normal distribution, the 40th percentile is 0.253 SDs below the mean and the 70th percentile is 0.524 SDs above the mean.
+The 40th percentile of midterm 1 scores is $\mu_1 - 0.253 \sigma$, and the 70th percentile of midterm 2 scores is $\mu_2 + 0.524\sigma$.
+We are told
+$$
+\mu_1 - 0.253 \sigma = \mu_2 + 0.524\sigma
+$$
+Solve for
+$$
+\frac{\mu_1-\mu_2}{\sigma} = 0.524 + 0.253 = 0.78
+$$
+The effect size is 0.78. 
+The mean on midterm 1 is 0.78 SDs above the mean on midterm 2.
+
+:::
+::::
+
+
+The previous example illustrates a common problem in statistics: comparing two (or more) groups; in particular, comparing two means.
+When comparing groups, a more important question than "is there a difference?" is "*how large* is the difference?"
+An **effect size** is a measure of the magnitude of a difference between groups.
+When comparing a numerical variable between two groups, one measure of the population effect size is **Cohens's $d$**
+$$
+\frac{\mu_1 - \mu_2}{\sigma}
+$$
+
+The values of any numerical variable vary naturally from unit to unit.
+The SD of the numerical variable measures the degree to which individual values of the variable vary naturally, so the SD provides a natural "scale" for the variable.
+Cohen's $d$ compares the magnitude of the difference in means relative to the natural scale (SD) for the variable
+
+
+Some rough guidelines for interpreting $|d|$:
+
+|             |       |        |       |            |      |
+|------------:|------:|-------:|------:|-----------:|-----:|
+|         *d* |   0.2 |    0.5 |   0.8 |        1.2 |  2.0 |
+| Effect size | Small | Medium | Large | Very Large | Huge |
+|             |       |        |       |            |      |
+
+For example, assume the two population distributions are Normal and the two population standard deviations are equal. Then when the effect size is 1.0 the median of the distribution with the higher mean is the 84th percentile of the distribution with the lower mean, which is a very large difference.
+
+|                                    |       |        |       |      |            |      |
+|:-----------------------------------|:-----:|:------:|:-----:|:----:|:----------:|:----:|
+| *d*                                |  0.2  |  0.5   |  0.8  | 1.0  |    1.2     | 2.0  |
+| Effect size                        | Small | Medium | Large |      | Very Large | Huge |
+| Median of population 1 is          |       |        |       |      |            |      |
+| (blank) percentile of population 2 | 58th  |  69th  | 79th  | 84th |    89th    | 98th |
+
+
+```{r}
+#| echo: false
+knitr::include_graphics("_graphics/effect_size_plots.png")
+```
+
