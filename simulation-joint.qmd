@@ -11,4 +11,1835 @@ $$
 $$
 :::
 
-TBS
+
+## Expected values of linear combinations of random variables
+
+
+Remember that, in general, you cannot interchange averaging and transformation.
+In general, an expected value of a function of random variables is not the function evaluated at the expected values of the random variables.
+
+\begin{align*}
+\E(g(X)) & \neq g(\E(X)) & & \text{for most functions $g$}\\
+\E(g(X, Y)) & \neq g(\E(X), \E(Y)) & & \text{for most functions $g$}
+\end{align*}
+
+But there are some functions, namely linear functions, for which an expected value of the transformation is the transformation evaluated at the expected values.
+In this section, we will study "linearity of expected value" and applications.
+We will also investigate variance of linear transformations of random variables, and in particular, the role that covariance plays.
+
+
+
+
+A linear rescaling is a transformation of the form $g(u) = au + b$.
+Recall that in @sec-linear-rescaling we observed, via simulation, that
+
+- A linear rescaling of a random variable does not change the basic shape of its distribution, just the range of possible values.
+- A linear rescaling transforms the mean in the same way the individual values are transformed.
+- Adding a constant to a random variable does not affect its standard deviation.
+- Multiplying a random variable by a constant multiples its standard deviation by the absolute value of the constant.
+
+
+If $X$ is a random variable and $a, b$ are non-random constants then
+
+\begin{align*}
+\E(aX + b) & = a\E(X) + b\\
+\SD(aX + b) & = |a|\SD(X)\\
+\Var(aX + b) & = a^2\Var(X)
+\end{align*}
+
+
+
+### Linearity of expected value
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-die}
+Spin the Uniform(1, 4) spinner twice and let $U_1$ be the first spin, $U_2$ the second, and $X = U_1 + U_2$ the sum.
+
+
+1.  Find $\E(U_1)$ and $\E(U_2)$.
+1.  Find $\E(X)$.
+1.  How does $\E(X)$ relate to $\E(U_1)$ and $\E(U_2)$?  Suggest a simpler way of finding $\E(U_1 + U_2)$.
+
+:::
+::::
+
+:::: {.callout-note appearance="simple"}
+::: {#sol-die}
+
+1. $\E(U_1) = \frac{1+4}{2} = 2.5 = \E(U_2)$.
+1. We found the pdf of $X$ in @exm-uniform-sum-max-pdf. Since the pdf of $X$ is symmetric about $5$ we should have $\E(X)=5$, which integrating confirms.
+    $$
+    \E(X) = \int_2^5 x \left((x-2)/9\right)dx + \int_5^8 x \left((8-x)/9\right) dx = 5.
+    $$
+1. We see that $\E(U_1+U_2) = 5 = 2.5 + 2.5 = \E(U_1) + \E(U_2)$.  Finding the expected value of each of $U_1$ and $U_2$ and adding these two numbers is much easier than finding the pdf of $U_1+U_2$ and then using the definition of expected value.
+
+:::
+::::
+
+In the previous example, the values $U_1$ and $U_2$ came from separate spins so they were uncorrelated (in fact, they were independent).  What about the expected value of $X+Y$ when $X$ and $Y$ are correlated?
+
+
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-sat-compare-ev}
+Consider the three scenarios depicted in the tables and plots below.
+Each scenario contains SAT Math ($X$) and Reading ($Y$) scores for 10 hypothetical students, along with the total score ($T  =  X + Y$) and the difference between the Math and Reading scores ($D = X - Y$, negative values indicate lower Math than Reading scores).
+Note that the 10 $X$ values are the same in each scenario, and the 10 $Y$ values are the same in each scenario, but the $(X, Y)$ values are paired in different ways: the correlation^[All averages, including those used to compute variance and covariance, are computed by dividing the appropriate sum by 10.] is 0.78 in scenario 1, -0.02 in scenario 2, and -0.94 in scenario 3.
+
+1.  What is the mean of $T = X + Y$ in each scenario? How does it relate to the means of $X$ and $Y$?
+Does the correlation affect the mean of $T = X + Y$?
+1.  What is the mean of $D = X - Y$ in each scenario? How does it relate to the means of $X$ and $Y$?
+Does the correlation affect the mean of $D = X - Y$?
+
+:::
+::::
+
+**Scenario 1.**
+
+| Student        |  $X$ | $Y$ |  $T$ | $D$ |
+|----------------|-----:|----:|-----:|----:|
+| 1              |  520 | 530 | 1050 | -10 |
+| 2              |  540 | 470 | 1010 |  70 |
+| 3              |  620 | 670 | 1290 | -50 |
+| 4              |  620 | 630 | 1250 | -10 |
+| 5              |  630 | 600 | 1230 |  30 |
+| 6              |  670 | 610 | 1280 |  60 |
+| 7              |  700 | 680 | 1380 |  20 |
+| 8              |  700 | 580 | 1280 | 120 |
+| 9              |  710 | 640 | 1350 |  70 |
+| 10             |  760 | 720 | 1480 |  40 |
+|                |      |     |      |     |
+| Mean           |  647 | 613 | 1260 |  34 |
+| SD             |   72 |  70 |  134 |  47 |
+| Corr($X$, $Y$) | 0.78 |     |      |     |
+
+
+```{r}
+#| echo: false
+#| fig-show: hold
+#| out-width: 33%
+x = c(520, 540, 620, 620, 630, 670, 700, 700, 710, 760)
+y = c(530, 470, 670, 630, 600, 610, 680, 580, 640, 720)
+
+# mean(x)
+# mean(y)
+# sx = sqrt(mean(x ^ 2) - mean(x) ^ 2); sx
+# sy = sqrt(mean(y ^ 2) - mean(y) ^ 2); sy
+# (mean(x * y) - mean(x) * mean(y)) / sx / sy
+# sqrt(mean((x + y) ^ 2) - mean(x + y) ^ 2)
+# sqrt(mean((x - y) ^ 2) - mean(x - y) ^ 2)
+
+plot(x, y,
+     xlim = c(500, 800),
+     ylim = c(500, 800),
+     xlab = "X", ylab = "Y")
+
+
+ggplot(data.frame(x, y),
+       aes(x = x + y ,
+           y = 0)) +
+  geom_point(shape = "|", size = 10) +
+  scale_y_continuous(limits = c(0, 5), expand = c(0, 0)) +
+  scale_x_continuous(limits = c(1000, 1500)) +
+  theme_classic() +
+  coord_fixed() +
+  labs(x = "X + Y") +
+  theme(axis.text.y=element_blank(),
+        axis.title.y = element_blank(),
+        axis.ticks.y=element_blank(),
+        axis.line.y = element_blank()
+  )
+
+
+ggplot(data.frame(x, y),
+       aes(x = x - y ,
+           y = 0)) +
+  geom_point(shape = "|", size = 10) +
+  scale_y_continuous(limits = c(0, 5), expand = c(0, 0)) +
+  scale_x_continuous(limits = c(-200, 300)) +
+  theme_classic() +
+  coord_fixed() +
+  labs(x = "X - Y") +
+  theme(axis.text.y=element_blank(),
+        axis.title.y = element_blank(),
+        axis.ticks.y=element_blank(),
+        axis.line.y = element_blank()
+  )
+```
+
+
+**Scenario 2.**
+
+| Student        |   $X$ | $Y$ |  $T$ |  $D$ |
+|----------------|------:|----:|-----:|-----:|
+| 1              |   520 | 680 | 1200 | -160 |
+| 2              |   540 | 530 | 1070 |   10 |
+| 3              |   620 | 630 | 1250 |  -10 |
+| 4              |   620 | 600 | 1220 |   20 |
+| 5              |   630 | 720 | 1350 |  -90 |
+| 6              |   670 | 470 | 1140 |  200 |
+| 7              |   700 | 670 | 1370 |   30 |
+| 8              |   700 | 580 | 1280 |  120 |
+| 9              |   710 | 640 | 1350 |   70 |
+| 10             |   760 | 610 | 1370 |  150 |
+|                |       |     |      |      |
+| Mean           |   647 | 613 | 1260 |   34 |
+| SD             |    72 |  70 |   98 |  103 |
+| Corr($X$, $Y$) | -0.04 |     |      |      |
+
+```{r}
+#| echo: false
+#| fig-show: hold
+#| out-width: 33%
+y = c(680, 530, 630, 600, 720, 470, 670, 580, 640, 610)
+
+# mean(x)
+# mean(y)
+# sx = sqrt(mean(x ^ 2) - mean(x) ^ 2); sx
+# sy = sqrt(mean(y ^ 2) - mean(y) ^ 2); sy
+# (mean(x * y) - mean(x) * mean(y)) / sx / sy
+# sqrt(mean((x + y) ^ 2) - mean(x + y) ^ 2)
+# sqrt(mean((x - y) ^ 2) - mean(x - y) ^ 2)
+
+plot(x, y,
+     xlim = c(500, 800),
+     ylim = c(500, 800),
+     xlab = "X", ylab = "Y")
+
+ggplot(data.frame(x, y),
+       aes(x = x + y ,
+           y = 0)) +
+  geom_point(shape = "|", size = 10) +
+  scale_y_continuous(limits = c(0, 5), expand = c(0, 0)) +
+  scale_x_continuous(limits = c(1000, 1500)) +
+  theme_classic() +
+  coord_fixed() +
+  labs(x = "X + Y") +
+  theme(axis.text.y=element_blank(),
+        axis.title.y = element_blank(),
+        axis.ticks.y=element_blank(),
+        axis.line.y = element_blank()
+  )
+
+
+ggplot(data.frame(x, y),
+       aes(x = x - y ,
+           y = 0)) +
+  geom_point(shape = "|", size = 10) +
+  scale_y_continuous(limits = c(0, 5), expand = c(0, 0)) +
+  scale_x_continuous(limits = c(-200, 300)) +
+  theme_classic() +
+  coord_fixed() +
+  labs(x = "X - Y") +
+  theme(axis.text.y=element_blank(),
+        axis.title.y = element_blank(),
+        axis.ticks.y=element_blank(),
+        axis.line.y = element_blank()
+  )
+```
+
+**Scenario 3.**
+
+| Student        |   $X$ | $Y$ |  $T$ |  $D$ |
+|----------------|------:|----:|-----:|-----:|
+| 1              |   520 | 720 | 1240 | -200 |
+| 2              |   540 | 680 | 1220 | -140 |
+| 3              |   620 | 670 | 1290 |  -50 |
+| 4              |   620 | 640 | 1260 |  -20 |
+| 5              |   630 | 630 | 1260 |    0 |
+| 6              |   670 | 610 | 1280 |   60 |
+| 7              |   700 | 600 | 1300 |  100 |
+| 8              |   700 | 580 | 1280 |  120 |
+| 9              |   710 | 530 | 1240 |  180 |
+| 10             |   760 | 470 | 1230 |  290 |
+|                |       |     |      |      |
+| Mean           |   647 | 613 | 1260 |   34 |
+| SD             |    72 |  70 |   26 |  140 |
+| Corr($X$, $Y$) | -0.94 |     |      |      |
+
+
+```{r}
+#| echo: false
+#| fig-show: hold
+#| out-width: 33%
+
+y = c(720, 680, 670, 640, 630, 610, 600, 580, 530, 470)
+
+# mean(x)
+# mean(y)
+# sx = sqrt(mean(x ^ 2) - mean(x) ^ 2); sx
+# sy = sqrt(mean(y ^ 2) - mean(y) ^ 2); sy
+# (mean(x * y) - mean(x) * mean(y)) / sx / sy
+# sqrt(mean((x + y) ^ 2) - mean(x + y) ^ 2)
+# sqrt(mean((x - y) ^ 2) - mean(x - y) ^ 2)
+
+plot(x, y,
+     xlim = c(500, 800),
+     ylim = c(500, 800),
+     xlab = "X", ylab = "Y")
+
+ggplot(data.frame(x, y),
+       aes(x = x + y ,
+           y = 0)) +
+  geom_point(shape = "|", size = 10) +
+  scale_y_continuous(limits = c(0, 5), expand = c(0, 0)) +
+  scale_x_continuous(limits = c(1000, 1500)) +
+  theme_classic() +
+  coord_fixed() +
+  labs(x = "X + Y") +
+  theme(axis.text.y=element_blank(),
+        axis.title.y = element_blank(),
+        axis.ticks.y=element_blank(),
+        axis.line.y = element_blank()
+  )
+
+
+ggplot(data.frame(x, y),
+       aes(x = x - y ,
+           y = 0)) +
+  geom_point(shape = "|", size = 10) +
+  scale_y_continuous(limits = c(0, 5), expand = c(0, 0)) +
+  scale_x_continuous(limits = c(-200, 300)) +
+  theme_classic() +
+  coord_fixed() +
+  labs(x = "X - Y") +
+  theme(axis.text.y=element_blank(),
+        axis.title.y = element_blank(),
+        axis.ticks.y=element_blank(),
+        axis.line.y = element_blank()
+  )
+```
+
+
+
+
+
+:::: {.callout-tip collapse=true}
+::: {#sol-sat-compare-ev}
+
+1.  In each situation, the mean of $X+Y$ is $1260 = 647 + 613$, which is equal to the sum of the means of $X$ and $Y$.
+Even though the joint distribution of $(X, Y)$ pairs and the distribution of the sum $X+Y$ are different for each situation, the correlation between $X$ and $Y$ does not affect the average of the $X + Y$. 
+1.  In each situation, the mean of $X-Y$ is $1260 = 647 - 613 = 34$, which is equal to the difference of the means of $X$ and $Y$.
+Even though the joint distribution of $(X, Y)$ pairs and the distribution of the difference $X-Y$ are different for each situation, the correlation between $X$ and $Y$ does not affect the average of the $X - Y$. 
+
+
+:::
+::::
+
+
+**Linearity of expected value.** For *any* two random variables $X$ and $Y$,
+\begin{align*}
+\E(X + Y) & = \E(X) + \E(Y)
+\end{align*}
+That is, the expected value of the sum is the sum of expected values, regardless of how the random variables are related.  Therefore, you only need to know the marginal distributions of $X$ and $Y$ to find the expected value of their sum.  (But keep in mind that the *distribution* of $X+Y$ will depend on the joint distribution of $X$ and $Y$.)
+
+
+Linearity of expected value follows from simple arithmetic properties of numbers. Whether in the short run or the long run,
+\begin{align*}
+\text{Average of $X + Y$ } & = \text{Average of $X$} + \text{Average of $Y$}
+\end{align*}
+regardless of the joint distribution of $X$ and $Y$.  For example, for the two $(X, Y)$ pairs (4, 3) and (2, 1)
+$$
+\text{Average of $X + Y$ } = \frac{(4+3)+(2+1)}{2} = \frac{4+2}{2} + \frac{3+1}{2} = \text{Average of $X$} + \text{Average of $Y$}.
+$$
+Changing the $(X, Y)$ pairs to (4, 1) and (2, 3) only moves values around in the calculation of the average without affecting the result.
+$$
+\text{Average of $X + Y$ } = \frac{(4+1)+(2+3)}{2} = \frac{4+2}{2} + \frac{3+1}{2} = \text{Average of $X$} + \text{Average of $Y$}.
+$$
+
+
+A **linear combination** of two random variables $X$ and $Y$ is of the form $aX + bY$ where $a$ and $b$ are non-random constants.  Combining properties of linear rescaling with linearity of expected value yields the expected value of a linear combination.
+$$
+\E(aX + bY) = a\E(X)+b\E(Y)
+$$
+For example, $\E(X - Y) = \E(X) - \E(Y)$. The left side above, $\E(aX+bY)$, represents the "long way": find the distribution of $aX + bY$, which will depend on the joint distribution of $X$ and $Y$, and then use the definition of expected value.  The right side above, $a\E(X)+b\E(Y)$, is the "short way": find the expected values of $X$ and $Y$, which only requires their marginal distributions, and plug those numbers into the transformation formula.  Similar to LOTUS, linearity of expected value provides a way to find the expected value of certain random variables without first finding the distribution of the random variables.
+
+
+Linearity of expected value extends naturally to more than two random variables.
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-matching-ev-n}
+Recall the matching problem in @exm-matching-ev. We showed that the expected value of the number of matches $X$ is $\E(X)=1$ when $n=4$.  Now consider a general $n$: there are $n$ objects that are shuffled and placed uniformly at random in $n$ spots with one object per spot.  Let $X$ be the number of matches.  Can you find a general formula for $\E(X)$? 
+
+
+1.  Before proceeding take a minute to consider: how do you think $\E(X)$ depends on $n$? Will $\E(X)$ increase as $n$ increases? Decrease? Stay the same?
+1.  When $n=4$ we derived the distribution of $X$ and used it to find $\E(X)=1$. Now we'll see how to find $\E(X)$ without first finding the distribution of $X$. The key is to use the indicator random variables from @exm-matching-indicator.  Let $\ind_1$ be the indicator that object 1 is placed correctly in spot 1.  Find $\E(\ind_1)$.
+1.  When $n=4$, find $\E(\ind_j)$ for $j=1,2,3, 4$.
+1.  What is the relationship between the random variables $X$ and $\ind_1, \ind_2,\ind_3, \ind_4$?
+1.  Use the previous parts to find $\E(X)$.
+1.  Now consider a general $n$. Let $\ind_i$ be the indicator that object $j$ is placed correctly in spot $j$, $j=1, \ldots, n$.  Find $\E(\ind_j)$.
+1.  What is the relationship between $X$ and $\ind_1, \ldots, \ind_n$? 
+1.  Find $\E(X)$.  Be amazed.
+1.  Interpret $\E(X)$ is context.
+
+:::
+::::
+
+:::: {.callout-tip collapse=true}
+::: {#sol-matching-ev-n}
+
+1.  There are two common guesses.  (1) As $n$ increases, there are more chances for a match, so maybe $\E(X)$ increases with $n$. (2) But as $n$ increases the chance that any particular object goes in the correct spot decreases, so maybe $\E(X)$ decreases with $n$.  These considerations move $\E(X)$ in opposite directions; how do they balance?
+1.  Recall that the expected value of an indicator random variable is just the probability of the corresponding event. There are $4$ objects which are equally likely to be placed in spot 1, only 1 of which is correct.  The probability that object 1 is correctly placed in spot 1 is $1/4$.  That is, $\E(\ind_1) = (1)(1/4) + (0)(1 - 1/4) = 1/4$.
+1.  If the objects are placed uniformly at random then no object is more or less likely than any other to be placed in its correct spot, so the probability and expected value should be the same for all $j$. Given any spot $j$, any of the $4$ objects is equally likely to be placed in spot $j$, and only one of those is the correct object, so $\IP(\ind_j = 1) = 1/4$, and $\E(\ind_j) = 1/4$. Note that these are *marginal* probabilities and *marginal* expected values; see the note after the example below.
+1.  Recall @exm-matching-indicator. We can count the total number of matches by starting with a count of 0, inspecting each spot, and incrementally adding 1 to our counter each time object $j$ matches spot $j$ for $j=1, \ldots, 4$.  That is, the total number of matches is the sum of the indicator random variables: $X=\ind_1 + \ind_2+\ind_3+\ind_4$.
+1.  Linearity of expected value says the expected value of the sum is the sum of the expected values
+\begin{align*}
+\E(X) & = \E(\ind_1 + \ind_2 + \ind_3 + \ind_4)\\
+& = \E(\ind_1) + \E(\ind_2) + \E(\ind_3) + \E(\ind_4)\\
+& = 1/4 + 1/4 + 1/4 + 1/4\\
+& = 4(1/4) = 1
+\end{align*}
+1.  Now we repeat the above process for a general $n$.
+If the objects are placed uniformly at random then no object is more or less likely than any other to be placed in its correct spot, so the probability and expected value should be the same for all $j=1, \ldots, n$. Given any spot $j$, any of the $n$ objects is equally likely to be placed in spot $j$, and only one of those is the correct object, so $\IP(\ind_j = 1) = 1/n$, and $\E(I_j) = 1/n$.
+1.  We can count the total number of matches by incrementally adding 1 to our counter each time object $j$ matches spot $j$ for $j=1, \ldots, n$.  That is, the total number of matches is the sum of the indicator random variables: $X=\ind_1 + \cdots + \ind_n$.
+1.  Use linearity of expected value
+\begin{align*}
+\E(X) & = \E(\ind_1 + \ind_2 + \cdots + \ind_n)\\
+& = \E(\ind_1) + \E(\ind_2) + \cdots + \E(\ind_n)\\
+& = \frac{1}{n} + \frac{1}{n} + \cdots + \frac{1}{n}\\
+& = n\left(\frac{1}{n}\right) = 1
+\end{align*}
+Regardless of the value of $n$, $\E(X) = 1$!
+1.  Imagine placing $n$ distinct objects uniformly at random in $n$ distinct spots with one object per spot. Then over many such placements, on average 1 object per placement is placed in the correct spot *regardless of the number of objects/spots*.
+
+:::
+::::
+
+The answer to the previous problem is not an approximation: the expected value of the number of matches is equal to 1 for any $n$.  We think that's pretty amazing.  (We'll see some even more amazing results for this problem later.)  Notice that we computed the expected value without first finding the distribution of $X$.
+When $n=4$ we found the distribution of $X$ by enumerating all the possibilities.
+Obviously this is not feasible when $n$ is large, and in general it is difficult to find the exact distribution of $X$ in the matching problem (though we'll see a pretty good approximation later).
+However, as the previous example shows, we don't need to find the distribution of $X$ to find $\E(X)$.
+
+
+Intuitively, if the objects are placed in the spots uniformly at random, then the probability that object $j$ is placed in the correct spot should be the same for all the objects, $1/n$. But you might have said: "if object 1 goes in spot 1, there are only $n-1$ objects that can go in spot 2, so the probability that object 2 goes in spot to is $1/(n-1)$".  That is true *if object 1 goes in spot 1*.  However, when computing the *marginal* probability that object 2 goes in spot 2, we don't know whether object 1 went in spot 1 or not, so the probability needs to account for both cases.  Remember, there is a difference between  *marginal/unconditional* probability and *conditional* probability; @sec-conditional-versus-unconditional.
+Linearity of expected value is useful because we only need the marginal distribution of each random variable to compute the sum of their expected values.
+
+When a problem asks "find the expected number of..." it's a good idea to try using indicator random variables and linearity of expected value. The following is a general statement of the strategy we used in the matching problem.
+
+Let $A_1, A_2, \ldots, A_n$ be a collection of $n$ events.  Suppose event $i$ occurs with marginal probability $p_i=\IP(A_i)$. Let $N = \ind_{A_i} + \ind_{A_2} + \cdots + \ind_{A_n}$ be the random variable which counts the number of the events in the collection which occur.  Then the expected number of events that occur is the sum of the event probabilities.
+$$
+\E(N) = \sum_{i=1}^n p_i.
+$$
+If each event has the same probability, $p_i \equiv p$, then $\E(N)$ is equal to $np$.
+These formulas for the expected number of events are true regardless of whether there is any association between the events (that is, regardless of whether the events are independent.)
+
+For example, in the matching problem $A_i$ was the event that object $i$ was placed in spot $i$ and $p_i=1/n$ for all $i$.
+
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-kids-wake-up}
+
+Kids wake up during the night. On any given night,
+
+-   the probability that Paul wakes up is 1/14
+-   the probability that Bob wakes up is 2/7
+-   the probability that Tommy wakes up is 1/30
+-   the probability that Chris wakes up is 1/2
+-   the probability that Slim wakes up is 6/7.
+
+If any kid wakes up they're likely to wake other kids up too.  Find and interpret the expected number of kids that wake up on any given night.
+
+:::
+::::
+
+
+
+:::: {.callout-tip collapse=true}
+::: {#sol-kids-wake-up}
+
+Simply add the probabilities: $1/14 + 2/7 + 1/30+ 1/2 + 6/7=1.75$.  The expected number of kids to wake up in a night is 1.75.  Over many nights, on average 1.75 kids wake up per night.
+
+The fact that kids wake each other up implies that the events are not independent, but this is irrelevant here. Because of linearity of expected value, we only need to know the *marginal* probability^[If there were too much dependence, then the provided marginal probabilities might not be possible.  For example if Slim always wakes up all the other kids, then the other marginal probabilities would have to be at least 6/7.  So a specified set of marginal probabilities puts some limits on how much dependence there can be.  This idea is similar to @exm-cats-dogs.] of each event (provided) in order to determine the expected number of events occur.  (The *distribution* of the number of kids that wake up would depend the relationships between the events, but not the long run average value.)
+
+:::
+::::
+
+
+When computing the expected value of a random variable, consider if it can be written as a sum of component random variables.  If so, then using linearity of expected value is usually easier than first finding the distribution of the random variable.  Of course, the expected value is only one feature of the distribution of a random variable; there is much more to a distribution than its expected value.
+
+### Variance of linear combinations of random variables
+
+We have seen that correlation does not affect the expected value of a linear combination of random variables.
+But what affect, if any, does correlation have on the variance of a linear combination of random variables?
+
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-var-two-times}
+Consider a random variable $X$ with $\Var(X)=1$.  What is $\Var(2X)$?
+
+-   Walt says: $\SD(2X) = 2\SD(X)$ so $\Var(2X) = 2^2\Var(X) = 4(1) = 4$.
+-   Jesse says: Variance of a sum is a sum of variances, so $\Var(2X) = \Var(X+X)$ which is equal to $\Var(X)+\Var(X) = 1+1=2$.
+
+Who is correct? 
+Why is the other wrong?
+  
+:::
+::::
+
+:::: {.callout-tip collapse=true}
+::: {#sol-var-two-times}
+
+If $\Var(X)=1$ then $\Var(2X)= 4$. Walt is correctly using properties of linear rescaling.  Jesse is assuming that a variance of a sum is the sum of the variances, which is not true in general.  We'll see why below.
+
+:::
+::::
+
+When two variables are correlated the degree of the association will affect the variability of linear combinations of the two variables.
+
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-sat-compare-var}
+Recall @exm-sat-compare-ev.
+
+1.  In which of the three scenarios is $\Var(X + Y)$ the largest?
+Can you explain why?
+1.  In which of the three scenarios is $\Var(X + Y)$ the smallest?
+Can you explain why?
+1.  In which scenario is $\Var(X + Y)$ roughly equal to the sum of $\Var(X)$ and $\Var(Y)$?
+1.  In which of the three scenarios is $\Var(X - Y)$ the largest?
+Can you explain why?
+1.  In which of the three scenarios is $\Var(X - Y)$ the smallest?
+Can you explain why?
+1.  In which scenario is $\Var(X - Y)$ roughly equal to the *sum* of $\Var(X)$ and $\Var(Y)$?
+
+:::
+::::
+
+
+:::: {.callout-tip collapse=true}
+::: {#sol-sat-compare-var}
+
+1.  Variance of $X + Y$ is largest when $\Corr(X, Y)$ is near 1 (scenario 1).
+With a strong positive correlation, students who scored high on Math tended to also score high on Reading so their total score was very high; students who scored low on Math tended to also score low on Reading so their total score was very low. Of these three scenarios we see the most variability in $X+Y$ in scenario 1. 
+1.  Variance of $X + Y$ is smallest when $\Corr(X, Y)$ is near $-1$ (scenario 3).
+With a strong negative correlation, students who scored high on Math tended to score low on Reading so their total score was moderate; students who scored low on Math tended to score high on Reading so their total score was moderate. Of these three scenarios we see the least variability in $X+Y$ in scenario 3. 
+1.  When the correlation between $X$ and $Y$ is near 0 (scenario 2) the variance of $X + Y$ is roughly equal to the sum of the variances.
+1.  Variance of $X - Y$ is largest when $\Corr(X, Y)$ is near $-1$ (scenario 3).
+With a strong negative correlation, students who scored high on Math tended to score low on Reading so their difference in scores was high and positive; students who scored low on Math tended to score high on Reading so their difference in scores was high and negative. Of these three scenarios we see the most variability in $X-Y$ in scenario 3. 
+1.  Variance of $X - Y$ is smallest when $\Corr(X, Y)$ is near 1 (scenario 1).
+With a strong positive correlation, students who scored high on Math tended to also score high on Reading so their difference in scores was small; students who scored low on Math tended to also score low on Reading so their difference in scores was small. Of these three scenarios we see the least variability in $X-Y$ in scenario 1. 
+1.  When the correlation between $X$ and $Y$ is near 0 (scenario 2) the variance of $X - Y$ is roughly equal to the *sum* of the variances.
+That is, when the correlation is 0, the sum $X+Y$ and the difference $X-Y$ have the same variance.
+
+:::
+::::
+
+
+The degree of correlation between two random variables affects the variability of their sum and difference.
+The following formulas represent the math behind the observations we made in the previous problem.
+
+
+
+**Variance of sums and differences of random variables.**
+\begin{align*}
+\Var(X + Y) & = \Var(X) + \Var(Y) + 2\Cov(X, Y)\\
+\Var(X - Y) & = \Var(X) + \Var(Y) - 2\Cov(X, Y)
+\end{align*}
+
+The left side represents first finding the distribution of the random variable $X+Y$ and computing its variance.
+The right side represents using the joint (and marginal) distribution of $(X, Y)$ to compute the variance of the sum.
+However, to compute the right side we do not need the full joint and marginal distributions; we simply need the marginal variances and the covariance (or correlation).
+
+
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-variance-of-sum}
+
+Assume that SAT Math ($X$) and Reading ($Y$) scores follow a Bivariate Normal distribution, Math  scores have mean 527 and standard deviation 107, and Reading scores have mean 533 and standard deviation 100.  Compute $\Var(X + Y)$ and $\SD(X+Y)$ for each of the following correlations.
+
+
+1.  $\Corr(X, Y) = 0.77$
+1.  $\Corr(X, Y) = 0.40$
+1.  $\Corr(X, Y) = 0$
+1.  $\Corr(X, Y) = -0.77$
+
+:::
+::::
+
+:::: {.callout-tip collapse=true}
+::: {#sol-variance-of-sum}
+
+Recall that we can obtain covariance from correlation: $\Cov(X, Y) = \Corr(X, Y)\SD(X)\SD(Y) = (0.77)(107)(100) = 8239$.
+
+1.  $\Var(X + Y) = \Var(X) + \Var(Y) + 2\Cov(X, Y) = 107^2 + 100^2 + 2(8239)=37927$.  $\SD(X+Y)=\sqrt{37927} = 195$. 
+1.  $\Var(X + Y) = 107^2 + 100^2 + 2(0.40)(107)(100)=30009$.  $\SD(X+Y)= 173$.
+1.  $\Var(X + Y) = 107^2 + 100^2 + 0=21449$.  $\SD(X+Y)= 146$.
+1.  $\Var(X + Y) = 107^2 + 100^2 + 2(-0.77)(107)(100)=4971$.  $\SD(X+Y)= 70$.
+
+:::
+::::
+
+
+
+
+
+If $X$ and $Y$ have a positive correlation: Large values of $X$ are associated with large values of $Y$ so the sum is really large, and small values of $X$ are associated with small values of $Y$ so the sum is really small. That is, the sum exhibits more variability than it would if the values of $X$ and $Y$ were uncorrelated.
+
+If $X$ and $Y$ have a negative correlation: Large values of $X$ are associated with small values of $Y$ so the sum is moderate, and small values of $X$ are associated with large values of $Y$ so the sum is moderate. That is, the sum exhibits less variability than it would if the values of $X$ and $Y$ were uncorrelated.
+
+The following simulation illustrates the previous example when the correlation is 0.77.
+First we simulate $(X, Y)$ pairs.
+
+```{python}
+X, Y = RV(BivariateNormal(mean1 = 527, sd1 = 107, mean2 = 533, sd2 = 100, corr = 0.77))
+
+x_and_y = (X & Y).sim(10000)
+
+x_and_y
+```
+
+
+```{python}
+#| eval: false
+x_and_y.plot()
+```
+
+
+```{python}
+#| echo: false
+plt.figure();
+x_and_y.plot()
+plt.show();
+```
+
+```{python}
+x_and_y.mean()
+```
+
+
+```{python}
+x_and_y.var()
+```
+
+
+```{python}
+x_and_y.sd()
+```
+
+Now we look at the sum $X + Y$.
+So that our simulation results our consistent with those above we'll define `x + y` in "simulation world" (but we could have defined `X + Y` in "random variable world" and then simulated values of it.)
+
+```{python}
+x = x_and_y[0]
+y = x_and_y[1]
+
+t = x + y
+
+t
+```
+
+
+```{python}
+#| eval: false
+t.plot()
+```
+
+
+```{python}
+#| echo: false
+plt.figure()
+t.plot()
+plt.show()
+```
+
+The simulated mean, variance, and standard deviation as close to what we computed in the previous example (of course, there is natural simulation variability).
+
+```{python}
+t.mean()
+```
+
+
+```{python}
+t.var()
+```
+
+
+```{python}
+t.sd()
+```
+
+Now we compare the distribution of the sum for each of the four cases for the correlation.
+Notice how the variability of $X+Y$ changes based on the correlation.
+The variability of $X + Y$ is largest when the correlation is strong and positive, and smallest when the correlation is strong and negative.
+
+```{python}
+
+X2, Y2 = RV(BivariateNormal(mean1 = 527, sd1 = 107, mean2 = 533, sd2 = 100, corr = 0.4))
+t2 = (X2 + Y2).sim(10000)
+
+X3, Y3 = RV(BivariateNormal(mean1 = 527, sd1 = 107, mean2 = 533, sd2 = 100, corr = 0))
+t3 = (X3 + Y3).sim(10000)
+
+X4, Y4 = RV(BivariateNormal(mean1 = 527, sd1 = 107, mean2 = 533, sd2 = 100, corr = -0.77))
+t4 = (X4 + Y4).sim(10000)
+
+plt.figure()
+t.plot()
+t2.plot()
+t3.plot()
+t4.plot()
+
+plt.legend(['corr = 0.77', 'corr = 0.40', 'corr = 0', 'corr = -0.77']);
+plt.show()
+```
+
+The simulated means, variances, and standard deviations as close to what we computed in the previous example (of course, there is natural simulation variability).
+
+```{python}
+t.mean(), t2.mean(), t3.mean(), t4.mean()
+```
+
+```{python}
+t.sd(), t2.sd(), t3.sd(), t4.sd()
+```
+
+Compare the 90th percentiles of $X+Y$. The largest value for the 90th percentile occurs when there is the most variability in the sum, so we see more extreme values of the sum.
+
+
+```{python}
+t.quantile(0.9), t2.quantile(0.9), t3.quantile(0.9), t4.quantile(0.9)
+```
+
+
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-variance-of-difference}
+Continuing the previous example. Compute $\Var(X - Y)$ and $\SD(X-Y)$ for each of the following correlations.
+
+1.  $\Corr(X, Y) = 0.77$
+1.  $\Corr(X, Y) = 0.40$
+1.  $\Corr(X, Y) = 0$
+1.  $\Corr(X, Y) = -0.77$
+
+:::
+::::
+
+:::: {.callout-tip collapse=true}
+::: {#sol-variance-of-difference}
+
+1.  $\Cov(X, Y) = \Corr(X, Y)\SD(X)\SD(Y) = (0.77)(107)(100) = 8239$. $\Var(X - Y) = \Var(X) + \Var(Y) - 2\Cov(X, Y) = 107^2 + 100^2 - 2(8239)=4971$.  $\SD(X-Y)=\sqrt{4971} = 70$. 
+1.  $\Var(X - Y) = 107^2 + 100^2 - 2(0.40)(107)(100)=12889$.  $\SD(X-Y)= 114$.
+1.  $\Var(X - Y) = 107^2 + 100^2 - 0=21449$.  $\SD(X-Y)= 146$.
+1.  $\Var(X - Y) = 107^2 + 100^2 - 2(-0.77)(107)(100)=37927$.  $\SD(X-Y)= 195$.
+
+:::
+::::
+
+If $X$ and $Y$ have a positive correlation:
+Large values of $X$ are associated with large values of $Y$ so the difference is small, and small values of $X$ are associated with small values of $Y$ so the difference is small. That is, the difference exhibits less variability than it would if the values of $X$ and $Y$ were uncorrelated.
+
+
+If $X$ and $Y$ have a negative correlation:
+Large values of $X$ are associated with small values of $Y$ so the difference is large and positive, and small values of $X$ are associated with large values of $Y$ so the difference is large and negative. That is, the difference exhibits more variability than it would if the values of $X$ and $Y$ were uncorrelated.
+
+
+
+
+We continue the simulation from above when the correlation is 0.77.
+New we look at the difference $X - Y$.
+Again, we define the difference `x - y` in "simulation world" (but we could have defined `X - Y` in "random variable world" and then simulated values of it).
+
+```{python}
+d = x - y
+
+d
+```
+
+
+```{python}
+#| eval: false
+d.plot()
+```
+
+
+```{python}
+#| echo: false
+plt.figure()
+d.plot()
+plt.show()
+```
+
+
+Now we compare the distributions of the difference $X - Y$ for each of the four cases of correlation.
+Notice how the variability of $X-Y$ changes based on the correlation.
+The variability of $X - Y$ is largest when the correlation is strong and negative, and smallest when the correlation is strong and positive.
+
+
+```{python}
+
+X2, Y2 = RV(BivariateNormal(mean1 = 527, sd1 = 107, mean2 = 533, sd2 = 100, corr = 0.4))
+d2 = (X2 - Y2).sim(10000)
+
+X3, Y3 = RV(BivariateNormal(mean1 = 527, sd1 = 107, mean2 = 533, sd2 = 100, corr = 0))
+d3 = (X3 - Y3).sim(10000)
+
+X4, Y4 = RV(BivariateNormal(mean1 = 527, sd1 = 107, mean2 = 533, sd2 = 100, corr = -0.77))
+d4 = (X4 - Y4).sim(10000)
+
+plt.figure()
+d.plot()
+d2.plot()
+d3.plot()
+d4.plot()
+
+plt.legend(['corr = 0.77', 'corr = 0.40', 'corr = 0', 'corr = -0.77']);
+plt.show()
+```
+
+
+The simulated mean, variance, and standard deviation as close to what we computed in the previous example (of course, there is natural simulation variability).
+
+```{python}
+d.mean(), d2.mean(), d3.mean(), d4.mean()
+```
+
+
+```{python}
+d.sd(), d2.sd(), d3.sd(), d4.sd()
+```
+
+
+Compare the 90th percentiles of $X-Y$. The largest value for the 90th percentile occurs when there is the most variability in the difference, so we see more extreme values of the difference.
+
+```{python}
+d.quantile(0.9), d2.quantile(0.9), d3.quantile(0.9), d4.quantile(0.9)
+```
+
+
+
+The variance of the sum is the sum of the variances if and only if $X$ and $Y$ are uncorrelated.
+\begin{align*}
+\Var(X+Y)  & = \Var(X) + \Var(Y)\qquad \text{if $X, Y$ are uncorrelated}\\
+\Var(X-Y)  & = \Var(X) + \Var(Y)\qquad \text{if $X, Y$ are uncorrelated}
+\end{align*}
+ 
+The variance of the difference of uncorrelated random variables is the *sum* of the variances.  Think just about the range of values.  Suppose SAT Math and Reading scores are each uniformly distributed on the interval [200, 800].  Then the sum takes values in [400, 1600], an interval of length 1200.  The difference takes values in $[-600, 600]$, also an interval of length 1200.
+
+<!-- We can use the formulas for variances of sums and differences to show that $-1 \le \Corr(X, Y) \le 1$.  Consider two random variables $X$ and $Y$ with $\Var(X) \ge \Var(Y)$.  Rearrange the formula for the variance of a sum to show -->
+<!-- \begin{align*} -->
+<!-- \Cov(X, Y) & = 0.5 (\Var(X + Y) - \Var(X) - \Var(Y))\\ -->
+<!-- & \le 0.5 (- \Var(X) - \Var(Y))\\ -->
+<!-- & \le 0.5 (-) -->
+<!-- \end{align*} -->
+
+Combining the formula for variance of sums with some properties of covariance in the next subsection, we have a general formula for the variance of a linear combination of two random variables.
+If $a, b, c$ are non-random constants and $X$ and $Y$ are random variables then
+$$
+\Var(aX + bY + c) = a^2\Var(X) + b^2\Var(Y) + 2ab\Cov(X, Y)
+$$
+
+### Bilinearity of covariance
+
+The formulas for variance of sums and differences are application of several more general properties of covariance. Let $X,Y,U,V$ be random variables and $a,b,c,d$ be non-random constants.
+
+**Properties of covariance.**
+\begin{align*}
+\Cov(X, X) &= \Var(X)\qquad\qquad\\
+\Cov(X, Y) & = \Cov(Y, X)\\
+\Cov(X, c) & = 0 \\
+\Cov(aX+b, cY+d) & = ac\Cov(X,Y)\\
+\Cov(X+Y,\; U+V) & = \Cov(X, U)+\Cov(X, V) + \Cov(Y, U) + \Cov(Y, V)
+\end{align*}
+
+
+- The variance of a random variable is the covariance of the random variable with itself.
+- Non-random constants don't vary, so they can't co-vary.
+- Adding non-random constants shifts the center of the joint distribution but does not affect variability.
+- Multiplying by non-random constants changes the scale and hence changes the degree of variability.  
+- The last property is like a "FOIL" (first, outer, inner, last) property. 
+
+The last two properties together are called **bilinearity of covariance.** These properties extend naturally to sums involving more than two random variables.  To compute the covariance between two sums of random variables, compute the covariance between each component random variable in the first sum and each component random variable in the second sum, and sum the covariances of the components.
+
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-cov-bilinear}
+
+Let $X$ be the number of two-point field goals a basketball player makes in a game, $Y$ the number of three point field goals made, and $Z$ the number of free throws made (worth one point each).  Assume $X$, $Y$, $Z$ have standard deviations of 2.5, 3.7, 1.8, respectively, and $\Corr(X,Y) = 0.1$, $\Corr(X, Z) = 0.3$, $\Corr(Y,Z) = -0.5$.  
+
+1.  Find the standard deviation of the number of  fields goals in a game (not including free throws)
+1.  Find the standard deviation of total points scored on fields goals in a game (not including free throws)
+1.  Find the standard deviation of total points scored in a game.
+
+:::
+::::
+
+:::: {.callout-tip collapse=true}
+::: {#sol-cov-bilinear}
+
+1.  We want $\SD(X+Y)$, so we first find $\Var(X + Y)$.  We could use the formula for a variance of sums, but we'll use bilinearity of covariance instead to illustrate how it works, and to motivate part 3.
+    \begin{align*}
+    \Var(X + Y) & = \Cov(X + Y, X + Y)\\
+    & = \Cov(X, X) + \Cov(X, Y) + \Cov(Y, X) + \Cov(Y, Y)\\
+    & = (2.5^2) + (0.1)(2.5)(3.7) + (0.1)(3.7)(2.5) + 3.7^2 = 21.49
+    \end{align*}
+    So $\SD(X + Y) = 4.67$.
+1.  We want $\SD(2X+3Y)$, so we first find $\Var(2X + 3Y)$.  We'll use bilinearity of covariance again.
+    \begin{align*}
+    \Var(2X + 3Y) & = \Cov(2X + 3Y, 2X + 3Y)\\
+    & = \Cov(2X, 2X) + \Cov(2X, 3Y) + \Cov(3Y, 2X) + \Cov(3Y, 3Y)\\
+    & = 2^2\Cov(X, X) + (2)(3)\Cov(X, Y) + (3)(2)\Cov(Y, X)+ (3)(3)\Cov(Y, Y)\\
+    & = (2^2)(2.5^2) + (2)(3)(0.1)(2.5)(3.7) + (3)(2)(0.1)(3.7)(2.5) + (3^2)(3.7^2) = 159.31
+    \end{align*}
+    So $\SD(2X + 3Y) = 12.62$.
+1.  We want $\SD(2X+3Y + Z)$, so we first find $\Var(2X + 3Y + Z)$.  We'll use bilinearity of covariance again.  Notice how we take the covariance of each term in the sum with each of the others.
+    \begin{align*}
+    \Var(2X + 3Y + Z) & = \Cov(2X + 3Y + Z, 2X + 3Y + Z)\\
+    & = \Cov(2X, 2X) + \Cov(2X, 3Y) + \Cov(2X, Z) \\
+    & \quad + \Cov(3Y, 2X) + \Cov(3Y, 3Y) + \Cov(3Y, Z)\\
+    & \quad + \Cov(Z, 2X) + \Cov(Z, 3Y) + \Cov(Z, Z)\\
+    & = 2^2\Cov(X, X) + (2)(3)\Cov(X, Y) + (2)(1)\Cov(X, Z)\\
+    & \quad + (3)(2)\Cov(Y, X)+ (3)(3)\Cov(Y, Y) + (3)(1)\Cov(Y, Z)\\
+    & \quad + (1)(2)\Cov(Z, X)+ (1)(3)\Cov(Z, Y) + 1^2\Cov(Z, Z)\\
+    & = (2^2)(2.5^2) + (2)(3)(0.1)(2.5)(3.7) + (2)(1)(0.3)(2.5)(1.8)\\
+    & \quad + (3)(2)(0.1)(3.7)(2.5) + (3^2)(3.7^2) + (3)(1)(-0.5)(3.7)(1.8)\\
+    & \quad + (1)(2)(0.3)(1.8)(2.5) + (1)(3)(-0.5)(1.8)(3.7) + 1^2(1.8^2)= 114.72
+    \end{align*}
+    So $\SD(2X + 3Y + Z) = 12.16$.
+
+:::
+::::
+
+
+## Central limit theorem
+
+Many statistical applications involve *random sampling* from a population.
+And one of the most basic operations in statistics is to average the values in a sample.
+If a sample is selected at random, then the sample mean is a random variable that has a distribution. How does this distribution behave?
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-sample-mean-dist-table}
+
+A random sample of $n$ customers at a snack bar is selected, independently.  Let $S_n$ by the total dollar amount spent by the $n$ customers in the sample, and let $\bar{X_n}=S_n/n$ represent the sample mean dollar amount spent by the $n$ customers in the sample.
+
+Assume that
+
+-   40% of customers spend 5 dollars
+-   40% of customers spend 6 dollars
+-   20% of customers spend 7 dollars
+
+Let $X$ denote the amount spent by a single randomly selected customer.
+
+
+1.  Find $\E(X)$.   We'll call this value the population mean $\mu$; explain what this means.
+1.  Find $\SD(X)$. We'll call this value the population standard deviation $\sigma$; explain what this means.
+1.  Randomly select two customers, independently, and let $X_1$ and $X_2$ denote the amounts spent by the two people selected.   Make a table of all possible $(X_1, X_2)$ pairs and their probabilities.
+1.  Use the table from the previous part to find the distribution of $\Xbar_2$. Interpret in words in context what this distribution represents.
+1.  Compute and interpret $\IP(\Xbar_{2} > 6)$.
+1.  Compute $\E(\Xbar_2)$.  How does it relate to $\mu$?
+1.  There are 3 "means" in the previous part.  What do they all mean?
+1.  Compute $\Var(\Xbar_2)$ and $\SD(\Xbar_2)$.  How do these values relate to the population variance $\sigma^2$ and the population standard deviation $\sigma$?
+1.  Describe in words in context what $\SD(\Xbar_2)$ measures variability of.
+
+:::
+::::
+
+
+:::: {.callout-note appearance="simple"}
+::: {#sol-sample-mean-dist-table}
+
+1.  $X$ takes value 5, 6, 7, with probability 0.4, 0.4, 0.2, so $\E(X)=5(0.4) + 6(0.4) + 2(0.2)= 5.8$.   Over the population of customers, individual customers spend on average 5.8 dollars.
+1.  $\E(X^2) = 5^2(0.4) + 6^2(0.4) + 2^2(0.2)= 34.2$ so $\Var(X) = E(X^2) - (E(X))^2 = 0.56$ squared-dollars and $\SD(X) = \sqrt{0.56} = 0.748$ dollars.
+Over the population of customers, amounts spent by individual customers deviate from the mean on average by about 0.75 dollars.
+1.  See the table below. Since $X_1$ and $X_2$ are independent, the probability of any pair is the product of the marginal probabilities.
+
+    | $X_1$ | $X_2$ |     Probability | $\bar{X}_2$ |
+    |------:|------:|----------------:|------------:|
+    |     5 |     5 | (0.4)(0.4)=0.16 |         5.0 |
+    |     5 |     6 | (0.4)(0.4)=0.16 |         5.5 |
+    |     5 |     7 | (0.4)(0.2)=0.08 |         6.0 |
+    |     6 |     5 | (0.4)(0.4)=0.16 |         5.5 |
+    |     6 |     6 | (0.4)(0.4)=0.16 |         6.0 |
+    |     6 |     7 | (0.4)(0.2)=0.08 |         6.5 |
+    |     7 |     5 | (0.2)(0.4)=0.08 |         6.0 |
+    |     7 |     6 | (0.2)(0.4)=0.08 |         6.5 |
+    |     7 |     7 | (0.2)(0.2)=0.04 |         7.0 |
+
+1.  Just collapse the table from the previous part. This is the distribution of sample *mean* amount spent over many *samples of 2 customers*.
+
+    | $\bar{x}_2$ | $\IP(\bar{X}_2 = \bar{x}_2)$ |
+    |------------:|-----------------------------:|
+    |         5.0 |                         0.16 |
+    |         5.5 |                         0.32 |
+    |         6.0 |                         0.32 |
+    |         6.5 |                         0.16 |
+    |         7.0 |                         0.04 |
+
+1.  $\IP(\Xbar_{2} > 6) = 20$. In 20% of samples of size 2 the sample mean income is greater than 6 dollars.
+1.  $\E(\Xbar_2)=5(0.16) + 5.5(0.32) + 6(0.32) + 6.5(0.16) + 7(0.04) = 5.8$.  We see that $\E(\Xbar_2)=\mu$.
+1.  Over many samples of size 2, the average of the sample means is equal to the population mean.
+1.  $\E(\Xbar_2^2)=5^2(0.16) + 5.5^2(0.32) + 6^2(0.32) + 6.5^2(0.16) + 7^2(0.04) = 33.92$ and $\Var(\Xbar_2) = \E(\Xbar_2^2) - (\E(\Xbar_2))^2 = 33.92 - 5.8^2 = 0.28 = 0.56 / 2$, and $\SD(\Xbar_2) = \sqrt{0.28} = 0.529 = \sqrt{0.748} / \sqrt{2}$.
+    \begin{align*}
+    \Var(\Xbar_2) & = \frac{\Var(X)}{2}\\
+    \SD(\Xbar_2) & = \frac{\SD(X)}{\sqrt{2}}\\
+    \end{align*}
+1.  $\SD(\Xbar_2)$ measures the sample-to-sample variability of sample *mean* amount spent over many *samples of size 2* customers. Over many samples of 2 customers, the sample mean amount spent deviates from the population mean amount spent by about 0.53 dollars on average.
+
+:::
+::::
+
+
+Many problems in statistics involve sampling from a population.
+The **population distribution** describes the distribution of values of a variable over all *individuals* in the population.
+The **population mean**, denoted $\mu$, is the average of the values of the variable over all individuals in the population.  
+The **population standard deviation**, denoted $\sigma$, is the standard deviation of all the individual values in the population.  
+
+
+A **(simple) random sample** of size $n$ is a collection of  random variables $X_1,\ldots,X_n$ that are *independent* and *identically distributed* (*i.i.d.*)
+
+- Independence assumes individuals are selected for the sample independently of one another (think of sampling with replacement, or sampling without replacement from a very large population)
+- Identically distributed assumes all individuals are selected from the same population, so all the individual values are selected from the same population distribution.
+
+
+The **sample mean** is
+$$
+\Xbar_n = \frac{X_1 + \cdots + X_n}{n} = \frac{S_n}{n},
+$$
+where $S_n=X_1+\cdots+X_n$ is the sum (total) of values in the sample.
+Because the sample is randomly selected, the sample mean $\Xbar_n$ is a random variable that has a distribution.
+This distribution describes how sample means vary from sample-to-sample over many random samples of size $n$.
+
+Over many random samples, sample means do not systematically overestimate or underestimate the population mean. (We say that the sample mean $\Xbar$ is an *unbiased* estimator of the population mean $\mu$.)
+$$
+\E(\Xbar_n) = \mu
+$$
+
+Variability of sample means depends on the variability of individual values of the variable; the more the values of the variable vary from individual-to-individual in the population, the more the sample means will vary from sample-to-sample.
+However, sample means are less variable than individual values of the variable. Furthermore, the sample-to-sample variability of sample means decreases as the sample size increases
+\begin{align*}
+\Var(\Xbar_n) & = \frac{\sigma^2}{n}\\
+\SD(\Xbar_n) & = \frac{\sigma}{\sqrt{n}}
+\end{align*}
+Over many random samples, sample means from larger random samples vary less, from sample to sample, than sample means from smaller random samples.
+The standard deviation of sample means decreases as the sample size increases, but this reduction in SD follows a "square root rule".  For example, if the sample size is increased by a factor of 4, then the sample-to-sample standard deviation of the sample mean is reduced by a factor of $\sqrt{4} = 2$.
+
+Given the population mean $\mu$ and population standard deviation $\sigma$, the above formulas provide the mean and standard deviation of the sample-to-sample distribution of sample means for any sample size.
+But what about the shape of the sample-to-sample distribution of sample means?
+
+In @exm-sample-mean-dist-table we found the distribution of sample means by enumerating all possible samples, but this strategy is unfeasible in almost all problems.
+Therefore, we need other ways of finding or approximating the distribution of $\Xbar_n$.
+As always, simulation is an excellent way to approximate distributions.
+
+Before simulating sample means, we first simulate individual values. The following simulates the population distribution of individual values of the variable $X$ in Example @exm-sample-mean-dist-table.
+
+
+```{python}
+population = BoxModel([5, 6, 7], probs = [0.4, 0.4, 0.2])
+
+X = RV(population)
+
+x = X.sim(10000)
+
+x
+```
+
+
+```{python}
+x.mean(), x.var(), x.sd()
+```
+
+```{python}
+#| eval: false
+x.plot()
+
+```
+
+
+```{python}
+#| echo: false
+plt.figure()
+x.plot()
+plt.show()
+```
+
+
+Now we simulate sample means for many samples of size 2. The random variable `Xbar` below takes `n` independent simulated values from the population (`population ** n`) and returns the sample mean. The `sim(10000)` command simulates 10000 samples of size `n` and computes the sample mean for each of these 10000 samples.
+
+
+```{python}
+#| eval: false
+population = BoxModel([5, 6, 7], probs = [0.4, 0.4, 0.2])
+
+n = 2
+
+Xbar = RV(population ** n, mean)
+
+xbar = Xbar.sim(10000)
+
+xbar
+```
+
+
+```{python}
+#| echo: false
+population = BoxModel([5, 6, 7], probs = [0.4, 0.4, 0.2])
+
+n = 2
+
+def sim_mean():
+  x = (population ** n).draw()
+  return x.mean()
+
+Xbar = RV(ProbabilitySpace(sim_mean))
+
+xbar = Xbar.sim(10000)
+
+xbar
+```
+
+
+```{python}
+xbar.mean(), xbar.var(), xbar.sd(), xbar.count_gt(6) / xbar.count()
+```
+
+
+```{python}
+#| eval: false
+xbar.plot()
+
+```
+
+
+```{python}
+#| echo: false
+plt.figure()
+xbar.plot()
+plt.show()
+```
+
+
+The simulation results are consistent with our work in @exm-sample-mean-dist-table.
+
+In general, the exact shape of the distribution of $\Xbar_n$ depends on the shape of the population distribution of individual values, in a complicated way^[Finding the exact distribution of a sample mean involves a mathematical operation called convolution, which is, well, fairly convoluted.].
+Fortunately, the *approximate* shape of the distribution of $\Xbar_n$ often follows a specific distribution that we're well acquainted with.
+
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-sample-mean-dist-clt}
+Continuing @exm-sample-mean-dist-table.
+Now suppose we take a random sample of 30 customers; consider $n=30$ and $\Xbar_{30}$. 
+
+1.  Find $\E(\Xbar_{30})$, $\Var(\Xbar_{30})$, and $\SD(\Xbar_{30})$.
+1.  What does $\SD(\Xbar_{30})$ measure the variability of?
+1.  Use simulation to determine the approximate shape of the distribution of $\Xbar_{30}$.
+1.  Simulation shows that $\Xbar_{30}$ has an approximate Normal distribution. Use this Normal distribution to approximate $\IP(\Xbar_{30} > 6)$, and interpret the probability.
+
+:::
+::::
+
+:::: {.callout-note appearance="simple"}
+::: {#sol-sample-mean-dist-clt}
+
+1.  It's the same population as before so the population mean is $\mu = 5.8$ and the population standard deviation is $\sigma = \sqrt{0.56} =  0.748$. Therefore, $\E(\Xbar_{30}) = \mu = 5.8$, $\Var(\Xbar_{30}) = \sigma^2/n = 0.56/30 = 0.019$, and $\SD(\Xbar_{30})=\sigma/\sqrt{30} = 0.137$.
+1.  $\SD(\Xbar_{30})= 0.137$ measures the sample-to-sample variability of sample means over many samples of size 30. Sample means deviate from the population mean by about 0.137 (dollars) on average.
+Notice that the sample-to-sample variability of sample means is smaller for samples of size 30 than for samples of size 2.
+1.  See simulation results below. The distribution of $\Xbar_{30}$ is approximately Normal with a mean of 5.8 and a standard deviation of 0.137.
+This distribution describes the sample-to-sample pattern of variability of sample means over many samples of size 30.
+1.  The value 6 is $(6-5.8)/0.137=1.46$ standard deviations above the mean of the Normal distribution, so $\IP(\Xbar_{30} > 6)$ is about 0.07. In about 7% of samples of size 30 the sample mean amount spent per customer is greater than 6 dollars.
+
+:::
+::::
+
+
+
+Now we revise our simulation to simulate samples of size 30 and their sample means.
+
+
+```{python}
+#| eval: false
+population = BoxModel([5, 6, 7], probs = [0.4, 0.4, 0.2])
+
+n = 30
+
+Xbar = RV(population ** n, mean)
+
+xbar = Xbar.sim(10000)
+
+xbar
+```
+
+
+```{python}
+#| echo: false
+population = BoxModel([5, 6, 7], probs = [0.4, 0.4, 0.2])
+
+n = 30
+
+def sim_mean():
+  x = (population ** n).draw()
+  return x.mean()
+
+Xbar = RV(ProbabilitySpace(sim_mean))
+
+xbar = Xbar.sim(10000)
+
+xbar
+```
+
+Compare the simulation based approximations of $\E(\Xbar_{30})$, $\Var(\Xbar_{30})$, and $\SD(\Xbar_{30})$ to the their theoretical values determined above.
+
+```{python}
+xbar.mean(), xbar.var(), xbar.sd()
+```
+
+
+
+Our simulation shows that the sample-to-sample distribution of sample means over many samples of size 30 has an approximate Normal shape.
+
+```{python}
+#| eval: false
+xbar.plot()
+
+```
+
+
+```{python}
+#| echo: false
+plt.figure()
+xbar.plot()
+# Normal(5.8, sqrt(0.56) / sqrt(n)).plot()
+plt.show()
+```
+
+
+Compare the simulation based approximation of $\IP(\Xbar_{30} > 6)$ with the Normal approximation^[A Normal distribution doesn't provide the greatest approximation, because it is continuous while the sample mean from a discrete population is a discrete random variable. It is possible to improve the approximation to account for the discrete/continuous mismatch, called a "continuity correction", but we won't cover it.].
+
+```{python}
+xbar.count_gt(6) / xbar.count(), 1 - Normal(5.8, sqrt(0.56) / sqrt(n)).cdf(6)
+```
+
+
+The previous example illustrates that if the sample size is large enough then the sample-to-sample distribution of sample means will be approximately Normal *even if the  population distribution of individual values is not*. This idea is formalized in the Central Limit Theorem.
+
+The **(Standard) Central Limit Theorem**^[There are actually many different versions of the Central Limit Theorem.  In particular, it is not necessary that the $X_i$ be strictly independent and identically distributed provided that some other conditions are satisfied.  But the other versions are beyond the scope of this book]. Let $X_1,X_2,\ldots$ be independent and identically distributed (i.i.d.) random variables with finite mean $\mu$ and finite standard deviation^[There are distributions with infinite (or undefined) SD, e.g., $t$-distributions with 1 or 2 degrees of freedom, and for these distributions the CLT won't work.  An infinite SD can occur when a distribution has very "heavy tails", so the probability of large (or small) values decays very slowly.  In these cases, there is a not insignificant probability of a few extreme outliers dominating the value of $S_n$ and $\Xbar_n$, which affects the distribution of the averages.] $\sigma$. Then^[Here is a technical statement of the theorem. Define the standardized (i.e. mean 0, SD 1) random variables 
+$$
+Z_n = \frac{S_n-n\mu}{\sigma\sqrt{n}} = \frac{\Xbar_n-\mu}{\sigma/\sqrt{n}}.
+$$
+Then $Z_n$ *converges in distribution* to Normal(0, 1).  That is, for all $z\in(-\infty,\infty)$,
+$$
+\lim_{n\to\infty} \IP(Z_n\le z) =\int_{-\infty}^z \frac{1}{\sqrt{2\pi}} e^{-u^2/2}du
+$$
+Thus, the CLT says that if $n$ is large enough, $Z_n$ has an approximate standard Normal distribution.
+Converting back to the original data units, yields the approximate distributions of $\Xbar_n$ and $S_n$.]
+$\Xbar_{n}$ has an approximate Normal distribution, if $n$ is large enough.
+That is,
+$$
+\text{$\Xbar_n$ has an approximate $N\left(\mu,\frac{\sigma}{\sqrt{n}}\right)$ distribution, if $n$ is large enough.}
+$$
+
+We can switch back and forth between sums and averages: the sum is just the sample mean times the sample size, $S_n = n\Xbar_n$.
+Multiplying $\Xbar_n$ by the number $n$ will not change the general shape of the distribution, just its mean and standard deviation.  So the CLT also says that the sum $S_{n}$ has an approximate Normal distribution, if $n$ is large enough.
+That is,
+$$
+\text{$S_n$ has an approximate $N(n\mu,\sigma\sqrt{n})$ distribution, if $n$ is large enough}
+$$
+
+
+
+
+
+The CLT says that if the sample size is large enough, the sample-to-sample distribution of sample means (or sums) is approximately Normal, *regardless of the shape of the population distribution.*
+A natural question: "How large is large enough?"
+The short answer: it depends.
+We'll elaborate after the following example.
+
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-sample-mean-dist-outlier}
+Continuing @exm-sample-mean-dist-table.
+Now suppose that each customer spends 5 dollars with probability 0.4, 6 with probability 0.4, 7 with probability 0.19, and 30 with probability 0.01 (maybe they treat a few friends).
+
+1.  Use simulation to approximate the distribution of $\Xbar_{30}$; is it approximately Normal?
+1.  Use simulation to approximate the distribution of $\Xbar_{100}$; is it approximately Normal?
+1.  Use simulation to approximate the distribution of $\Xbar_{300}$; is it approximately Normal?
+
+:::
+::::
+
+:::: {.callout-note appearance="simple"}
+::: {#sol-sample-mean-dist-outlier}
+
+Note that for this population $\mu = 6.03$ and $\sigma=2.52$
+
+See the simulation results below. The distribution doesn't look anything like a Normal distribution when $n=30$.
+
+When $n=100$ the distribution is closer to Normal than when $n=30$, but still definitely not Normal.
+The individuals who spend 30 dollars throw off the averages, even when the sample size isn't super small.
+
+When the sample size is large, the outliers have less affect on the mean and the overall average characteristics take over.
+For samples of size 300 the distribution of sample means looks much closer to Normal, but some asymmetry is still present.
+
+:::
+::::
+
+
+The following simulation uses the population distribution from @exm-sample-mean-dist-outlier.
+The distribution of sample means is not Normal when $n=30$.
+(The distinct "humps" basically correspond to samples with no people who spent 30 dollars, samples with exactly 1 person who spent 30 dollars, samples with exactly 2 people who spent 30 dollars, etc)
+
+
+
+```{python}
+#| eval: false
+population = BoxModel([5, 6, 7, 30], probs = [0.4, 0.4, 0.19, 0.01])
+
+n = 30
+
+Xbar = RV(population ** n, mean)
+
+xbar = Xbar.sim(10000)
+
+xbar
+```
+
+
+```{python}
+#| echo: false
+population = BoxModel([5, 6, 7, 30], probs = [0.4, 0.4, 0.19, 0.01])
+
+n = 30
+
+def sim_mean():
+  x = (population ** n).draw()
+  return x.mean()
+
+Xbar = RV(ProbabilitySpace(sim_mean))
+
+xbar = Xbar.sim(10000)
+
+xbar
+```
+
+```{python}
+#| eval: false
+xbar.plot()
+```
+
+
+```{python}
+#| echo: false
+plt.figure()
+xbar.plot()
+plt.show()
+```
+
+
+For samples of size 100, the distribution is sample means is less distinctly "humpy", but still far from Normal.
+
+
+```{python}
+#| eval: false
+population = BoxModel([5, 6, 7, 30], probs = [0.4, 0.4, 0.19, 0.01])
+
+n = 100
+
+Xbar = RV(population ** n, mean)
+
+xbar = Xbar.sim(10000)
+```
+
+```{python}
+#| echo: false
+population = BoxModel([5, 6, 7, 30], probs = [0.4, 0.4, 0.19, 0.01])
+
+n = 100
+
+def sim_mean():
+  x = (population ** n).draw()
+  return x.mean()
+
+Xbar = RV(ProbabilitySpace(sim_mean))
+
+xbar = Xbar.sim(10000)
+```
+
+```{python}
+#| eval: false
+xbar.plot()
+```
+
+
+```{python}
+#| echo: false
+plt.figure()
+xbar.plot()
+plt.show()
+```
+
+For samples of size 300, the humps have disappeared, but the distribution of sample means is still a little right skewed compared with a Normal distribution.
+
+```{python}
+#| eval: false
+population = BoxModel([5, 6, 7, 30], probs = [0.4, 0.4, 0.19, 0.01])
+
+n = 300
+
+Xbar = RV(population ** n, mean)
+
+xbar = Xbar.sim(10000)
+
+```
+
+
+```{python}
+#| echo: false
+population = BoxModel([5, 6, 7, 30], probs = [0.4, 0.4, 0.19, 0.01])
+
+n = 300
+
+def sim_mean():
+  x = (population ** n).draw()
+  return x.mean()
+
+Xbar = RV(ProbabilitySpace(sim_mean))
+
+xbar = Xbar.sim(10000)
+```
+
+```{python}
+#| eval: false
+xbar.plot('hist')
+Normal(6.03, 2.52 / sqrt(n)).plot()
+
+```
+
+
+```{python}
+#| echo: false
+plt.figure()
+xbar.plot('hist')
+Normal(6.03, 2.52 / sqrt(n)).plot()
+plt.show()
+```
+
+
+
+
+The previous example is an early cautionary tale.
+There is no magic number^[If you've heard "$n\ge 30$ is large enough", forget it, because you just saw an example where that's not true] for how large the sample size needs to be for the CLT to kick in.
+
+The CLT says that if the sample size is large enough, the sample-to-sample distribution of sample means is approximately Normal, *regardless of the shape of the population distribution.*
+However, the shape of the population distribution --- which describes the distribution of individual values of the variable --- does matter in determining *how large* is large enough.
+
+-   If the population distribution is Normal, then the sample-to-sample distribution of sample means is Normal for any sample size. 
+-   If the population distribution is "close to Normal" --- e.g., symmetric, light tails, single peak --- then smaller samples sizes are sufficient for the sample-to-sample distribution of sample means to be approximately Normal.
+-   If the population distribution is "far from Normal" --- e.g., severe skewness, heavy tails, extreme outliers, multiple peaks --- then larger sample sizes are required for the sample-to-sample distribution of sample means to be approximately Normal.
+
+
+
+
+You should certainly be aware that some population distributions require a large sample size for the CLT to kick in.
+However, in many situations the sample-to-sample distributions of sample means is approximately Normal even for small or moderate sample sizes.
+
+Clicking on the following will take you to a Colab notebook that conducts a simulation of samples means like the ones earlier in the section. You can experiment with different population distributions and sample sizes to see the Central Limit Theorem in action.
+
+
+
+
+The Central Limit Theorem provides a relatively simple and easy way to approximate probabilities in a wide variety of problems that involve sums or averages of many independent random quantities.
+In some of the next few examples we'll work with sample means $\Xbar_n$; in the others, sums $S_n$.
+Either way is fine; you just need to make sure you use the appropriate mean ($\mu$ versus $n\mu$) and standard deviation ($\sigma/\sqrt{n}$ versus $\sigma/\sqrt{n}$) for the Normal distribution.
+To avoid confusion, you might want to translate every problem in terms of $\Xbar_n$.
+
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-clt-poisson}
+The number of free throws that a particular basketball player attempts in a game has a Poisson distribution with parameter 2.7.  Approximate the probability that the player attempts more than 60 free throws in the next 20 games.
+:::
+::::
+
+
+
+
+:::: {.callout-note appearance="simple"}
+::: {#sol-clt-poisson}
+
+Each $X_i$ represents the number of free throws in a single game.
+The population distribution is the Poisson(2.7) distribution, since this describes the distribution of the number of free throw attempts in individual games. The mean of the Poisson(2.7) distribution is 2.7, so the population mean is $\mu = 2.7$.
+The standard deviation of the Poisson(2.7) distribution is $\sqrt{2.7} = 1.64$, so the population standard deviation is $\sigma = 1.64$.
+
+The total number of free throw attempts in the next 20 games is $S_{20}$. Assuming $n=20$ is large enough for the CLT to kick in for a Poisson(2.7) population distribution, $S_{20}$ has an approximate Normal distribution with mean $n\mu = 20(2.7) = 54$ and standard deviation $\sigma\sqrt{n} = 1.64\sqrt{20} = 7.35$.
+
+We want $\IP(S_{20} > 60)$. A value of 60 is $(60-54)/7.35 = 0.82$ standard deviations above the mean.
+Using a Normal distribution approximation, the probability is approximately 0.21.
+The player is about 4 times more likely than not to attempt at most 60 free throws in the next 20 games.
+
+:::
+::::
+
+Is a sample size of 20 large enough for a Normal approximation in the previous problem?
+Here is our population distribution, the Poisson(2.7) distribution.
+
+```{python}
+#| eval: false
+Poisson(2.7).plot()
+```
+
+
+```{python}
+#| echo: false
+plt.figure()
+Poisson(2.7).plot()
+plt.show()
+```
+
+
+A Poisson(2.7) distribution is not very skewed, does not produce many extreme values, and has a single peak, so maybe a small sample size like 20 is ok for the distribution of sample means to be approximately Normal. Simulation confirms this.
+
+
+```{python}
+#| eval: false
+population = Poisson(2.7)
+
+n = 20
+
+S = RV(population ** n, sum)
+
+s = S.sim(10000)
+
+s.count_gt(60) / s.count()
+```
+
+
+```{python}
+#| echo: false
+population = Poisson(2.7)
+
+n = 20
+
+def sim_mean():
+  x = (population ** n).draw()
+  return x.sum()
+
+S = RV(ProbabilitySpace(sim_mean))
+
+s = S.sim(10000)
+
+s.count_gt(60) / s.count()
+```
+
+```{python}
+#| eval: false
+s.plot('hist')
+Normal(2.7 * n, sqrt(2.7) * sqrt(n)).plot()
+
+```
+
+
+```{python}
+#| echo: false
+plt.figure()
+s.plot('hist')
+Normal(2.7 * n, sqrt(2.7) * sqrt(n)).plot()
+plt.show()
+```
+
+
+In the previous problem we could have just used Poisson aggregation: $S_{20}$ has a Poisson(54) distribution.
+The probability from the Normal approximation is reasonably close^[Again, accounting for the discrete/continuous mismatch with a "continuity correction" can improve the approximation.] to the theoretical probability that Poisson(54) distribution yields a value greater than 60.
+Of course, the simulated relative frequency of sums greater than 60 is also close to the theoretical probability.
+
+```{python}
+
+1 - Poisson(2.7 * 20).cdf(60)
+
+```
+
+
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-clt-uniform}
+
+Ten independent resistors are connected in series.
+Each has a resistance Uniformly distributed between 215 and 225 ohms, independently.
+Compute the probability that the mean resistance of this series system is between 219 and 221 ohms.
+
+:::
+::::
+
+
+:::: {.callout-note appearance="simple"}
+::: {#sol-clt-uniform}
+
+Each $X_i$ represents the resistance of a single resistor
+The population distribution is the Uniform(215, 225) distribution, since this describes the distribution of resistances for individual resistors. The mean of the Uniform(215, 225) distribution is 220, so the population mean is $\mu = 220$ ohms.
+The standard deviation of the Uniform(215, 225) distribution is $(225-215)/\sqrt{12} = 2.89$, so the population standard deviation is $\sigma = 2.89$ ohms.
+
+The mean resistance of the 10 resistors is $\Xbar_{10}$. Assuming $n=10$ is large enough for the CLT to kick in for a Uniform(215, 225) population distribution, $\Xbar_{10}$ has an approximate Normal distribution with mean $\mu = 220$ and standard deviation $\sigma/\sqrt{n} = 2.89/\sqrt{10} = 0.91$.
+
+We want $\IP(219 < \Xbar_{10} < 221)$. That is, we want the probability that $\Xbar_{10}$ is within $(221 - 220) / 0.91 = 1.09$ standard deviations of the mean. Using a Normal distribution approximation, the probability is approximately 0.73.
+
+:::
+::::
+
+
+Is a sample size of 10 large enough for a Normal approximation in the previous problem?
+The Uniform(215, 225) distribution certainly isn't Normal, but it is symmetric, and it is bounded so it never produces super extreme values.
+Simulation suggests that for a Uniform population, even a sample size of 10 is large enough for the sample-to-sample distribution of sample means to be approximately Normal.
+
+
+```{python}
+#| eval: false
+population = Uniform(215, 225)
+
+n = 10
+
+Xbar = RV(population ** n, mean)
+
+xbar = Xbar.sim(10000)
+
+abs(xbar - 220).count_lt(1) / xbar.count()
+```
+
+
+```{python}
+#| echo: false
+population = Uniform(215, 225)
+
+n = 10
+
+def sim_mean():
+  x = (population ** n).draw()
+  return x.mean()
+
+Xbar = RV(ProbabilitySpace(sim_mean))
+
+xbar = Xbar.sim(10000)
+
+abs(xbar - 220).count_lt(1) / xbar.count()
+```
+
+```{python}
+#| eval: false
+xbar.plot('hist')
+Normal(220, (10 / sqrt(12)) / sqrt(n)).plot()
+
+```
+
+
+```{python}
+#| echo: false
+plt.figure()
+xbar.plot('hist')
+Normal(220, (10 / sqrt(12)) / sqrt(n)).plot()
+plt.show()
+```
+
+
+
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-clt-dice-sum}
+A fair six-sided die is rolled until the total sum of all rolls exceeds 300.  Approximate the probability that at least 80 rolls are necessary.
+:::
+::::
+
+
+
+:::: {.callout-note appearance="simple"}
+::: {#sol-clt-dice-sum}
+
+To apply the CLT we need a fixed sample size.
+However, in this problem the sample size is random, so it's not immediately clear how to apply the CLT.
+The key is to represent the event of interest involving the random number of rolls as an equivalent event involving a fixed number of rolls.
+Logically, at least 80 rolls are necessary for the sum to exceed 300 if and only if the sum of the first 79 rolls is at most 300.
+So we want $\IP(S_{79} \le 300)$, where $S_{79}$ is the sum of the first 79 rolls.
+
+Each $X_i$ represents a single roll.
+The population distribution is the DiscreteUniform(1, 6) distribution, that is, the distribution where the values $1, \ldots, 6$ are equally likely.
+The population mean is $\mu = 1(1/6) + \cdots + 6(1/6) = 3.5$ and the population standard deviation is $\sigma = \sqrt{(1^2(1/6) + \cdots + 6^2(1/6)) - 3.5^2}=\sqrt{35/12} = 1.708$. 
+
+The sum of the first 79 rolls is $S_{79}$. Assuming $n=79$ is large enough for the CLT to kick for this population distribution, $S_{79}$ has an approximate Normal distribution with mean $n\mu = 79(3.5) = 276.5$ and standard deviation $\sigma\sqrt{n} = 1.708\sqrt{79} = 15.18$.
+
+We want $\IP(S_{79} \le  300)$. The value 300 is $(300-276.5)/15.18 = 1.55$ standard deviations above the mean. Using a Normal distribution approximation, the probability is approximately 0.94.
+
+:::
+::::
+
+In the previous problem, we applied the CLT to the sum of the first 79 rolls.
+Simulation confirms that the distribution of $S_{79}$ is approximately Normal.
+
+
+
+```{python}
+#| eval: false
+population = BoxModel([1, 2, 3, 4, 5, 6])
+
+n = 79
+
+S = RV(population ** n, sum)
+
+s = S.sim(10000)
+
+s.count_leq(300) / s.count()
+```
+
+
+```{python}
+#| echo: false
+population = BoxModel([1, 2, 3, 4, 5, 6])
+
+n = 79
+
+def sim_mean():
+  x = (population ** n).draw()
+  return x.sum()
+
+S = RV(ProbabilitySpace(sim_mean))
+
+s = S.sim(10000)
+
+s.count_leq(300) / s.count()
+```
+
+```{python}
+#| eval: false
+s.plot('hist')
+Normal(3.5 * n, 1.708 * sqrt(n)).plot()
+
+```
+
+
+```{python}
+#| echo: false
+plt.figure()
+s.plot('hist')
+Normal(3.5 * n, 1.708 * sqrt(n)).plot()
+plt.show()
+```
+
+
+
+
+
+Below we simulate the distribution of the random number of rolls needed for the sum to exceed 300.
+
+```{python}
+t = 300
+
+def sum_until_t(omega):
+    trials_so_far = []
+    for i, w in enumerate(omega):
+        trials_so_far.append(w)
+        if sum(trials_so_far) > t:
+            return i + 1 
+        
+P = BoxModel([1, 2, 3, 4, 5, 6], size=inf)
+X = RV(P, sum_until_t)
+x = X.sim(10000)
+
+plt.figure()
+x.plot()
+plt.show()
+
+x.mean(), x.sd(), x.count_geq(80) / x.count()
+```
+
+
+
+:::: {.callout-note appearance="simple"}
+::: {#exm-clt-income}
+
+Suppose that average annual income for U.S. households is about $100,000, and that the standard deviation of income is about $230,000.
+
+
+1.  What can you say about the probability that a single randomly selected household has an income above $120,000?
+1.  Donny Don't says: "Since a sample size of one million is extremely large, the CLT says that the incomes in a sample of one million households should follow a Normal distribution". Do you agree? If not, explain to Donny what the CLT does say.
+1.  Use the CLT to approximate the probability that in a sample of 1000 households the sample mean income is above $120,000.
+1.  Donny says: "Wait, the distribution of household income is highly skewed to the right. Wouldn't it be more appropriate to use the sample median than the sample mean"? Do you agree? Explain.
+
+:::
+::::
+
+
+
+:::: {.callout-note appearance="simple"}
+::: {#sol-clt-income}
+
+1.  Not much^[Well, we can use probability inequalities to get bounds. Since 120,000 is less than one standard deviation away from the population mean, Chebyshev's inequality is no help. From Markov's inequality the probability is at most $100000/120000 = 0.833$. So all we can say is that the probability of interest is between 0 and 0.833, which isn't saying much at all]. The mean and the standard deviation don't tell us much^[Again, we can get bounds based on inequalities, but these bounds say very little about the shape of the distribution.] about the shape of the distribution. We know from experience that distributions of incomes are highly skewed to the right, but we don't know what percentile an income of $120,000 represents, and there is no way to figure out it based on the mean and standard deviation alone.
+1.  Donny is misinterpreting the CLT. The CLT doesn't say anything about the shape of the population distribution of individual household incomes.
+We know from experience that the population distribution of incomes will be fairly skewed to the right.
+A random sample of one million households should be reasonably representative of the population, so we would expected the distribution of incomes in the sample to have a shape similar to the population distribution of incomes; we would expect the distribution of the individual incomes in the sample to be skewed to the right.
+    The CLT says that if we were to take many random samples of one million households each and compute the mean income for each sample, then the sample-to-sample distribution of sample means would be approximately Normal.
+1.  Assuming that a sample size of 1000 is large enough for the CLT to kick in, the sample-to-sample distribution of sample mean income over many samples of 1000 households will be approximately Normal with mean 100,000 and standard deviation $230000/\sqrt{1000} = 7273$. The value 120,000 is $(120000-100000)/7273 = 2.75$ standard deviations above the mean. So the probability is about 0.003. If population mean income is $100,000 then we would see a sample mean income greater than $120,000 in only 0.3% of samples of 1000 households.
+1.  Donny has a good point! Means are commonly used as a measure of "center" of a distribution. The CLT makes sample means relatively easy to work with. But just because sample means are easy to analyze, doesn't make them the right thing to analyze. For incomes, it is often more appropriate to represent center with a median. For example, in 2019 the mean annual household income in the U.S. was about $100,000 but the median was about $70,000; that's a big difference! In particular, as a single number, $70,000 is much more representative of a "typical" annual household income than $100,000. 
+
+:::
+::::
+
+
+Be careful to distinguish between what the CLT does say, and what it doesn't say.
+The CLT doesn't say anything about the shape of the population distribution of individual values of the variable; it can be anything.
+Randomly selected samples tend to be representative of the population they're sampled from, so we expect the shape of the distribution of individual values in the sample to resemble the shape of the distribution of individual values in the population, regardless of the sample size.
+Over many samples, the distribution of individual values within each sample will resemble the population distribution.
+For example, if the population distribution has an Exponential shape, then the distribution of values in any single randomly selected sample will tend to have a roughly Exponential shape.
+
+The CLT applies to how sample means behave over many samples, not what happens within any single sample. If $n$ is large enough, then over many samples of size $n$ the sample-to-sample distribution of sample means will be approximately Normal, regardless of the shape of the population distribution of individual values of the variable.
+
+
+
+You might say: "Why do we need the CLT? We can always approximate the distribution of sample means with a simulation". (And a simulation often provides a better approximation than a Normal approximation, as illustrated by @exm-clt-poisson.)
+True! And we certainly want to encourage you to use simulation as much as possible!
+But the CLT is definitely something well worth knowing; here are just a few reasons.
+
+- The CLT is amazing. The sample-to-sample distribution of sample means is approximately Normal *regardless of the shape of the population distribution.*
+- Really, the CLT is amazing. The simple process of averaging (or adding) "normalizes" random quantities. If you take a bunch of random quantities and average them, the distribution of the average will be roughly Normal.
+- The CLT provides some justification for the ubiquity of Normal distributions. Many quantities in the natural world follow a Normal distribution. We can often think of these measurements as a sum of smaller quantities, and so the CLT provides some justification for why the measurements follow a Normal distribution.
+- The CLT is the backbone of many statistical methods, including many widely used confidence interval and hypothesis testing procedures.
+- The CLT is historically important. The CLT was indispensable in the times before modern computing.
+- Even when we can approximate via simulation, the CLT provides relatively simple and easy ballpark estimates in a wide variety of problems.
+
+
+
+
+
+*Why* should the CLT be true?
+We have seen examples providing evidence that the CLT is true, but it is far from obvious just why the CLT is true.
+Unfortunately, there is not an easy intuitive explanation, but we'll try our best to provide an idea of why the CLT is true.
+
+
+The CLT says something about the distribution of an average (or sum) of a large number of terms.
+Here we'll focus on averages; sums can be treated similarly.
+Understanding why the theorem should be true involves the following key ideas in sequence.  Try to convince yourself of the following ("if 1 is true then 2 has to be true", "if 2 is true then 3 has to be true", etc).
+
+1. If there are enough independent random quantities being averaged then the contribution to the overall average of any one particular quantity is small.
+1. Since the contribution of each individual value to the overall average is small, the particular form of the population distribution --- which describes how *individual* values behave --- is  not that important. What matters is what happens *on average*.
+1. If $n$ is large enough then only the mean and standard deviation of the population distribution matter in terms of the distribution of the average.  The population mean identifies "typical" values of the sample mean; the population SD identifies the size of the "typical deviation" from the typical value.  These two numbers are enough to characterize what happens "on average".  Therefore, two different population distributions with the same mean and standard deviation will give rise to the same distribution of the sample mean if the sample size is large enough.
+1.  The distribution of the averages in standardized units is the same for every population if $n$ is large enough.  So there is just one possible distribution for the averages in standard units, if $n$ is large enough.
+1. We only need to find the distribution of the average in standard units for *one* population distribution to find the approximate distribution if $n$ is large for *all* population distributions.  Consider a Normal population distribution.  Unrelated to the CLT, we know that if the population distribution is Normal *exactly* then the distribution of the average is Normal *exactly*, for any sample size.
+
+Putting it all together gives the conclusion of the CLT.
+
+Before elaborating on these steps, consider an analogy. 
+Suppose you have the following sum,
+\[
+10 + 1 + 1 + 1 + 1 + 1 + \cdots
+\]
+where you just keep adding 1's forever.  Now look at the average of the first $n$ terms:
+$$
+\frac{10 + 1 + 1 + 1 + \cdots +1}{n} = \frac{10}{n} + \frac{1}{n}+ \frac{1}{n}+ \frac{1}{n}+ \cdots + \frac{1}{n}.
+$$
+If $n$ is large each of the terms in the sum on the right in the line above is close to 0 and does not contribute significantly *by itself* to the overall average.  So even if a small fraction of the 1's were changed to 10's, for large enough $n$ these few changes do not matter in terms of the overall average; if $n$ is large the average will be very close to 1.  What wins out is that most of the terms are 1's.
+
+**Key idea 1.**
+
+The CLT is somewhat analogous to the above example.  The first key idea in why the CLT should be true is that **if there are enough independent random quantities being averaged then the contribution to the overall average of any particular quantity is small.**  This idea is what the "independent and identically distributed and finite variance" assumptions^[If the standard deviation were infinite, then there would be a relatively high probability of getting many values with *huge* magnitudes which could dominate the value of the overall average even if $n$ were large.  In the sum $10+1+1+\cdots$, imagine changing even just a few of the 1's to 1,000,000,000,000,000 --- this could have a huge influence on the resulting average.  Having the values very spread out like this (1 versus 1,000,000,000,000,000) is like having infinite standard deviation. In practice, if the standard deviation is very large (but finite) it will take a very large sample size for the CLT to kick in.] guarantee: while the $X_i's$ are not all the same (as the 1's were above), they are *statistically the same*.  First, the values are independent.  This is important because if there were dependence, then say knowing the first value is large might imply that the remaining values are also large; in this case the first value has a great deal of influence on the resulting average.  Second, the individual $X_i$ values come from the same population distribution (the identically distributed assumption).  This means the $X_i$'s all "look alike" from the average's perspective and so each term contributes about the same to the average.  Again, this is all in "statistical" terms; the idea is that $X_1$ has the same chance of being very big as $X_2$ does, as $X_3$ does, and so on.  Since there are a large number of terms, each with roughly the same contribution, the contribution of any one is small.
+
+**Key idea 2.**
+The previous paragraph explains why the independent and identically distributed assumptions imply that if there are enough terms being averaged then the contribution to the overall average of any particular term is small.  Here is the second key idea in why the CLT is true.
+**Since the contribution of each individual value to the overall average is small, the particular form of the population distribution --- which describes how *individual* values behave --- is  not that important.**  What matters is what happens *on average* (like in the above example what mattered is that most of the terms were 1's).  The two key features of the population distribution that we do need are: 1) the population mean, which determines the "typical" value of each $X_i$  (in the example, like saying "the typical value of each term is 1") and 2) the population standard deviation, which determines how much variability around the overall mean there is (in the example, knowing the standard deviation is like knowing what fraction of the 1's are replaced by 10's).  Higher order features of the distribution (like degree of symmetry or skewness, number of peaks) which describe specific features of the behavior of individual values are not important^[Where these features are important is in how large $n$ needs to be for the CLT to kick in.  The farther away the population distribution is from Normal, the larger $n$ needs to be for the Normal approximation to be a good one.] from the perspective of the average. 
+
+**Key idea 3.**
+The above reasoning suggests that **if $n$ is large enough then only the mean and standard deviation of the population distribution matter in terms of the distribution of the average**.  Thus, if two population distributions have the same mean and standard deviation then by the reasoning above they should lead to the same sampling distribution of $\Xbar$, if $n$ is large enough, even if the population distributions have different shapes.
+
+For example, suppose you roll 30 fair six-sided die and compute the average roll.  Each individual die roll comes from a discrete uniform population on the values $\{1, 2, 3, 4, 5, 6\}$ with mean $\mu=3.5$ and standard deviation  $\sigma=\sqrt{35/12}\approx 1.708$.  Now suppose you simulate 30 values from a N(3.5,$1.708$) distribution and compute the average.  The above reasoning says the distribution of the averages will be the same in either case.
+
+
+
+**Key idea 4.**
+Now the values of the averages can always be converted to standard units.  Any variable in standard units has mean 0 and standard deviation 1.  What all the above implies is that **the distribution of the averages in standard units is the same for every population if $n$ is large enough**.  So there is just one possible distribution for the averages in standard units, if $n$ is large enough.  It turns out that this one special distribution is the Standard Normal distribution.
+
+**Key idea 5.**
+Basically, if you believe the above, then you only need to show that the N(0,1) is distribution of the averages in standard units for a single population distribution.  Once you have done this, since the previous paragraph implies that there can only be one distribution for the average in standard units, then you know that it's the N(0,1) distribution for *all population distributions*.  Now imagine that your population distribution is N(0,1); i.e. the individual values follow this distribution. We have already seen that **if the population distribution is Normal *exactly* then the distribution of the average is Normal *exactly*, for any sample size.**  From this fact, it follows that if your population distribution is N(0,1) then the distribution of the average in standard units is also N(0,1).  So this shows that the special distribution is the Standard Normal.
+
+
+
