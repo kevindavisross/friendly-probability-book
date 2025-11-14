@@ -54,7 +54,7 @@ execute:
 format:
   html:
     theme: cosmo
-    embed-resources: true
+    embed-resources: false
     callout-appearance: default
     callout-icon: false
   pdf:
